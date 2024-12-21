@@ -62,6 +62,7 @@ struct UnitProperties final
 	};
 
 	static const char* getTypename(UnitProperties::Type type);
+	static const UnitProperties::Type unitTypeFromString(const std::string& strTypename);
 	const char* getTypename() const;
 
 	Type m_type;
@@ -82,6 +83,7 @@ public:
 	static int GetUnitCost(const UnitProperties::Type& type);
 	Unit(const UnitProperties::Type& type, const Player* owner);
 	bool IsLander() const noexcept;
+	bool IsFootsoldier() const noexcept;
 	bool CanLoad(UnitProperties::Type type) const noexcept;
 	void Load(Unit* pUnit);
 	int CLoadedUnits() const noexcept;

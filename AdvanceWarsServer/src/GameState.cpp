@@ -17,11 +17,7 @@ GameState::GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexc
 Result GameState::InitializeGame() noexcept {
 	MapParser parser;
 	time_point fileStartTime = std::chrono::steady_clock::now();
-	Result result = parser.TryCreateFromFile(std::filesystem::path(mapChoiceFilePath), m_arrPlayers, m_spmap);
-	if (result == Result::Failed) {
-		std::cout << "Program failed fetching map from file." << std::endl;
-		return Result::Failed;
-	}
+	IfFailedReturn(parser.TryCreateFromFile(std::filesystem::path(mapChoiceFilePath), m_arrPlayers, m_spmap));
 
 	time_point fileEndTime = std::chrono::steady_clock::now();
 	std::clog << "File load time: " << std::chrono::duration<double, std::milli>(fileEndTime - fileStartTime).count() << "\n";
@@ -402,9 +398,128 @@ Result GameState::AddIndirectAttackActions(int x, int y, const Unit& attacker, i
 	return Result::Succeeded;
 }
 
-Result GameState::DoAction() noexcept {
+Result GameState::DoAction(int x, int y, const Action& action) noexcept {
+	switch (action.m_type) {
+	default:
+		return Result::Failed;
+	case Action::Type::Attack:
+		return DoAttackAction(x, y, action);
+	case Action::Type::Buy:
+		return DoBuyAction(x, y, action);
+	case Action::Type::COPower:
+		return DoCOPowerAction(action);
+	case Action::Type::MoveAttack:
+	case Action::Type::MoveCapture:
+	case Action::Type::MoveCombine:
+	case Action::Type::MoveLoad:
+	case Action::Type::MoveWait:
+		return DoMoveAction(x, y, action);
+	case Action::Type::Repair:
+	case Action::Type::SCOPower:
+	case Action::Type::Unload:
+		return Result::Succeeded;
+	}
 	return Result::Succeeded;
 }
+
+Result GameState::DoBuyAction(int x, int y, const Action& action) {
+	MapTile* ptile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
+
+	Player* currentPlayer = &GetCurrentPlayer();
+	if (ptile->m_spPropertyInfo->m_owner != currentPlayer) {
+		return Result::Failed;
+	}
+
+	if (!action.m_optUnitType.has_value()) {
+		return Result::Failed;
+	}
+
+	UnitProperties::Type unitType = action.m_optUnitType.value();
+	int cost = Unit::GetUnitCost(unitType) * 10;
+	if (currentPlayer->m_funds > cost) {
+		currentPlayer->m_funds -= cost;
+		return ptile->TryAddUnit(unitType, currentPlayer);
+	}
+
+	return Result::Succeeded;
+}
+
+Result GameState::DoAttackAction(int x, int y, const Action& action) {
+	MapTile* pAttackerTile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pAttackerTile));
+
+	MapTile* pDefenderTile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pDefenderTile));
+
+	Unit* pattacker = pAttackerTile->TryGetUnit();
+	Unit* pdefender = pDefenderTile->TryGetUnit();
+	if (pattacker == nullptr ||
+		pattacker->m_owner != &GetCurrentPlayer() ||
+		pattacker->m_moved ||
+		pdefender == nullptr ||
+		!CanUnitAttack(*pattacker, *pdefender)) {
+		return Result::Failed;
+	}
+
+	int attackDamage = calculateDamage(*pattacker, *pdefender, pDefenderTile->GetTerrain().m_defense);
+	if (attackDamage < -1) {
+		return Result::Failed;
+	}
+
+	pdefender->health -= attackDamage;
+	attackDamage = calculateDamage(*pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
+	if (attackDamage > 0) {
+		pattacker->health -= attackDamage;
+	}
+
+	return Result::Succeeded;
+}
+
+int GameState::calculateDamage(const Unit& attacker, const Unit& defender, int defenderTerrainStars) {
+	int baseDamage = -1;
+	if (defender.IsFootsoldier()) {
+		if (attacker.m_properties.m_primaryWeapon == UnitProperties::Weapon::MachineGun) {
+			baseDamage = vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+		}
+		else if (attacker.m_properties.m_secondaryWeapon == UnitProperties::Weapon::MachineGun) {
+			baseDamage = vrgSecondaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+		}
+	}
+	else if (attacker.m_properties.m_ammo > 0) {
+		baseDamage = vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+	}
+
+	if (baseDamage == -1) {
+		return -1;
+	}
+
+	int attackValue = 100;
+	int luck = 0;
+	int badluck = 0;
+	int defenceValue = 0;
+	double damage = ((baseDamage * attackValue / 100.0) + luck - badluck) * (attacker.health / 10) / 10.0 * ((200 - (defenceValue + defenderTerrainStars * defender.health / 10)) / 100.0);
+	if (damage <= 0) {
+		return 0;
+	}
+
+	damage = std::ceil(damage * 20.0) / 20.0;
+	return std::floor(damage);
+}
+
+Result GameState::DoMoveAction(int x, int y, const Action& action) {
+	MapTile* ptile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
+
+	const Unit* punit = ptile->TryGetUnit();
+	// search to see if unit can move to location
+	return Result::Succeeded;
+}
+
+Result GameState::DoCOPowerAction(const Action& action) {
+	return Result::Succeeded;
+}
+
 Map* GameState::TryGetMap() const noexcept {
 	return m_spmap.get();
 }
@@ -441,5 +556,39 @@ void to_json(json& j, const Action& action) {
 
 	if (action.m_optUnitType.has_value()) {
 		j["unit"] = UnitProperties::getTypename(*action.m_optUnitType);
+	}
+}
+
+void from_json(json& j, Action& action) {
+	j.at("type").get_to(action.m_type);
+
+	if (j.contains("target")) {
+		std::pair<int, int> target;
+		j.at("target").get_to(target);
+		action.m_optTarget = std::move(target);
+	}
+
+	if (j.contains("unit")) {
+		std::string strUnit;
+		j.at("unit").get_to(strUnit);
+		action.m_optUnitType = UnitProperties::unitTypeFromString(strUnit);
+	}
+
+	if (j.contains("direction")) {
+		std::string strDirection;
+		j.at("direction").get_to(strDirection);
+
+		if (strDirection == "north") {
+			action.m_optDirection = Action::Direction::North;
+		}
+		else if (strDirection == "east") {
+			action.m_optDirection = Action::Direction::East;
+		}
+		else if (strDirection == "south") {
+			action.m_optDirection = Action::Direction::South;
+		}
+		else if (strDirection == "west") {
+			action.m_optDirection = Action::Direction::West;
+		}
 	}
 }

@@ -85,6 +85,7 @@ struct Action {
 		}
 	}
 
+	Action() {}
 	// Used for Indirect Attacks, Capture, Load, Combine, Wait
 	Action(Type type, int x, int y) : m_type(type), m_optTarget({ x, y }) {}
 	// Used for Move Attack
@@ -93,9 +94,15 @@ struct Action {
 	Action(Type type, Direction direction) : m_type(type), m_optDirection(direction) {}
 	// Used for Buy Actions
 	Action(Type type, UnitProperties::Type unitType) : m_type(type), m_optUnitType(unitType) {}
-	Type m_type;
+	Type m_type{ Type::Invalid };
+
+	// Where are we moving or indirectly attacking
 	std::optional<std::pair<int, int>> m_optTarget;
+
+	// Where are we repairing, unloading, attacking
 	std::optional<Direction> m_optDirection;
+
+	// Which unit are we buying
 	std::optional<UnitProperties::Type> m_optUnitType;
 };
 
@@ -119,12 +126,13 @@ public:
 	GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept;
 
 	Result InitializeGame() noexcept;
-	Result DoAction() noexcept;
+	Result DoAction(int x, int y, const Action& action) noexcept;
 	Map* TryGetMap() const noexcept;
 	const std::string& GetId() const noexcept;
 	const std::array<Player, 2>& GetPlayers() const noexcept;
 	bool IsFirstPlayerTurn() const noexcept;
 	Result GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept;
+
 private:
 	Result BeginTurn() noexcept;
 	Player& GetCurrentPlayer() noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[0] : m_arrPlayers[1]; }
@@ -134,6 +142,13 @@ private:
 	bool CanUnitAttack(const Unit& attacker, const Unit& defender) const noexcept;
 
 	MoveNode* AddNewNodeToGraph(std::vector<Action>& vecActions, std::vector<std::unique_ptr<MoveNode>>& vecMoves, MoveNode** pMoveUpdate, int movement, int fuel, int x, int y) const noexcept;
+
+	// Actions
+	Result DoAttackAction(int x, int y, const Action& action);
+	Result DoBuyAction(int x, int y, const Action& action);
+	Result DoMoveAction(int x, int y, const Action& action);
+	Result DoCOPowerAction(const Action& action);
+	int calculateDamage(const Unit& attacker, const Unit& defender, int defenderTerrainStars);
 private:
 	std::string m_guid;
 	std::unique_ptr<Map> m_spmap;
@@ -142,4 +157,5 @@ private:
 };
 
 void to_json(json& j, const GameState& gameState);
-void to_json(json& j, const Action& gameState);
+void to_json(json& j, const Action& action);
+void from_json(json& j, Action& action);

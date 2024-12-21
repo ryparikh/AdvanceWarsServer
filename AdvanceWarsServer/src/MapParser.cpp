@@ -118,10 +118,7 @@ Result MapParser::TryCreateFromFile(std::filesystem::path filePath, const std::a
 				return Result::Failed;
 			}
 
-			if (spMapTemp->TryAddTile(x, y, ToTerrainType(static_cast<TerrainFileID>(nTileId))) == Result::Failed)
-			{
-				return Result::Failed;
-			}
+			IfFailedReturn(spMapTemp->TryAddTile(x, y, ToTerrainType(static_cast<TerrainFileID>(nTileId))));
 
 			strStream.clear();
 			if (fComma)

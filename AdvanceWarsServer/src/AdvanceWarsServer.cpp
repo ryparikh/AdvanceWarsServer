@@ -40,8 +40,6 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 }
 
 /*static*/ tx_response AdvanceWarsServer::get_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body) {
-	tx_response resp(response_status::code::OK);
-	resp.add_header("Access-Control-Allow-Origin", "*");
 	int x = std::stoi(parameters.find("x")->second);
 	int y = std::stoi(parameters.find("y")->second);
 	std::string gameId = parameters.find("gameid")->second;
@@ -49,10 +47,25 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 	AdvanceWarsServer& server = AdvanceWarsServer::getInstance();
 	json j = server.get_actions(gameId, x, y);
 	response_body = j.dump();
+
+	tx_response resp(response_status::code::OK);
+	resp.add_header("Access-Control-Allow-Origin", "*");
 	return resp;
 }
 
 /*static*/ tx_response AdvanceWarsServer::put_game_action(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body) {
+	int x = std::stoi(parameters.find("x")->second);
+	int y = std::stoi(parameters.find("y")->second);
+	std::string gameId = parameters.find("gameid")->second;
+	AdvanceWarsServer& server = AdvanceWarsServer::getInstance();
+
+	Action action;
+	std::istringstream stream(data);
+	json j;
+	stream >> j;
+	from_json(j, action);
+
+	server.do_action(gameId, x, y, action);
 	tx_response resp(response_status::code::OK);
 	resp.add_header("Access-Control-Allow-Origin", "*");
 	return resp;
@@ -94,7 +107,7 @@ json AdvanceWarsServer::create_new_game(std::string guid) {
 	return j;
 }
 
-json AdvanceWarsServer::get_actions(std::string gameId, int x, int y) {
+json AdvanceWarsServer::get_actions(const std::string& gameId, int x, int y) const {
 	const auto& game = m_gameCache.find(gameId.c_str());
 	std::vector<Action> vecActions;
 	game->second->GetValidActions(x, y, vecActions);
@@ -102,4 +115,9 @@ json AdvanceWarsServer::get_actions(std::string gameId, int x, int y) {
 	json j;
 	to_json(j, vecActions);
 	return j;
+}
+
+void AdvanceWarsServer::do_action(const std::string& gameId, int x, int y, const Action& action) {
+	const auto& game = m_gameCache.find(gameId.c_str());
+	game->second->DoAction(x, y, action);
 }

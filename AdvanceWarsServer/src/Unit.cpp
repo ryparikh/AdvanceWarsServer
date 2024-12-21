@@ -74,6 +74,10 @@ bool Unit::IsLander() const noexcept {
 		m_properties.m_type == UnitProperties::Type::TCopter;
 }
 
+bool Unit::IsFootsoldier() const noexcept {
+	return m_properties.m_type == UnitProperties::Type::Infantry || m_properties.m_type == UnitProperties::Type::Mech;
+}
+
 bool IsAirUnit(UnitProperties::Type type) {
 	switch (type)
 	{
@@ -290,6 +294,82 @@ Unit* Unit::Unload(int i) {
 		return "";
 	}
 
+}
+
+/*static*/ const UnitProperties::Type UnitProperties::unitTypeFromString(const std::string& strTypename) {
+	if (strTypename == "antiair") {
+		return UnitProperties::Type::AntiAir;
+	} else if (strTypename == "apc") {
+		return UnitProperties::Type::Apc;
+	} else if (strTypename == "artillery") {
+		return UnitProperties::Type::Artillery;
+	} else if (strTypename == "bcopter") {
+		return UnitProperties::Type::BCopter;
+	} else if (strTypename == "battleship") {
+		return UnitProperties::Type::Battleship;
+	}
+	else if (strTypename == "blackboat") {
+		return UnitProperties::Type::BlackBoat;
+	}
+	else if (strTypename == "blackbomb") {
+		return UnitProperties::Type::BlackBomb;
+	}
+	else if (strTypename == "bomber") {
+		return UnitProperties::Type::Bomber;
+	}
+	else if (strTypename == "carrier") {
+		return UnitProperties::Type::Carrier;
+	}
+	else if (strTypename == "crusier") {
+		return UnitProperties::Type::Crusier;
+	}
+	else if (strTypename == "fighter") {
+		return UnitProperties::Type::Fighter;
+	}
+	else if (strTypename == "infantry") {
+		return UnitProperties::Type::Infantry;
+	}
+	else if (strTypename == "lander") {
+		return UnitProperties::Type::Lander;
+	}
+	else if (strTypename == "medium-tank") {
+		return UnitProperties::Type::MediumTank;
+	}
+	else if (strTypename == "mech") {
+		return UnitProperties::Type::Mech;
+	}
+	else if (strTypename == "megatank") {
+		return UnitProperties::Type::MegaTank;
+	}
+	else if (strTypename == "missile") {
+		return UnitProperties::Type::Missile;
+	}
+	else if (strTypename == "neotank") {
+		return UnitProperties::Type::Neotank;
+	}
+	else if (strTypename == "piperunner") {
+		return UnitProperties::Type::Piperunner;
+	}
+	else if (strTypename == "recon") {
+		return UnitProperties::Type::Recon;
+	}
+	else if (strTypename == "rocket") {
+		return UnitProperties::Type::Rocket;
+	}
+	else if (strTypename == "stealth") {
+		return UnitProperties::Type::Stealth;
+	}
+	else if (strTypename == "sub") {
+		return UnitProperties::Type::Sub;
+	}
+	else if (strTypename == "tcopter") {
+		return UnitProperties::Type::TCopter;
+	}
+	else if (strTypename == "tank") {
+		return UnitProperties::Type::Tank;
+	}
+
+	return UnitProperties::Type::Invalid;
 }
 
 const char* UnitProperties::getTypename() const {

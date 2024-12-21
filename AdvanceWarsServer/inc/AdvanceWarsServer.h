@@ -41,7 +41,8 @@ public:
 	static tx_response get_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
 
 	json create_new_game(std::string guid);
-	json get_actions(std::string gamdId, int x, int y);
+	json get_actions(const std::string& gamdId, int x, int y) const;
+	void do_action(const std::string& gamdId, int x, int y, const Action& action);
 private:
 	static std::unique_ptr<AdvanceWarsServer> s_spServer;
 	asio::io_context m_io_context;

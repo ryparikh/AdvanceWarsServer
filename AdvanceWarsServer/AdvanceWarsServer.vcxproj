@@ -75,12 +75,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\deps\json-develop\single_include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\deps\json-develop\single_include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -104,12 +106,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -140,18 +145,61 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AdvanceWarsServer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\AdvanceWarsServer.cpp" />
+    <ClCompile Include="src\CommandingOfficier.cpp" />
+    <ClCompile Include="src\GameState.cpp" />
+    <ClCompile Include="src\Map.cpp" />
+    <ClCompile Include="src\MapParser.cpp" />
+    <ClCompile Include="src\MapTile.cpp" />
+    <ClCompile Include="src\MapView.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\TerrainInfo.cpp" />
+    <ClCompile Include="src\Unit.cpp" />
+    <ClCompile Include="src\UnitInfo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\asio-1.30.2\asio-1.30.2\include\asio.hpp" />
+    <ClInclude Include="D:\Projects\via-httplib-main\via-httplib-main\include\via\comms\tcp_adaptor.hpp" />
+    <ClInclude Include="D:\Projects\via-httplib-main\via-httplib-main\include\via\http\request_router.hpp" />
+    <ClInclude Include="D:\Projects\via-httplib-main\via-httplib-main\include\via\http_server.hpp" />
+    <ClInclude Include="deps\json-develop\single_include\nlohmann\json.hpp" />
+    <ClInclude Include="inc\AdvanceWarsServer.h" />
+    <ClInclude Include="inc\CommandingOfficier.h" />
+    <ClInclude Include="inc\GameState.h" />
+    <ClInclude Include="inc\Map.h" />
+    <ClInclude Include="inc\MapParser.h" />
+    <ClInclude Include="inc\MapTile.h" />
+    <ClInclude Include="inc\MapView.h" />
+    <ClInclude Include="inc\MovementTypes.h" />
+    <ClInclude Include="inc\Player.h" />
+    <ClInclude Include="inc\Result.h" />
+    <ClInclude Include="inc\Terrain.h" />
+    <ClInclude Include="inc\TerrainFileId.h" />
+    <ClInclude Include="inc\TerrainInfo.h" />
+    <ClInclude Include="inc\Unit.h" />
+    <ClInclude Include="inc\UnitInfo.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\AWBW\MapSources\From_Wharf_To_Wilds.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AdvanceWarsServer.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

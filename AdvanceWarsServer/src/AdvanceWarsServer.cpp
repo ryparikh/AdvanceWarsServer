@@ -53,7 +53,7 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 	return resp;
 }
 
-/*static*/ tx_response AdvanceWarsServer::put_game_action(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body) {
+/*static*/ tx_response AdvanceWarsServer::post_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body) {
 	int x = std::stoi(parameters.find("x")->second);
 	int y = std::stoi(parameters.find("y")->second);
 	std::string gameId = parameters.find("gameid")->second;
@@ -65,7 +65,8 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 	stream >> j;
 	from_json(j, action);
 
-	server.do_action(gameId, x, y, action);
+	const json jsonResponseBody = server.do_action(gameId, x, y, action);
+	response_body = jsonResponseBody.dump();
 	tx_response resp(response_status::code::OK);
 	resp.add_header("Access-Control-Allow-Origin", "*");
 	return resp;
@@ -79,6 +80,7 @@ AdvanceWarsServer::AdvanceWarsServer() :
 	std::cout << app_name << ": " << port_number << std::endl;
 	m_http_server.request_router().add_method("POST", "/games", &AdvanceWarsServer::post_games_handler);
 	m_http_server.request_router().add_method("GET", "/actions/:gameid/:x/:y", &AdvanceWarsServer::get_game_actions);
+	m_http_server.request_router().add_method("POST", "/actions/:gameid/:x/:y", &AdvanceWarsServer::post_game_actions);
 	//m_http_server.request_router().add_method("GET", "/actions/:gameid", &AdvanceWarsServer::get_valid_game_actions);
 }
 
@@ -97,7 +99,7 @@ int AdvanceWarsServer::run() {
 
 json AdvanceWarsServer::create_new_game(std::string guid) {
 	Player player1(CommandingOfficier::Type::Andy, Player::ArmyType::OrangeStar);
-	Player player2(CommandingOfficier::Type::Andy, Player::ArmyType::BlueMoon);
+	Player player2(CommandingOfficier::Type::Adder, Player::ArmyType::BlueMoon);
 	std::array<Player, 2> arrPlayers{ std::move(player1), std::move(player2) };
 	GameState* gameState = new GameState(guid, std::move(arrPlayers));
 	gameState->InitializeGame();
@@ -118,7 +120,14 @@ json AdvanceWarsServer::get_actions(const std::string& gameId, int x, int y) con
 	return j;
 }
 
-void AdvanceWarsServer::do_action(const std::string& gameId, int x, int y, const Action& action) {
+json AdvanceWarsServer::do_action(const std::string& gameId, int x, int y, const Action& action) {
 	const auto& game = m_gameCache.find(gameId.c_str());
 	game->second->DoAction(x, y, action);
+	if (!game->second->AnyValidActions()) {
+		game->second->EndTurn();
+	}
+
+	json j;
+	to_json(j, *game->second);
+	return j;
 }

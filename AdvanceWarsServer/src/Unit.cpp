@@ -66,9 +66,7 @@ Unit::Unit(const UnitProperties::Type& type, const Player* owner): m_owner(owner
 
 
 bool Unit::IsVehicle() const noexcept {
-	return m_properties.m_movementType == MovementTypes::Pipe ||
-		m_properties.m_movementType == MovementTypes::Tires ||
-		m_properties.m_movementType == MovementTypes::Treads;
+	return UnitProperties::IsVehicle(m_properties.m_type);
 }
 
 bool Unit::IsTransport() const noexcept {
@@ -81,124 +79,117 @@ bool Unit::IsTransport() const noexcept {
 }
 
 bool Unit::IsFootsoldier() const noexcept {
-	return m_properties.m_type == UnitProperties::Type::Infantry || m_properties.m_type == UnitProperties::Type::Mech;
+	return UnitProperties::IsFootsoldier(m_properties.m_type);
 }
 
-bool IsAirUnit(UnitProperties::Type type) {
-	switch (type)
-	{
-	case UnitProperties::Type::AntiAir:
+/*static*/ bool UnitProperties::IsFootsoldier(const UnitProperties::Type& type) noexcept {
+	return type == UnitProperties::Type::Infantry || type == UnitProperties::Type::Mech;
+}
+
+/*static*/ bool UnitProperties::IsSeaUnit(const UnitProperties::Type& type) noexcept {
+	switch (type) {
+	default:
 		return false;
-	case UnitProperties::Type::Apc:
-		return false;
-	case UnitProperties::Type::Artillery:
-		return false;
-	case UnitProperties::Type::BCopter:
-		return true;
 	case UnitProperties::Type::Battleship:
-		return false;
 	case UnitProperties::Type::BlackBoat:
-		return false;
-	case UnitProperties::Type::BlackBomb:
-		return true;
-	case UnitProperties::Type::Bomber:
-		return true;
 	case UnitProperties::Type::Carrier:
-		return false;
 	case UnitProperties::Type::Crusier:
-		return false;
-	case UnitProperties::Type::Fighter:
-		return true;
-	case UnitProperties::Type::Infantry:
-		return false;
 	case UnitProperties::Type::Lander:
-		return false;
-	case UnitProperties::Type::MediumTank:
-		return false;
-	case UnitProperties::Type::Mech:
-		return false;
-	case UnitProperties::Type::MegaTank:
-		return false;
-	case UnitProperties::Type::Missile:
-		return false;
-	case UnitProperties::Type::Neotank:
-		return false;
-	case UnitProperties::Type::Piperunner:
-		return false;
-	case UnitProperties::Type::Recon:
-		return false;
-	case UnitProperties::Type::Rocket:
-		return false;
-	case UnitProperties::Type::Stealth:
-		return true;
 	case UnitProperties::Type::Sub:
-		return false;
-	case UnitProperties::Type::TCopter:
 		return true;
-	case UnitProperties::Type::Tank:
-		return false;
 	}
-
-	return false;
 }
 
-bool IsGroundUnit(UnitProperties::Type type) {
-	switch (type)
-	{
+/*static*/ bool UnitProperties::IsVehicle(const UnitProperties::Type& type) noexcept {
+	switch (type) {
+	default:
+		return false;
 	case UnitProperties::Type::AntiAir:
-		return true;
 	case UnitProperties::Type::Apc:
-		return true;
 	case UnitProperties::Type::Artillery:
-		return true;
-	case UnitProperties::Type::BCopter:
-		return false;
-	case UnitProperties::Type::Battleship:
-		return false;
-	case UnitProperties::Type::BlackBoat:
-		return false;
-	case UnitProperties::Type::BlackBomb:
-		return false;
-	case UnitProperties::Type::Bomber:
-		return false;
-	case UnitProperties::Type::Carrier:
-		return false;
-	case UnitProperties::Type::Crusier:
-		return false;
-	case UnitProperties::Type::Fighter:
-		return false;
-	case UnitProperties::Type::Infantry:
-		return true;
-	case UnitProperties::Type::Lander:
-		return false;
 	case UnitProperties::Type::MediumTank:
-		return true;
-	case UnitProperties::Type::Mech:
-		return true;
 	case UnitProperties::Type::MegaTank:
-		return true;
 	case UnitProperties::Type::Missile:
-		return true;
 	case UnitProperties::Type::Neotank:
-		return true;
 	case UnitProperties::Type::Piperunner:
-		return true;
 	case UnitProperties::Type::Recon:
-		return true;
 	case UnitProperties::Type::Rocket:
-		return true;
-	case UnitProperties::Type::Stealth:
-		return false;
-	case UnitProperties::Type::Sub:
-		return false;
-	case UnitProperties::Type::TCopter:
-		return false;
 	case UnitProperties::Type::Tank:
 		return true;
 	}
+}
 
-	return false;
+/*static*/ bool UnitProperties::IsDirectAttack(const UnitProperties::Type& type) noexcept {
+	switch (type) {
+	default:
+		return false;
+	case UnitProperties::Type::AntiAir:
+	case UnitProperties::Type::BCopter:
+	case UnitProperties::Type::Bomber:
+	case UnitProperties::Type::Crusier:
+	case UnitProperties::Type::Fighter:
+	case UnitProperties::Type::Infantry:
+	case UnitProperties::Type::Mech:
+	case UnitProperties::Type::MediumTank:
+	case UnitProperties::Type::MegaTank:
+	case UnitProperties::Type::Neotank:
+	case UnitProperties::Type::Recon:
+	case UnitProperties::Type::Stealth:
+	case UnitProperties::Type::Sub:
+	case UnitProperties::Type::Tank:
+		return true;
+	}
+}
 
+/*static*/ bool UnitProperties::IsIndirectAttack(const UnitProperties::Type& type) noexcept {
+	switch (type) {
+	default:
+		return false;
+	case UnitProperties::Type::Artillery:
+	case UnitProperties::Type::Battleship:
+	case UnitProperties::Type::Carrier:
+	case UnitProperties::Type::Missile:
+	case UnitProperties::Type::Piperunner:
+	case UnitProperties::Type::Rocket:
+		return true;
+	}
+}
+
+/*static*/ bool UnitProperties::IsAirUnit(const UnitProperties::Type& type) noexcept {
+	switch (type)
+	{
+	default:
+		return false;
+	case UnitProperties::Type::BCopter:
+	case UnitProperties::Type::BlackBomb:
+	case UnitProperties::Type::Bomber:
+	case UnitProperties::Type::Fighter:
+	case UnitProperties::Type::Stealth:
+	case UnitProperties::Type::TCopter:
+		return true;
+	}
+}
+
+/*static*/ bool UnitProperties::IsGroundUnit(const UnitProperties::Type& type) noexcept {
+	switch (type)
+	{
+	default:
+		return false;
+	case UnitProperties::Type::AntiAir:
+	case UnitProperties::Type::Apc:
+	case UnitProperties::Type::Artillery:
+	case UnitProperties::Type::Infantry:
+	case UnitProperties::Type::MediumTank:
+	case UnitProperties::Type::Mech:
+	case UnitProperties::Type::MegaTank:
+	case UnitProperties::Type::Missile:
+	case UnitProperties::Type::Neotank:
+	case UnitProperties::Type::Piperunner:
+	case UnitProperties::Type::Recon:
+	case UnitProperties::Type::Rocket:
+	case UnitProperties::Type::Tank:
+		return true;
+	}
 }
 
 bool Unit::CanLoad(UnitProperties::Type type) const noexcept {
@@ -213,11 +204,11 @@ bool Unit::CanLoad(UnitProperties::Type type) const noexcept {
 	}
 
 	if (m_properties.m_type == UnitProperties::Type::Crusier || m_properties.m_type == UnitProperties::Type::Carrier) {
-		unitTypeIsOk = ::IsAirUnit(type);
+		unitTypeIsOk = UnitProperties::IsAirUnit(type);
 	}
 
 	if (m_properties.m_type == UnitProperties::Type::Lander) {
-		unitTypeIsOk = IsGroundUnit(type);
+		unitTypeIsOk = UnitProperties::IsGroundUnit(type);
 	}
 
 	return unitTypeIsOk && (m_vecLanderUnits.size() < (2U));
@@ -302,16 +293,11 @@ Unit* Unit::Unload(int i) {
 }
 
 bool Unit::IsAirUnit() const noexcept {
-	return ::IsAirUnit(m_properties.m_type);
+	return UnitProperties::IsAirUnit(m_properties.m_type);
 }
 
 bool Unit::IsSeaUnit() const noexcept {
-	return m_properties.m_type == UnitProperties::Type::Battleship ||
-		m_properties.m_type == UnitProperties::Type::BlackBoat ||
-		m_properties.m_type == UnitProperties::Type::Carrier ||
-		m_properties.m_type == UnitProperties::Type::Crusier ||
-		m_properties.m_type == UnitProperties::Type::Lander ||
-		m_properties.m_type == UnitProperties::Type::Sub;
+	return UnitProperties::IsSeaUnit(m_properties.m_type);
 }
 
 bool Unit::IsHidden() const noexcept {

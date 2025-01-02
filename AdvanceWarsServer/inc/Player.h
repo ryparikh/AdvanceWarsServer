@@ -12,6 +12,10 @@ public:
 	int PowerStatus() const {
 		return m_powerStatus;
 	}
+	void SetPowerStatus(int status) {
+		m_powerStatus = status;
+	}
+
 	int m_funds{ 0 };
 	CommandingOfficier m_co{ CommandingOfficier::Type::Invalid };
 	// This indexes into the damage charts during damage calculations

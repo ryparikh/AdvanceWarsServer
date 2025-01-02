@@ -6,6 +6,8 @@ using json = nlohmann::json;
 
 
 // TODO: CO Power bonuses
+// CO Ready for Play:
+// Adder, Andy
 struct CommandingOfficier {
 	enum class Type {
 		Invalid = -1,

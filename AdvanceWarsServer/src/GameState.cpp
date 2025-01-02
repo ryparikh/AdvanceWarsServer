@@ -24,20 +24,22 @@ Result GameState::InitializeGame() noexcept {
 	std::clog << "File load time: " << std::chrono::duration<double, std::milli>(fileEndTime - fileStartTime).count() << "\n";
 
 	// Headquarters
-	m_spmap->Capture(7, 13, &GetPlayers()[0]);
-	m_spmap->Capture(6, 5, &GetPlayers()[1]);
+	m_spmap->Capture(6, 5, &GetPlayers()[0]);
+	m_spmap->Capture(7, 13, &GetPlayers()[1]);
 	// Bases
-	m_spmap->Capture(11, 10, &GetPlayers()[0]);
-	m_spmap->Capture(12, 15, &GetPlayers()[0]);
-	m_spmap->Capture(5, 0, &GetPlayers()[1]);
-	m_spmap->Capture(10, 2, &GetPlayers()[1]);
-	m_spmap->TryAddUnit(7, 13, UnitProperties::Type::Infantry, &GetPlayers()[0]);
-	m_spmap->TryAddUnit(6, 13, UnitProperties::Type::Infantry, &GetPlayers()[1]);
-	m_spmap->TryAddUnit(1, 2, UnitProperties::Type::Artillery, &GetPlayers()[0]);
-	m_spmap->TryAddUnit(1, 4, UnitProperties::Type::Infantry, &GetPlayers()[0]);
-	m_spmap->TryAddUnit(1, 5, UnitProperties::Type::Infantry, &GetPlayers()[1]);
+	m_spmap->Capture(5, 0, &GetPlayers()[0]);
+	m_spmap->Capture(10, 2, &GetPlayers()[0]);
+	m_spmap->Capture(11, 10, &GetPlayers()[1]);
+	m_spmap->Capture(12, 15, &GetPlayers()[1]);
+	m_spmap->TryAddUnit(7, 13, UnitProperties::Type::Infantry, &GetPlayers()[1]);
 
 	BeginTurn();
+	return Result::Succeeded;
+}
+
+Result GameState::EndTurn() noexcept {
+	m_isFirstPlayerTurn = !m_isFirstPlayerTurn;
+	IfFailedReturn(BeginTurn());
 	return Result::Succeeded;
 }
 
@@ -294,6 +296,10 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 
 	// If current player unit, moves
 	if (pUnit != nullptr) {
+		if (pUnit->m_owner != &GetCurrentPlayer()) {
+			return Result::Succeeded;
+		}
+
 		int cLoadedUnits = pUnit->CLoadedUnits();
 		if (pUnit->IsTransport() && cLoadedUnits > 0) {
 			for (int i = 0; i < cLoadedUnits; ++i) {
@@ -379,32 +385,20 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 
 				// Direct combat actions
 				if (attackRange.first == 1) {
-					// north
-					// TODO: Refactor
-					MapTile* pAttackTile = nullptr;
-					m_spmap->TryGetTile(xCurr, yCurr - 1, &pAttackTile);
-					const Unit* pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
-						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::North, xCurr, yCurr);
-					}
-					// east
-					m_spmap->TryGetTile(xCurr + 1, yCurr, &pAttackTile);
-					pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
-						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::East, xCurr, yCurr);
-					}
-					// south
-					m_spmap->TryGetTile(xCurr, yCurr + 1, &pAttackTile);
-					pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
-						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::South, xCurr, yCurr);
-					}
-					// west
-					m_spmap->TryGetTile(xCurr - 1, yCurr, &pAttackTile);
-					pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
-						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::West, xCurr, yCurr);
-					}
+					auto checkAttack = [&](int xAtt, int yAtt, Action::Direction direction) {
+						MapTile* pAttackTile = nullptr;
+						if (m_spmap->TryGetTile(xAtt, yAtt, &pAttackTile) == Result::Succeeded) {
+							const Unit* pAttackUnit = pAttackTile->TryGetUnit();
+							if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
+								vecActions.emplace_back(Action::Type::MoveAttack, direction, xCurr, yCurr);
+							}
+						}
+					};
+
+					checkAttack(xCurr, yCurr - 1, Action::Direction::North);
+					checkAttack(xCurr + 1, yCurr, Action::Direction::East);
+					checkAttack(xCurr, yCurr + 1, Action::Direction::South);
+					checkAttack(xCurr + 1, yCurr, Action::Direction::West);
 				}
 				// Indirect combat can only happen from the same square
 				else if (attackRange.first > 1 && x == xCurr && y == yCurr) {
@@ -468,6 +462,10 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 		return Result::Succeeded;
 	}
 	else {
+		if (MapTile::IsProperty(pmaptile->m_terrain.m_type) && pmaptile->m_spPropertyInfo->m_owner != &GetCurrentPlayer()) {
+			return Result::Succeeded;
+		}
+
 		switch (terrain.m_type) {
 		case Terrain::Type::Airport:
 			for (auto unit : vrgUnits) {
@@ -527,6 +525,20 @@ Result GameState::AddIndirectAttackActions(int x, int y, const Unit& attacker, i
 	return Result::Succeeded;
 }
 
+bool GameState::AnyValidActions() const noexcept {
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			std::vector<Action> vecActions;
+			GetValidActions(x, y, vecActions);
+			if (vecActions.size() > 0) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 Result GameState::DoAction(int x, int y, const Action& action) noexcept {
 	switch (action.m_type) {
 	default:
@@ -536,7 +548,7 @@ Result GameState::DoAction(int x, int y, const Action& action) noexcept {
 	case Action::Type::Buy:
 		return DoBuyAction(x, y, action);
 	case Action::Type::COPower:
-		return DoCOPowerAction(action);
+		return DoCOPowerAction();
 	case Action::Type::MoveAttack:
 	case Action::Type::MoveCapture:
 	case Action::Type::MoveCombine:
@@ -545,6 +557,7 @@ Result GameState::DoAction(int x, int y, const Action& action) noexcept {
 		return DoMoveAction(x, y, action);
 	case Action::Type::Repair:
 	case Action::Type::SCOPower:
+		return DoSCOPowerAction();
 	case Action::Type::Unload:
 		return Result::Succeeded;
 	}
@@ -554,6 +567,10 @@ Result GameState::DoAction(int x, int y, const Action& action) noexcept {
 Result GameState::DoBuyAction(int x, int y, const Action& action) {
 	MapTile* ptile = nullptr;
 	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
+
+	if (ptile->TryGetUnit() != nullptr) {
+		return Result::Failed;
+	}
 
 	Player* currentPlayer = &GetCurrentPlayer();
 	if (ptile->m_spPropertyInfo->m_owner != currentPlayer) {
@@ -565,10 +582,19 @@ Result GameState::DoBuyAction(int x, int y, const Action& action) {
 	}
 
 	UnitProperties::Type unitType = action.m_optUnitType.value();
+
+	if ((ptile->GetTerrain().m_type == Terrain::Type::Airport && !UnitProperties::IsAirUnit(unitType)) ||
+		(ptile->GetTerrain().m_type == Terrain::Type::Base && !UnitProperties::IsGroundUnit(unitType)) ||
+		(ptile->GetTerrain().m_type == Terrain::Type::Port && !UnitProperties::IsSeaUnit(unitType))) {
+		return Result::Failed;
+	}
+
 	int cost = Unit::GetUnitCost(unitType) * 10;
-	if (currentPlayer->m_funds > cost) {
+	if (currentPlayer->m_funds >= cost) {
 		currentPlayer->m_funds -= cost;
-		return ptile->TryAddUnit(unitType, currentPlayer);
+		IfFailedReturn(ptile->TryAddUnit(unitType, currentPlayer));
+		Unit* punit = ptile->TryGetUnit();
+		punit->m_moved = true;
 	}
 
 	return Result::Succeeded;
@@ -753,7 +779,37 @@ Result GameState::DoMoveAction(int x, int y, const Action& action) {
 	return Result::Succeeded;
 }
 
-Result GameState::DoCOPowerAction(const Action& action) {
+void GameState::HealUnits(int health) {
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			Unit* punit = pTile->TryGetUnit();
+			punit->health = (punit->health + health * 10) / 10 * 10;
+			punit->health = std::max(punit->health, 100);
+		}
+	}
+}
+
+Result GameState::DoCOPowerAction() {
+	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
+	GetCurrentPlayer().SetPowerStatus(1);
+	switch (type) {
+		case CommandingOfficier::Type::Andy:
+			HealUnits(2);
+			return Result::Succeeded;
+	}
+	return Result::Succeeded;
+}
+
+Result GameState::DoSCOPowerAction() {
+	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
+	GetCurrentPlayer().SetPowerStatus(2);
+	switch (type) {
+		case CommandingOfficier::Type::Andy:
+			HealUnits(5);
+			return Result::Succeeded;
+	}
 	return Result::Succeeded;
 }
 
@@ -796,8 +852,16 @@ void to_json(json& j, const Action& action) {
 	}
 }
 
+/*static*/ Action::Type Action::fromTypeString(std::string strType) {
+	if (strType == "buy") {
+		return Action::Type::Buy;
+	}
+}
+
 void from_json(json& j, Action& action) {
-	j.at("type").get_to(action.m_type);
+	std::string strType;
+	j.at("type").get_to(strType);
+	action.m_type = Action::fromTypeString(strType);
 
 	if (j.contains("target")) {
 		std::pair<int, int> target;

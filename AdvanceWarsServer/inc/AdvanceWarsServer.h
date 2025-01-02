@@ -37,13 +37,13 @@ public:
 
 	static AdvanceWarsServer& getInstance();
 	static tx_response post_games_handler(const http_request& request, const Parameters& parameters, const std::string& data, std::string& response_body);
-	static tx_response put_game_action(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
+	static tx_response post_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
 	static tx_response get_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
 //	static tx_response get_valid_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
 
 	json create_new_game(std::string guid);
 	json get_actions(const std::string& gameId, int x, int y) const;
-	void do_action(const std::string& gameId, int x, int y, const Action& action);
+	json do_action(const std::string& gameId, int x, int y, const Action& action);
 private:
 	static std::unique_ptr<AdvanceWarsServer> s_spServer;
 	asio::io_context m_io_context;

@@ -85,6 +85,8 @@ struct Action {
 		}
 	}
 
+	static Type fromTypeString(std::string strType);
+
 	Action() {}
 	// Used for Indirect Attacks, Capture, Load, Combine, Wait
 	Action(Type type, int x, int y) : m_type(type), m_optTarget({ x, y }) {}
@@ -132,6 +134,8 @@ public:
 	const std::array<Player, 2>& GetPlayers() const noexcept;
 	bool IsFirstPlayerTurn() const noexcept;
 	Result GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept;
+	bool AnyValidActions() const noexcept;
+	Result EndTurn() noexcept;
 
 private:
 	Result BeginTurn() noexcept;
@@ -150,12 +154,14 @@ private:
 	Result DoAttackAction(int x, int y, const Action& action);
 	Result DoBuyAction(int x, int y, const Action& action);
 	Result DoMoveAction(int x, int y, const Action& action);
-	Result DoCOPowerAction(const Action& action);
+	Result DoCOPowerAction();
+	Result DoSCOPowerAction();
 	int calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars);
 
 	int GetMaxGoodLuck(const Player& player) noexcept;
 	int GetMaxBadLuck(const Player& player) noexcept;
 	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
+	void HealUnits(int health);
 private:
 	std::string m_guid;
 	std::unique_ptr<Map> m_spmap;

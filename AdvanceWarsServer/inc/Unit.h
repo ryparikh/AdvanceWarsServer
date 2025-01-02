@@ -63,6 +63,13 @@ struct UnitProperties final
 
 	static const char* getTypename(UnitProperties::Type type);
 	static const UnitProperties::Type unitTypeFromString(const std::string& strTypename);
+	static bool IsGroundUnit(const UnitProperties::Type& type) noexcept;
+	static bool IsAirUnit(const UnitProperties::Type& type) noexcept;
+	static bool IsSeaUnit(const UnitProperties::Type& type) noexcept;
+	static bool IsVehicle(const UnitProperties::Type& type) noexcept;
+	static bool IsDirectAttack(const UnitProperties::Type& type) noexcept;
+	static bool IsIndirectAttack(const UnitProperties::Type& type) noexcept;
+	static bool IsFootsoldier(const UnitProperties::Type& type) noexcept;
 	const char* getTypename() const;
 
 	Type m_type;

@@ -9,8 +9,13 @@ public:
 	};
 
 	Player(CommandingOfficier::Type type, ArmyType army) : m_co{ type }, m_armyType(army) {}
+	int PowerStatus() const {
+		return m_powerStatus;
+	}
 	int m_funds{ 0 };
 	CommandingOfficier m_co{ CommandingOfficier::Type::Invalid };
+	// This indexes into the damage charts during damage calculations
+	int m_powerStatus{ 0 };
 	ArmyType m_armyType{ ArmyType::Invalid };
 	std::string getArmyTypeJson() const;
 };

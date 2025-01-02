@@ -65,7 +65,13 @@ Unit::Unit(const UnitProperties::Type& type, const Player* owner): m_owner(owner
 }
 
 
-bool Unit::IsLander() const noexcept {
+bool Unit::IsVehicle() const noexcept {
+	return m_properties.m_movementType == MovementTypes::Pipe ||
+		m_properties.m_movementType == MovementTypes::Tires ||
+		m_properties.m_movementType == MovementTypes::Treads;
+}
+
+bool Unit::IsTransport() const noexcept {
 	return m_properties.m_type == UnitProperties::Type::Apc ||
 		m_properties.m_type == UnitProperties::Type::BlackBoat ||
 		m_properties.m_type == UnitProperties::Type::Crusier ||
@@ -207,7 +213,7 @@ bool Unit::CanLoad(UnitProperties::Type type) const noexcept {
 	}
 
 	if (m_properties.m_type == UnitProperties::Type::Crusier || m_properties.m_type == UnitProperties::Type::Carrier) {
-		unitTypeIsOk = IsAirUnit(type);
+		unitTypeIsOk = ::IsAirUnit(type);
 	}
 
 	if (m_properties.m_type == UnitProperties::Type::Lander) {
@@ -293,7 +299,23 @@ Unit* Unit::Unload(int i) {
 	default:
 		return "";
 	}
+}
 
+bool Unit::IsAirUnit() const noexcept {
+	return ::IsAirUnit(m_properties.m_type);
+}
+
+bool Unit::IsSeaUnit() const noexcept {
+	return m_properties.m_type == UnitProperties::Type::Battleship ||
+		m_properties.m_type == UnitProperties::Type::BlackBoat ||
+		m_properties.m_type == UnitProperties::Type::Carrier ||
+		m_properties.m_type == UnitProperties::Type::Crusier ||
+		m_properties.m_type == UnitProperties::Type::Lander ||
+		m_properties.m_type == UnitProperties::Type::Sub;
+}
+
+bool Unit::IsHidden() const noexcept {
+	return m_hidden;
 }
 
 /*static*/ const UnitProperties::Type UnitProperties::unitTypeFromString(const std::string& strTypename) {

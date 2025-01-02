@@ -10,15 +10,12 @@
 		type == Terrain::Type::Port;
 }
 
-MapTile::MapTile(const Terrain& terrain)
-	: m_terrain(terrain) {
+MapTile::MapTile(const Terrain& terrain, int nFileID) :
+	m_terrain(terrain),
+	m_nFileID(nFileID) {
 	if (IsProperty(terrain.m_type)) {
 		m_spPropertyInfo.reset(new PropertyInfo());
 	}
-}
-
-MapTile::MapTile(Terrain&& terrain)
-	: m_terrain(std::move(terrain)) {
 }
 
 Result MapTile::Capture(const Player* owner) {
@@ -48,7 +45,13 @@ Unit* MapTile::TryGetUnit() noexcept {
 	return m_spUnit.get();
 }
 
-TerrainFileID toTerrainFileId(const Terrain::Type& type, const PropertyInfo* pproperty) {
+Result MapTile::TryDestroyUnit() noexcept {
+	m_spUnit.reset();
+	return Result::Succeeded;
+}
+
+TerrainFileID toTerrainFileId(const MapTile& maptile, const PropertyInfo* pproperty) {
+	const Terrain::Type& type = maptile.m_terrain.m_type;
 	if (MapTile::IsProperty(type) && pproperty == nullptr) {
 		throw;
 	}
@@ -80,8 +83,6 @@ TerrainFileID toTerrainFileId(const Terrain::Type& type, const PropertyInfo* ppr
 		case Player::ArmyType::Invalid:
 			throw;
 		}
-	case Terrain::Type::Bridge:
-		return TerrainFileID::HBridge;
 	case Terrain::Type::City:
 		if (pproperty->m_owner == nullptr) {
 			return TerrainFileID::NeutralCity;
@@ -107,8 +108,6 @@ TerrainFileID toTerrainFileId(const Terrain::Type& type, const PropertyInfo* ppr
 		case Player::ArmyType::Invalid:
 			throw;
 		}
-	case Terrain::Type::Forest:
-		return TerrainFileID::Forest;
 	case Terrain::Type::Headquarters:
 		switch (pproperty->m_owner->m_armyType) {
 		case Player::ArmyType::BlueMoon:
@@ -130,14 +129,6 @@ TerrainFileID toTerrainFileId(const Terrain::Type& type, const PropertyInfo* ppr
 		case Player::ArmyType::Invalid:
 			throw;
 		}
-	case Terrain::Type::Mountain:
-		return TerrainFileID::Mountain;
-	case Terrain::Type::MissleSilo:
-		return TerrainFileID::MissileSiloEmpty;
-	case Terrain::Type::Pipe:
-		return TerrainFileID::VPipe;
-	case Terrain::Type::Plain:
-		return TerrainFileID::Plain;
 	case Terrain::Type::Port:
 		if (pproperty->m_owner == nullptr) {
 			return TerrainFileID::NeutralPort;
@@ -150,24 +141,14 @@ TerrainFileID toTerrainFileId(const Terrain::Type& type, const PropertyInfo* ppr
 		case Player::ArmyType::Invalid:
 			throw;
 		}
-	case Terrain::Type::Reef:
-		return TerrainFileID::Reef;
-	case Terrain::Type::River:
-		return TerrainFileID::HRiver;
-	case Terrain::Type::Road:
-		return TerrainFileID::HRoad;
-	case Terrain::Type::Sea:
-		return TerrainFileID::Sea;
-	case Terrain::Type::Shoal:
-		return TerrainFileID::HShoal;
+	default:
+		return static_cast<TerrainFileID>(maptile.m_nFileID);
 	}
-
-	return TerrainFileID::Invalid;
 }
 
 
 void to_json(json& j, const MapTile& maptile) {
-	j = { {"terrain", toTerrainFileId(maptile.m_terrain.m_type, maptile.m_spPropertyInfo.get())} };
+	j = { {"terrain", toTerrainFileId(maptile, maptile.m_spPropertyInfo.get())} };
 
 	if (maptile.m_spUnit) {
 		j["unit"] = *maptile.m_spUnit;

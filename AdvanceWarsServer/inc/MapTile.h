@@ -13,8 +13,7 @@ struct PropertyInfo{
 class MapTile final
 {
 public:
-	MapTile(const Terrain& terrain);
-	MapTile(Terrain&& terrain);
+	MapTile(const Terrain& terrain, int nFileID);
 
 	const Terrain& GetTerrain() const {
 		return m_terrain;
@@ -24,9 +23,11 @@ public:
 	Unit* TryGetUnit() noexcept;
 	const Unit* TryGetUnit() const noexcept;
 	Result TryAddUnit(const UnitProperties::Type& type, const Player* player) noexcept;
+	Result TryDestroyUnit() noexcept;
 	Result Capture(const Player* owner);
 
 	const Terrain& m_terrain;
+	const int m_nFileID;
 	std::unique_ptr<Unit> m_spUnit{ nullptr };
 	std::unique_ptr<PropertyInfo> m_spPropertyInfo{ nullptr };
 };

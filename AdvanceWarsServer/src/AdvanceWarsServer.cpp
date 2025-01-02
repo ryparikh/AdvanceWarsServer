@@ -79,6 +79,7 @@ AdvanceWarsServer::AdvanceWarsServer() :
 	std::cout << app_name << ": " << port_number << std::endl;
 	m_http_server.request_router().add_method("POST", "/games", &AdvanceWarsServer::post_games_handler);
 	m_http_server.request_router().add_method("GET", "/actions/:gameid/:x/:y", &AdvanceWarsServer::get_game_actions);
+	//m_http_server.request_router().add_method("GET", "/actions/:gameid", &AdvanceWarsServer::get_valid_game_actions);
 }
 
 

@@ -5,7 +5,7 @@
 #include "TerrainInfo.h"
 
 #include <iostream>
-Result Map::TryAddTile(unsigned int x, unsigned int y, Terrain::Type terrainType) noexcept
+Result Map::TryAddTile(unsigned int x, unsigned int y, Terrain::Type terrainType, int nTileId) noexcept
 {
 	std::size_t nRows = GetRows();
 
@@ -26,7 +26,7 @@ Result Map::TryAddTile(unsigned int x, unsigned int y, Terrain::Type terrainType
 	}
 	else if (nColumns == x)
 	{
-		vecpTerrainRow.emplace_back(GetTerrainInfo(terrainType));
+		vecpTerrainRow.emplace_back(GetTerrainInfo(terrainType), nTileId);
 	}
 	else
 	{
@@ -122,6 +122,14 @@ Result Map::TryAddUnit(unsigned int x, unsigned int y, const UnitProperties::Typ
 	}
 
 	vecMapTileRow[x].TryAddUnit(type, owner);
+	return Result::Succeeded;
+}
+
+
+Result Map::TryDestroyUnit(unsigned int x, unsigned int y) noexcept {
+	MapTile* pTile;
+	IfFailedReturn(TryGetTile(x, y, &pTile));
+	IfFailedReturn(pTile->TryDestroyUnit());
 	return Result::Succeeded;
 }
 

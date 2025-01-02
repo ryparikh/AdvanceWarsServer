@@ -82,8 +82,12 @@ class Unit {
 public:
 	static int GetUnitCost(const UnitProperties::Type& type);
 	Unit(const UnitProperties::Type& type, const Player* owner);
-	bool IsLander() const noexcept;
+	bool IsTransport() const noexcept;
 	bool IsFootsoldier() const noexcept;
+	bool IsAirUnit() const noexcept;
+	bool IsSeaUnit() const noexcept;
+	bool IsVehicle() const noexcept;
+	bool IsHidden() const noexcept;
 	bool CanLoad(UnitProperties::Type type) const noexcept;
 	void Load(Unit* pUnit);
 	int CLoadedUnits() const noexcept;
@@ -93,6 +97,7 @@ public:
 	const Player* m_owner;
 	int health = 100;
 	bool m_moved = false;
+	bool m_hidden = false;
 	std::vector<Unit*> m_vecLanderUnits;
 };
 

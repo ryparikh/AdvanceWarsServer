@@ -7,6 +7,6 @@ enum class Result : int
 };
 
 #define IfFailedReturn(r) \
-	if ((r) != Result::Succeeded) { \
-		return (r); \
+	if (Result _result = (r); _result != Result::Succeeded) { \
+		return _result; \
 	}

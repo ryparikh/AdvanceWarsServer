@@ -26,7 +26,7 @@ const UnitInfo vrgUnits{{
 	{ UnitProperties::Type::Stealth,		MovementTypes::Air,		24000,		6,				6,			60,			{5, 8},				4,			{1, 1},		UnitProperties::Weapon::OmniMissile,			UnitProperties::Weapon::Invalid},
 	{ UnitProperties::Type::Sub,			MovementTypes::Sea,		20000,		5,				6,			60,			{1, 5},				5,			{1, 1},		UnitProperties::Weapon::Torpedoes,				UnitProperties::Weapon::Invalid},
 	{ UnitProperties::Type::TCopter,		MovementTypes::Air,		5000,		6,				0,			99,			{2, 2},				2,			{-1, -1},	UnitProperties::Weapon::Invalid,				UnitProperties::Weapon::Invalid},
-	{ UnitProperties::Type::Tank,			MovementTypes::Treads,	7000,		6,				9,			70,			{0, 0},				3,			{1, 1},		UnitProperties::Weapon::LightCannon,				UnitProperties::Weapon::MachineGun},
+	{ UnitProperties::Type::Tank,			MovementTypes::Treads,	7000,		6,				9,			70,			{0, 0},				3,			{1, 1},		UnitProperties::Weapon::LightCannon,			UnitProperties::Weapon::MachineGun},
 }};
 
 

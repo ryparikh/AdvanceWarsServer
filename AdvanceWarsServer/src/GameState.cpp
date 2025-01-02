@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <queue>
+#include <random>
 
 #include "MapParser.h"
 const std::string mapChoiceFilePath = R"(.\res\AWBW\MapSources\Lefty.txt)";
@@ -56,6 +57,8 @@ Result GameState::BeginTurn() noexcept {
 		}
 	}
 
+	// Repair Units
+	// Resupply by APC Units
 	m_arrPlayers[player].m_funds += newFunds;
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
@@ -63,19 +66,74 @@ Result GameState::BeginTurn() noexcept {
 			m_spmap->TryGetTile(x, y, &pTile);
 			const Terrain& terrain = pTile->GetTerrain();
 			const Unit* pUnit = pTile->m_spUnit.get();
-			if (pUnit != nullptr && MapTile::IsProperty(terrain.m_type) && (terrain.m_type != Terrain::Type::ComTower || terrain.m_type != Terrain::Type::Lab) && pUnit->m_owner == &m_arrPlayers[player]) {
-				Unit* pUnit = pTile->TryGetUnit();
-				if (pUnit != nullptr && pUnit->health < 10) {
-					int repairAmount = std::min(10 - pUnit->health, 2);
-					repairFunds += Unit::GetUnitCost(pUnit->m_properties.m_type) * repairAmount;
-					if (repairFunds <= m_arrPlayers[player].m_funds) {
-						m_arrPlayers[player].m_funds -= repairFunds;
-						pUnit->health += repairAmount;
+			if (pUnit != nullptr)
+			{
+				if (pUnit->m_properties.m_type == UnitProperties::Type::Apc && pUnit->m_owner == &GetCurrentPlayer()) {
+					ResupplyApcUnits(x, y);
+				}
+
+				if (MapTile::IsProperty(terrain.m_type) && (terrain.m_type != Terrain::Type::ComTower || terrain.m_type != Terrain::Type::Lab) && pUnit->m_owner == &m_arrPlayers[player]) {
+					Unit* pUnit = pTile->TryGetUnit();
+					if (pUnit != nullptr && pUnit->health < 10) {
+						int repairAmount = std::min(10 - pUnit->health, 2);
+						repairFunds += Unit::GetUnitCost(pUnit->m_properties.m_type) * repairAmount;
+						if (repairFunds <= m_arrPlayers[player].m_funds) {
+							m_arrPlayers[player].m_funds -= repairFunds;
+							pUnit->health += repairAmount;
+						}
 					}
 				}
 			}
 		}
 	}
+
+	// Subtract Fuel/Day
+	// Destroy Air/Sea Units
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			const Terrain& terrain = pTile->GetTerrain();
+			Unit* pUnit = pTile->m_spUnit.get();
+			if (pUnit != nullptr &&
+				pUnit->m_owner == &GetCurrentPlayer() &&
+				(pUnit->IsAirUnit() || pUnit->IsSeaUnit())) {
+				bool isHidden = pUnit->IsHidden();
+				pUnit->m_properties.m_fuel -= isHidden ? pUnit->m_properties.m_fuelCostPerDay.second : pUnit->m_properties.m_fuelCostPerDay.first;
+				if (pUnit->m_properties.m_fuel <= 0) {
+					m_spmap->TryDestroyUnit(x, y);
+				}
+			}
+		}
+	}
+	return Result::Succeeded;
+}
+
+Result GameState::ResupplyApcUnits(int x, int y) noexcept {
+	const MapTile* pResupplyTile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pResupplyTile));
+
+	auto resupplyUnit = [&](int xResupply, int yResupply) -> Result {
+		MapTile* pTile = nullptr;
+		IfFailedReturn(m_spmap->TryGetTile(x, y - 1, &pTile));
+		if (pTile != nullptr) {
+			Unit* pUnit = pTile->TryGetUnit();
+			if (pUnit->m_owner == pResupplyTile->m_spUnit->m_owner) {
+				pUnit->m_properties.m_fuel = GetUnitInfo(pUnit->m_properties.m_type).m_fuel;
+			}
+		}
+		return Result::Succeeded;
+	};
+
+	// North
+	IfFailedReturn(resupplyUnit(x, y - 1));
+	// East 
+	IfFailedReturn(resupplyUnit(x - 1, y));
+	// South 
+	IfFailedReturn(resupplyUnit(x, y + 1));
+	// West 
+	IfFailedReturn(resupplyUnit(x + 1, y));
+
 	return Result::Succeeded;
 }
 
@@ -159,6 +217,75 @@ bool GameState::CanUnitAttack(const Unit& attacker, const Unit& defender) const 
 	return false;
 }
 
+int GameState::GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept {
+	const Player& player = GetCurrentPlayer();
+	switch (co) {
+	case CommandingOfficier::Type::Adder:
+		if (player.PowerStatus() == 1) {
+			return 1;
+		}
+		else if (player.PowerStatus() == 2) {
+			return 2;
+		}
+	case CommandingOfficier::Type::Andy:
+		if (player.PowerStatus() == 2) {
+			return 1;
+		}
+	case CommandingOfficier::Type::Drake:
+		if (unit.IsSeaUnit()) {
+			return 1;
+		}
+	case CommandingOfficier::Type::Jake:
+		if (player.PowerStatus() == 2) {
+			return 2;
+		}
+	case CommandingOfficier::Type::Jess:
+		if (unit.IsVehicle()) {
+			if (player.PowerStatus() == 1) {
+				return 1;
+			}
+			else if (player.PowerStatus() == 2) {
+				return 2;
+			}
+		}
+	case CommandingOfficier::Type::Koal:
+		if (player.PowerStatus() == 1) {
+			return 1;
+		}
+		else if (player.PowerStatus() == 2) {
+			return 2;
+		}
+	case CommandingOfficier::Type::Max:
+		if (unit.m_properties.m_range.first == 1) {
+			if (player.PowerStatus() == 1) {
+				return 1;
+			}
+			else if (player.PowerStatus() == 2) {
+				return 2;
+			}
+		}
+	case CommandingOfficier::Type::Sami:
+		if (unit.IsTransport()) {
+			return 1;
+		}
+		if (player.PowerStatus() == 1) {
+			if (unit.IsFootsoldier()) {
+				return 1;
+			}
+		}
+		else if (player.PowerStatus() == 2) {
+			if (unit.IsFootsoldier()) {
+				return 2;
+			}
+		}
+	case CommandingOfficier::Type::Sensei:
+		if (unit.IsTransport()) {
+			return 1;
+		}
+	default:
+		return 0;
+	}
+}
 Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept {
 	const MapTile* pmaptile;
 	m_spmap->TryGetTile(x, y, &pmaptile);
@@ -168,7 +295,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 	// If current player unit, moves
 	if (pUnit != nullptr) {
 		int cLoadedUnits = pUnit->CLoadedUnits();
-		if (pUnit->IsLander() && cLoadedUnits > 0) {
+		if (pUnit->IsTransport() && cLoadedUnits > 0) {
 			for (int i = 0; i < cLoadedUnits; ++i) {
 				const Unit* pUnloadUnit = pUnit->GetLoadedUnit(i);
 				const MapTile* pUnloadDestination = nullptr;
@@ -226,7 +353,8 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 		MovementTypes movementType = pUnit->m_properties.m_movementType;
 		std::vector<std::pair<int, int>> vecTargets;
 		std::vector<std::unique_ptr<MoveNode>> vecNodes;
-		vecNodes.emplace_back(new MoveNode(pUnit->m_properties.m_movement, pUnit->m_properties.m_fuel, x, y));
+		int maxMovement = pUnit->m_properties.m_movement + GetCOMovementBonus(GetCurrentPlayer().m_co.m_type, *pUnit);
+		vecNodes.emplace_back(new MoveNode(maxMovement, pUnit->m_properties.m_fuel, x, y));
 		std::queue<MoveNode*> queueMoveNodes;
 		queueMoveNodes.push(vecNodes.back().get());
 		while (!queueMoveNodes.empty()) {
@@ -245,6 +373,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 			const Unit* pCurrentTileUnit = pCurrentTile->TryGetUnit();
 			if (pCurrentTileUnit == nullptr || pCurrentTileUnit == pUnit) {
 				vecActions.emplace_back(Action::Type::MoveWait, xCurr, yCurr);
+
 				// Check for enemy attacks
 				std::pair<int, int> attackRange = GetUnitInfo(pUnit->m_properties.m_type).m_range;
 
@@ -255,31 +384,31 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 					MapTile* pAttackTile = nullptr;
 					m_spmap->TryGetTile(xCurr, yCurr - 1, &pAttackTile);
 					const Unit* pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pCurrentTileUnit, *pAttackUnit)) {
+					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
 						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::North, xCurr, yCurr);
 					}
 					// east
 					m_spmap->TryGetTile(xCurr + 1, yCurr, &pAttackTile);
 					pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pCurrentTileUnit, *pAttackUnit)) {
+					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
 						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::East, xCurr, yCurr);
 					}
 					// south
 					m_spmap->TryGetTile(xCurr, yCurr + 1, &pAttackTile);
 					pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pCurrentTileUnit, *pAttackUnit)) {
+					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
 						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::South, xCurr, yCurr);
 					}
 					// west
 					m_spmap->TryGetTile(xCurr - 1, yCurr, &pAttackTile);
 					pAttackUnit = pAttackTile->TryGetUnit();
-					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pCurrentTileUnit, *pAttackUnit)) {
+					if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
 						vecActions.emplace_back(Action::Type::MoveAttack, Action::Direction::West, xCurr, yCurr);
 					}
 				}
 				// Indirect combat can only happen from the same square
 				else if (attackRange.first > 1 && x == xCurr && y == yCurr) {
-					AddIndirectAttackActions(xCurr, yCurr, *pCurrentTileUnit, attackRange.first, attackRange.second, vecActions);
+					AddIndirectAttackActions(xCurr, yCurr, *pUnit, attackRange.first, attackRange.second, vecActions);
 				}
 
 				// Check for property and capture
@@ -290,7 +419,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 			else {
 				// this should be true always.  If the unit wasn't owned by the same player we don't expect to visit
 				if (pCurrentTileUnit->m_owner == &GetCurrentPlayer()) {
-					if (pCurrentTileUnit->IsLander() && pCurrentTileUnit->CanLoad(pUnit->m_properties.m_type)) {
+					if (pCurrentTileUnit->IsTransport() && pCurrentTileUnit->CanLoad(pUnit->m_properties.m_type)) {
 						vecActions.emplace_back(Action::Type::MoveLoad, pTop->m_x, pTop->m_y);
 					}
 					// Can combine if the unit you move to is not at full health. Can't combine with itself
@@ -462,13 +591,30 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		return Result::Failed;
 	}
 
-	int attackDamage = calculateDamage(*pattacker, *pdefender, pDefenderTile->GetTerrain().m_defense);
-	if (attackDamage < -1) {
-		return Result::Failed;
+	Player* pattackingplayer = &GetCurrentPlayer();
+	Player* pdefendingplayer = &GetEnemyPlayer();
+	bool fSonjaPower = pdefendingplayer->m_co.m_type == CommandingOfficier::Type::Sonja && pdefendingplayer->PowerStatus() == 2;
+
+	if (fSonjaPower) {
+		Player* playerswap = pattackingplayer;
+		pattackingplayer = pdefendingplayer;
+		pdefendingplayer = playerswap;
+		Unit* unitswap = pattacker;
+		pattacker = pdefender;
+		pdefender = unitswap;
 	}
 
-	pdefender->health -= attackDamage;
-	attackDamage = calculateDamage(*pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
+	int attackDamage = calculateDamage(pattackingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pDefenderTile->GetTerrain().m_defense);
+	if (attackDamage <= -1 ) {
+		if (!fSonjaPower) {
+			return Result::Failed;
+		}
+	}
+	else {
+		pdefender->health -= attackDamage;
+	}
+
+	attackDamage = calculateDamage(pdefendingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
 	if (attackDamage > 0) {
 		pattacker->health -= attackDamage;
 	}
@@ -476,7 +622,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	return Result::Succeeded;
 }
 
-int GameState::calculateDamage(const Unit& attacker, const Unit& defender, int defenderTerrainStars) {
+int GameState::calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars) {
 	int baseDamage = -1;
 	if (defender.IsFootsoldier()) {
 		if (attacker.m_properties.m_primaryWeapon == UnitProperties::Weapon::MachineGun) {
@@ -494,11 +640,30 @@ int GameState::calculateDamage(const Unit& attacker, const Unit& defender, int d
 		return -1;
 	}
 
-	int attackValue = 100;
-	int luck = 0;
-	int badluck = 0;
-	int defenceValue = 0;
-	double damage = ((baseDamage * attackValue / 100.0) + luck - badluck) * (attacker.health / 10) / 10.0 * ((200 - (defenceValue + defenderTerrainStars * defender.health / 10)) / 100.0);
+	std::random_device rd;
+	std::mt19937 luckGen(rd());
+	std::uniform_int_distribution<int> goodLuckDistribution(0, GetMaxGoodLuck(GetCurrentPlayer()));
+	// Generate a random number
+	int goodLuckRoll = goodLuckDistribution(luckGen);
+
+	std::uniform_int_distribution<int> badLuckDistribution(0, GetMaxGoodLuck(GetCurrentPlayer()));
+	int badLuckRoll = badLuckDistribution(luckGen);
+
+	int nComTowers = 0;
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			const MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			const Terrain& terrain = pTile->GetTerrain();
+			if (MapTile::IsProperty(terrain.m_type) && terrain.m_type == Terrain::Type::ComTower  && pTile->m_spPropertyInfo->m_owner == pattackingplayer) {
+				++nComTowers;
+			}
+		}
+	}
+
+	int attackValue = rgCharts[static_cast<int>(attackerCO)][GetCurrentPlayer().PowerStatus()][static_cast<int>(attacker.m_properties.m_type)].first + 10 * nComTowers;
+	int defenceValue = rgCharts[static_cast<int>(defenderCO)][GetEnemyPlayer().PowerStatus()][static_cast<int>(defender.m_properties.m_type)].first;
+	double damage = ((baseDamage * attackValue / 100.0) + goodLuckRoll - badLuckRoll) * (attacker.health / 10) / 10.0 * ((200 - (defenceValue + defenderTerrainStars * defender.health / 10)) / 100.0);
 	if (damage <= 0) {
 		return 0;
 	}
@@ -507,12 +672,84 @@ int GameState::calculateDamage(const Unit& attacker, const Unit& defender, int d
 	return std::floor(damage);
 }
 
+int GameState::GetMaxGoodLuck(const Player& player) noexcept {
+	int status = player.PowerStatus();
+	switch (player.m_co.m_type) {
+	case CommandingOfficier::Type::Rachel:
+		if (status == 1) {
+			return 39;
+		}
+	case CommandingOfficier::Type::Nell:
+		if (status == 0) {
+			return 19;
+		}
+		else if (status == 1) {
+			return 59;
+		}
+		else if (status == 2) {
+			return 99;
+		}
+	case CommandingOfficier::Type::Flak:
+		if (status == 0) {
+			return 24;
+		}
+		else if (status == 1) {
+			return 49;
+		}
+		else if (status == 2) {
+			return 89;
+		}
+	case CommandingOfficier::Type::Jugger:
+		if (status == 0) {
+			return 29;
+		}
+		else if (status == 1) {
+			return 54;
+		}
+		else if (status == 2) {
+			return 94;
+		}
+	default:
+		return 9;
+	}
+}
+
+int GameState::GetMaxBadLuck(const Player& player) noexcept {
+	int status = player.PowerStatus();
+	switch (player.m_co.m_type) {
+	case CommandingOfficier::Type::Sonja:
+		return 9;
+	case CommandingOfficier::Type::Flak:
+		if (status == 0) {
+			return 9;
+		}
+		else if (status == 1) {
+			return 19;
+		}
+		else if (status == 2) {
+			return 39;
+		}
+	case CommandingOfficier::Type::Jugger:
+		if (status == 0) {
+			return 14;
+		}
+		else if (status == 1) {
+			return 24;
+		}
+		else if (status == 2) {
+			return 44;
+		}
+	default:
+		return 0;
+	}
+}
 Result GameState::DoMoveAction(int x, int y, const Action& action) {
 	MapTile* ptile = nullptr;
 	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
 
 	const Unit* punit = ptile->TryGetUnit();
 	// search to see if unit can move to location
+	// if APC Resupply Units
 	return Result::Succeeded;
 }
 

@@ -135,7 +135,10 @@ public:
 
 private:
 	Result BeginTurn() noexcept;
+	Result ResupplyApcUnits(int x, int y) noexcept;
 	Player& GetCurrentPlayer() noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[0] : m_arrPlayers[1]; }
+	Player& GetEnemyPlayer() noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[1] : m_arrPlayers[0]; }
+	const Player& GetEnemyPlayer() const noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[1] : m_arrPlayers[0]; }
 	const Player& GetCurrentPlayer() const noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[0] : m_arrPlayers[1]; }
 	std::pair<int, int> movementRemainingAfterStep(int x, int y, MovementTypes movementType, int maxMovement, int maxFuel) const noexcept;
 	Result AddIndirectAttackActions(int x, int y, const Unit& attacker, int minAttackRange, int maxAttackRange, std::vector<Action>& vecActions) const noexcept;
@@ -148,7 +151,11 @@ private:
 	Result DoBuyAction(int x, int y, const Action& action);
 	Result DoMoveAction(int x, int y, const Action& action);
 	Result DoCOPowerAction(const Action& action);
-	int calculateDamage(const Unit& attacker, const Unit& defender, int defenderTerrainStars);
+	int calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars);
+
+	int GetMaxGoodLuck(const Player& player) noexcept;
+	int GetMaxBadLuck(const Player& player) noexcept;
+	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 private:
 	std::string m_guid;
 	std::unique_ptr<Map> m_spmap;

@@ -276,7 +276,7 @@ Unit* Unit::Unload(int i) {
 	case UnitProperties::Type::Piperunner:
 		return "piperunner";
 	case UnitProperties::Type::Recon:
-		return "reacon";
+		return "recon";
 	case UnitProperties::Type::Rocket:
 		return "rocket";
 	case UnitProperties::Type::Stealth:
@@ -387,10 +387,12 @@ const char* UnitProperties::getTypename() const {
 void to_json(json& j, const UnitProperties& unitproperties) {
 	j = { {"type", unitproperties.getTypename() },
 		  {"ammo", unitproperties.m_ammo },
-		  {"fuel", unitproperties.m_fuel} };
+		  {"fuel", unitproperties.m_fuel}
+	};
 }
 
 void to_json(json& j, const Unit& unit) {
 	to_json(j, unit.m_properties);
 	j["owner"] = unit.m_owner->getArmyTypeJson();
+	j["health"] = (unit.health + 9) / 10;
 }

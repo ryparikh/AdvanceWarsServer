@@ -39,11 +39,14 @@ public:
 	static tx_response post_games_handler(const http_request& request, const Parameters& parameters, const std::string& data, std::string& response_body);
 	static tx_response post_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
 	static tx_response get_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
-//	static tx_response get_valid_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
+	static tx_response get_valid_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
 
-	json create_new_game(std::string guid);
+	json create_new_game(std::string& gameId);
+	json get_valid_actions(const std::string& gameId) const;
+	Result get_valid_actions(const std::string& gameId, std::vector<Action>& vecActions) const;
 	json get_actions(const std::string& gameId, int x, int y) const;
-	json do_action(const std::string& gameId, int x, int y, const Action& action);
+	json do_action(const std::string& gameId, const Action& action);
+	bool game_over(const std::string& gameId);
 private:
 	static std::unique_ptr<AdvanceWarsServer> s_spServer;
 	asio::io_context m_io_context;

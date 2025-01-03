@@ -15,6 +15,7 @@ struct Action {
 	enum class Type {
 		Invalid = -1,
 		Attack,
+		EndTurn,
 		MoveWait,
 		MoveAttack, // Requires direction
 		Unload, // Requires direction
@@ -64,6 +65,8 @@ struct Action {
 			return "buy";
 		case Type::COPower:
 			return "co-power";
+		case Type::EndTurn:
+			return "end-turn";
 		case Type::MoveAttack:
 			return "move-attack";
 		case Type::MoveCapture:
@@ -76,7 +79,7 @@ struct Action {
 			return "repair";
 		case Type::Unload:
 			return "unload";
-		case Type::MoveWait: 
+		case Type::MoveWait:
 			return "move-wait";
 		case Type::SCOPower:
 			return "super-co-power";
@@ -88,15 +91,56 @@ struct Action {
 	static Type fromTypeString(std::string strType);
 
 	Action() {}
+	// EndTurn
+	Action(Type type) : m_type(type) {}
 	// Used for Indirect Attacks, Capture, Load, Combine, Wait
-	Action(Type type, int x, int y) : m_type(type), m_optTarget({ x, y }) {}
+	Action(Type type, int xSource, int ySource, int xTarget, int yTarget) : m_type(type), m_optSource({ xSource, ySource }), m_optTarget({ xTarget, yTarget }) {}
 	// Used for Move Attack
-	Action(Type type, Direction direction, int x, int y) : m_type(type), m_optTarget({ x, y }), m_optDirection(direction) {}
+	Action(Type type, int xSource, int ySource, Direction direction, int xTarget, int yTarget) : m_type(type), m_optSource({ xSource, ySource }), m_optTarget({ xTarget, yTarget }), m_optDirection(direction) {}
 	// Used for Repair, Unload
-	Action(Type type, Direction direction) : m_type(type), m_optDirection(direction) {}
+	Action(Type type, int xSource, int ySource, Direction direction) : m_type(type), m_optSource({ xSource, ySource }), m_optDirection(direction) {}
 	// Used for Buy Actions
-	Action(Type type, UnitProperties::Type unitType) : m_type(type), m_optUnitType(unitType) {}
+	Action(Type type, int xSource, int ySource, UnitProperties::Type unitType) : m_type(type), m_optSource({ xSource, ySource }), m_optUnitType(unitType) {}
+
+	bool operator==(const Action& other) const {
+		if (m_type != other.m_type) {
+			return false;
+		}
+
+		if (m_optDirection.has_value()) {
+			if (!other.m_optDirection.has_value() ||
+				(m_optDirection.value() != other.m_optDirection.value())) {
+				return false;
+			}
+		}
+
+		if (m_optSource.has_value()) {
+			if (!other.m_optSource.has_value() ||
+				(m_optSource.value() != other.m_optSource.value())) {
+				return false;
+			}
+		}
+
+		if (m_optTarget.has_value()) {
+			if (!other.m_optTarget.has_value() ||
+				(m_optTarget.value() != other.m_optTarget.value())) {
+				return false;
+			}
+		}
+
+		if (m_optUnitType.has_value()) {
+			if (!other.m_optUnitType.has_value() ||
+				(m_optUnitType.value() != other.m_optUnitType.value())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	Type m_type{ Type::Invalid };
+
+	std::optional<std::pair<int, int>> m_optSource;
 
 	// Where are we moving or indirectly attacking
 	std::optional<std::pair<int, int>> m_optTarget;
@@ -128,14 +172,19 @@ public:
 	GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept;
 
 	Result InitializeGame() noexcept;
-	Result DoAction(int x, int y, const Action& action) noexcept;
+	Result DoAction(const Action& action) noexcept;
 	Map* TryGetMap() const noexcept;
 	const std::string& GetId() const noexcept;
 	const std::array<Player, 2>& GetPlayers() const noexcept;
 	bool IsFirstPlayerTurn() const noexcept;
+	Result GetValidActions(std::vector<Action>& vecActions) const noexcept;
 	Result GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept;
 	bool AnyValidActions() const noexcept;
 	Result EndTurn() noexcept;
+	bool CheckPlayerResigns() noexcept;
+	bool FGameOver() const noexcept {
+		return m_fGameOver;
+	}
 
 private:
 	Result BeginTurn() noexcept;
@@ -147,13 +196,17 @@ private:
 	std::pair<int, int> movementRemainingAfterStep(int x, int y, MovementTypes movementType, int maxMovement, int maxFuel) const noexcept;
 	Result AddIndirectAttackActions(int x, int y, const Unit& attacker, int minAttackRange, int maxAttackRange, std::vector<Action>& vecActions) const noexcept;
 	bool CanUnitAttack(const Unit& attacker, const Unit& defender) const noexcept;
+	bool FAttackUsesAmmo(const Unit& attacker, const Unit& defender) const noexcept;
 
 	MoveNode* AddNewNodeToGraph(std::vector<Action>& vecActions, std::vector<std::unique_ptr<MoveNode>>& vecMoves, MoveNode** pMoveUpdate, int movement, int fuel, int x, int y) const noexcept;
+
+	void CreateMovementGraph(int x, int y, const Unit& unit, std::vector<std::unique_ptr<MoveNode>>& vecMoves);
 
 	// Actions
 	Result DoAttackAction(int x, int y, const Action& action);
 	Result DoBuyAction(int x, int y, const Action& action);
-	Result DoMoveAction(int x, int y, const Action& action);
+	Result DoMoveAction(int& x, int& y, const Action& action);
+	Result DoCaptureAction(int x, int y, const Action& action);
 	Result DoCOPowerAction();
 	Result DoSCOPowerAction();
 	int calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars);
@@ -162,11 +215,16 @@ private:
 	int GetMaxBadLuck(const Player& player) noexcept;
 	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 	void HealUnits(int health);
+	bool FAtUnitCap() const noexcept;
 private:
 	std::string m_guid;
 	std::unique_ptr<Map> m_spmap;
 	std::array<Player, 2> m_arrPlayers;
+	int m_nUnitCap = 50;
+	int m_nCaptureLimit = 21;
+	int m_nTurnCount = 0;
 	bool m_isFirstPlayerTurn{ true };
+	bool m_fGameOver = false;
 };
 
 void to_json(json& j, const GameState& gameState);

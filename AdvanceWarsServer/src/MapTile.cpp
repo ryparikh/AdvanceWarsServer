@@ -19,21 +19,23 @@ MapTile::MapTile(const Terrain& terrain, int nFileID) :
 }
 
 Result MapTile::Capture(const Player* owner) {
-	if (!IsProperty(m_terrain.m_type)) {
-		return Result::Failed;
-	}
-
 	// Should I just reallocate instead of failing?
 	if (m_spPropertyInfo == nullptr) {
 		return Result::Failed;
 	}
 
 	m_spPropertyInfo->m_owner = owner;
+	m_spPropertyInfo->m_capturePoints = 20;
 	return Result::Succeeded;
 }
 
 Result MapTile::TryAddUnit(const UnitProperties::Type& type, const Player* player) noexcept {
 	m_spUnit.reset(new Unit(type, player));
+	return Result::Succeeded;
+}
+
+Result MapTile::TryAddUnit(Unit* pUnit) noexcept {
+	m_spUnit.reset(pUnit);
 	return Result::Succeeded;
 }
 
@@ -43,6 +45,10 @@ const Unit* MapTile::TryGetUnit() const noexcept {
 
 Unit* MapTile::TryGetUnit() noexcept {
 	return m_spUnit.get();
+}
+
+Unit* MapTile::SpDetachUnit() noexcept {
+	return m_spUnit.release();
 }
 
 Result MapTile::TryDestroyUnit() noexcept {
@@ -153,4 +159,15 @@ void to_json(json& j, const MapTile& maptile) {
 	if (maptile.m_spUnit) {
 		j["unit"] = *maptile.m_spUnit;
 	}
+
+	if (maptile.m_spPropertyInfo.get() != nullptr) {
+		j["property"] = *maptile.m_spPropertyInfo;
+	}
+}
+
+void to_json(json& j, const PropertyInfo& propertyInfo) {
+	j = { {
+			{"capture-points", propertyInfo.m_capturePoints},
+			{"owner", propertyInfo.m_owner != nullptr ? propertyInfo.m_owner->getArmyTypeJson() : "neutral"}
+		} };
 }

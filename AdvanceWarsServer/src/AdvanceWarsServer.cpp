@@ -14,24 +14,7 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 	json gameRequestJson = json::parse(data);
 
 	AdvanceWarsServer& server = AdvanceWarsServer::getInstance();
-	GUID guid;
-	HRESULT hCreateGuid = CoCreateGuid(&guid);
-	if (hCreateGuid != S_OK) {
-		std::cerr << "Failed to create GUID" << std::endl;
-		tx_response resp(response_status::code::INTERNAL_SERVER_ERROR);
-		return resp;
-	}
-	// Convert GUID to a string
 	std::string guidString;
-	RPC_CSTR szUuid = NULL;
-	if (::UuidToStringA(&guid, &szUuid) == RPC_S_OK) {
-		guidString = (char*)szUuid;
-		::RpcStringFreeA(&szUuid);
-	}
-
-	std::cout << "GUID: " << guidString << std::endl;
-
-	// Free the allocated string
 	const json jsonResponseBody = server.create_new_game(guidString);
 	response_body = jsonResponseBody.dump();
 	tx_response resp(response_status::code::OK);
@@ -54,8 +37,7 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 }
 
 /*static*/ tx_response AdvanceWarsServer::post_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body) {
-	int x = std::stoi(parameters.find("x")->second);
-	int y = std::stoi(parameters.find("y")->second);
+	time_point startTime = std::chrono::steady_clock::now();
 	std::string gameId = parameters.find("gameid")->second;
 	AdvanceWarsServer& server = AdvanceWarsServer::getInstance();
 
@@ -65,8 +47,21 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 	stream >> j;
 	from_json(j, action);
 
-	const json jsonResponseBody = server.do_action(gameId, x, y, action);
+	const json jsonResponseBody = server.do_action(gameId, action);
 	response_body = jsonResponseBody.dump();
+	tx_response resp(response_status::code::OK);
+	resp.add_header("Access-Control-Allow-Origin", "*");
+	time_point endTime = std::chrono::steady_clock::now();
+	std::clog << "Post game action: " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << "\n";
+	return resp;
+}
+
+/*static*/ tx_response AdvanceWarsServer::get_valid_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body) {
+	std::string gameId = parameters.find("gameid")->second;
+	AdvanceWarsServer& server = AdvanceWarsServer::getInstance();
+	json j = server.get_valid_actions(gameId);
+	response_body = j.dump();
+
 	tx_response resp(response_status::code::OK);
 	resp.add_header("Access-Control-Allow-Origin", "*");
 	return resp;
@@ -80,8 +75,8 @@ AdvanceWarsServer::AdvanceWarsServer() :
 	std::cout << app_name << ": " << port_number << std::endl;
 	m_http_server.request_router().add_method("POST", "/games", &AdvanceWarsServer::post_games_handler);
 	m_http_server.request_router().add_method("GET", "/actions/:gameid/:x/:y", &AdvanceWarsServer::get_game_actions);
-	m_http_server.request_router().add_method("POST", "/actions/:gameid/:x/:y", &AdvanceWarsServer::post_game_actions);
-	//m_http_server.request_router().add_method("GET", "/actions/:gameid", &AdvanceWarsServer::get_valid_game_actions);
+	m_http_server.request_router().add_method("GET", "/actions/:gameid", &AdvanceWarsServer::get_valid_game_actions);
+	m_http_server.request_router().add_method("POST", "/actions/:gameid", &AdvanceWarsServer::post_game_actions);
 }
 
 
@@ -97,14 +92,27 @@ int AdvanceWarsServer::run() {
 	return 0;
 }
 
-json AdvanceWarsServer::create_new_game(std::string guid) {
+json AdvanceWarsServer::create_new_game(std::string& gameId) {
+	GUID guid;
+	HRESULT hCreateGuid = CoCreateGuid(&guid);
+	if (hCreateGuid != S_OK) {
+		std::cerr << "Failed to create GUID" << std::endl;
+		return "";
+	}
+	// Convert GUID to a string
+	RPC_CSTR szUuid = NULL;
+	if (::UuidToStringA(&guid, &szUuid) == RPC_S_OK) {
+		gameId = (char*)szUuid;
+		::RpcStringFreeA(&szUuid);
+	}
+
 	Player player1(CommandingOfficier::Type::Andy, Player::ArmyType::OrangeStar);
 	Player player2(CommandingOfficier::Type::Adder, Player::ArmyType::BlueMoon);
 	std::array<Player, 2> arrPlayers{ std::move(player1), std::move(player2) };
-	GameState* gameState = new GameState(guid, std::move(arrPlayers));
+	GameState* gameState = new GameState(gameId, std::move(arrPlayers));
 	gameState->InitializeGame();
-	m_gameCache.emplace(guid, gameState);
-	const auto& game = m_gameCache.find(guid.c_str());
+	m_gameCache.emplace(gameId, gameState);
+	const auto& game = m_gameCache.find(gameId.c_str());
 	json j;
 	to_json(j, *game->second);
 	return j;
@@ -120,14 +128,40 @@ json AdvanceWarsServer::get_actions(const std::string& gameId, int x, int y) con
 	return j;
 }
 
-json AdvanceWarsServer::do_action(const std::string& gameId, int x, int y, const Action& action) {
+json AdvanceWarsServer::get_valid_actions(const std::string& gameId) const {
+	std::vector<Action> vecActions;
+	get_valid_actions(gameId, vecActions);
+	json j;
+	to_json(j, vecActions);
+	return j;
+}
+
+Result AdvanceWarsServer::get_valid_actions(const std::string& gameId, std::vector<Action>& vecActions) const {
 	const auto& game = m_gameCache.find(gameId.c_str());
-	game->second->DoAction(x, y, action);
-	if (!game->second->AnyValidActions()) {
+	game->second->GetValidActions(vecActions);
+	return Result::Succeeded;
+}
+
+json AdvanceWarsServer::do_action(const std::string& gameId, const Action& action) {
+	time_point startTime = std::chrono::steady_clock::now();
+	const auto& game = m_gameCache.find(gameId.c_str());
+	game->second->DoAction(action);
+	std::vector<Action> vecActions;
+	// Only action left is EndTurn;
+	if (!game->second->FGameOver() && game->second->GetValidActions(vecActions) == Result::Succeeded && vecActions.size() == 1) {
 		game->second->EndTurn();
+		game->second->CheckPlayerResigns();
 	}
+
+	time_point endTime = std::chrono::steady_clock::now();
+	std::clog << "Do action: " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << "\n";
 
 	json j;
 	to_json(j, *game->second);
 	return j;
+}
+
+bool AdvanceWarsServer::game_over(const std::string& gameId) {
+	const auto& game = m_gameCache.find(gameId.c_str());
+	return game->second->FGameOver();
 }

@@ -22,7 +22,9 @@ public:
 	static bool IsProperty(Terrain::Type type);
 	Unit* TryGetUnit() noexcept;
 	const Unit* TryGetUnit() const noexcept;
+	Unit* SpDetachUnit() noexcept;
 	Result TryAddUnit(const UnitProperties::Type& type, const Player* player) noexcept;
+	Result TryAddUnit(Unit* pUnit) noexcept;
 	Result TryDestroyUnit() noexcept;
 	Result Capture(const Player* owner);
 
@@ -33,3 +35,4 @@ public:
 };
 
 void to_json(json& j, const MapTile& maptile);
+void to_json(json& j, const PropertyInfo& propertyInfo);

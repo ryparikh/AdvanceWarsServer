@@ -12,7 +12,9 @@ std::string Player::getArmyTypeJson() const {
 }
 
 void to_json(json& j, const Player& player) {
-	j = { { "co", player.m_co,
-			"funds", player.m_funds,
-			"armyType", player.getArmyTypeJson() } };
+	j = { 
+			{ "co", player.m_co},
+			{"funds", player.m_funds},
+			{"armyType", player.getArmyTypeJson()} 
+	};
 }

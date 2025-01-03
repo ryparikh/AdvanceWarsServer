@@ -206,6 +206,8 @@ private:
 	Result DoAttackAction(int x, int y, const Action& action);
 	Result DoBuyAction(int x, int y, const Action& action);
 	Result DoMoveAction(int& x, int& y, const Action& action);
+	Result DoMoveCombineAction(int x, int y, const Action& action);
+	Result DoMoveLoadAction(int x, int y, const Action& action);
 	Result DoCaptureAction(int x, int y, const Action& action);
 	Result DoCOPowerAction();
 	Result DoSCOPowerAction();

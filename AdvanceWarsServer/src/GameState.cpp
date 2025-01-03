@@ -476,9 +476,12 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 					if (pCurrentTileUnit->IsTransport() && pCurrentTileUnit->CanLoad(pUnit->m_properties.m_type)) {
 						vecActions.emplace_back(Action::Type::MoveLoad, x, y, pTop->m_x, pTop->m_y);
 					}
-					// Can combine if the unit you move to is not at full health. Can't combine with itself
-					else if (pCurrentTileUnit->m_properties.m_type == pUnit->m_properties.m_type && pCurrentTileUnit->health <= 90 && x != xCurr && y != yCurr) {
-						vecActions.emplace_back(Action::Type::MoveCombine, x, y, pTop->m_x, pTop->m_y);
+					// Can combine if the unit you are combining with is not full health. Can't combine with itself
+					else if (pCurrentTileUnit->m_properties.m_type == pUnit->m_properties.m_type && x != xCurr && y != yCurr) {
+						if (((pUnit->IsTransport() && pCurrentTileUnit->CLoadedUnits() == 0 && pUnit->CLoadedUnits() == 0) || !pUnit->IsTransport()) &&
+							(pCurrentTileUnit->health <= 90)){
+							vecActions.emplace_back(Action::Type::MoveCombine, x, y, pTop->m_x, pTop->m_y);
+						}
 					}
 				}
 			}
@@ -647,7 +650,7 @@ Result GameState::DoAction(const Action& action) noexcept {
 		DoMoveAction(x, y, action);
 		return DoCaptureAction(x, y, action);
 	case Action::Type::MoveCombine:
-		return Result::Failed;
+		return DoMoveCombineAction(x, y, action);
 	case Action::Type::MoveLoad:
 		return Result::Failed;
 	case Action::Type::MoveWait:
@@ -657,6 +660,45 @@ Result GameState::DoAction(const Action& action) noexcept {
 		return Result::Failed;
 	}
 	return Result::Succeeded;
+}
+
+Result GameState::DoMoveCombineAction(int x, int y, const Action& action) {
+	if (!action.m_optTarget.has_value()) {
+		return Result::Failed;
+	}
+
+	MapTile* ptile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
+
+	MapTile* pDest = nullptr;
+	const std::pair<int, int>& pairDestination = action.m_optTarget.value();
+
+	std::unique_ptr<Unit> spunitSource(ptile->SpDetachUnit());
+	x = pairDestination.first;
+	y = pairDestination.second;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pDest));
+	Unit* punitDest = pDest->TryGetUnit();
+
+	// Combine ammo, fuel, health
+	punitDest->m_properties.m_ammo = std::min(GetUnitInfo(spunitSource->m_properties.m_type).m_ammo, punitDest->m_properties.m_ammo + spunitSource->m_properties.m_ammo);
+	punitDest->m_properties.m_fuel = std::min(GetUnitInfo(spunitSource->m_properties.m_type).m_fuel, punitDest->m_properties.m_fuel + spunitSource->m_properties.m_fuel);
+	
+	int healthTotal = punitDest->health + spunitSource->health;
+	if (healthTotal > 100) {
+		int refundUnits = (healthTotal + 9) / 10 - 10;
+		GetCurrentPlayer().m_funds += refundUnits * Unit::GetUnitCost(spunitSource->m_properties.m_type);
+		punitDest->health = 100;
+	}
+	else {
+		punitDest->health = healthTotal;
+	}
+
+	punitDest->m_moved = true;
+	return Result::Succeeded;
+}
+
+Result GameState::DoMoveLoadAction(int x, int y, const Action& action) {
+	return Result::Failed;
 }
 
 Result GameState::DoCaptureAction(int x, int y, const Action& action) {

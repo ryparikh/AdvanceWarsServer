@@ -49,6 +49,8 @@ Result GameState::BeginTurn() noexcept {
 		++m_nTurnCount;
 	}
 
+	GetCurrentPlayer().m_powerStatus = 0;
+
 	// Add Funds
 	int player = IsFirstPlayerTurn() ? 0 : 1;
 	int newFunds = 0;
@@ -322,6 +324,14 @@ Result GameState::GetValidActions(std::vector<Action>& vecActions) const noexcep
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
 			IfFailedReturn(GetValidActions(x, y, vecActions));
 		}
+	}
+
+	if (GetCurrentPlayer().m_powerMeter.FCopCharged()) {
+		vecActions.emplace_back(Action::Type::COPower);
+	}
+
+	if (GetCurrentPlayer().m_powerMeter.FScopCharged()) {
+		vecActions.emplace_back(Action::Type::SCOPower);
 	}
 
 	vecActions.emplace_back(Action::Type::EndTurn);
@@ -793,7 +803,6 @@ Result GameState::DoMoveCombineAction(int x, int y, const Action& action) {
 		punitDest->health = 100;
 	}
 	else {
-		std::cout << healthDest << ", " << healthSrc << ", " << punitDest->health << ", " << spunitSource->health << std::endl;
 		punitDest->health = (healthDest + healthSrc) * 10;
 	}
 
@@ -955,6 +964,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		pdefender = unitswap;
 	}
 
+	// Calculate Attacker damange
 	int attackDamage = calculateDamage(pattackingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pDefenderTile->GetTerrain().m_defense);
 	if (attackDamage <= -1) {
 		if (!fSonjaPower) {
@@ -962,14 +972,23 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		}
 	}
 	else {
+		int defenderVisualHealthStart = (pdefender->health + 9) / 10;
 		pdefender->health -= attackDamage;
+		int defenderVisualHealthEnd = std::max((pdefender->health + 9) / 10, 0);
+		int defenderUnitCost = (defenderVisualHealthStart - defenderVisualHealthEnd) * Unit::GetUnitCost(pdefender->m_properties.m_type);
+		if (pattackingplayer->PowerStatus() == 0) {
+			pattackingplayer->m_powerMeter.AddCharge(0.5 * defenderUnitCost);
+		}
+
+		if (pdefendingplayer->PowerStatus() == 0) {
+			pdefendingplayer->m_powerMeter.AddCharge(defenderUnitCost);
+		}
 		if (FAttackUsesAmmo(*pattacker, *pdefender)) {
 			--pattacker->m_properties.m_ammo;
 		}
 	}
 
 	if (pdefender->health <= 0) {
-		std::cout << "Defending Unit Destroyed" << std::endl;
 		pDefenderTile->TryDestroyUnit();
 		return Result::Succeeded;
 	}
@@ -981,7 +1000,16 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 
 	attackDamage = calculateDamage(pdefendingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
 	if (attackDamage >= 0) {
+		int attackerVisualHealthStart = (pattacker->health + 9) / 10;
 		pattacker->health -= attackDamage;
+		int attackerVisualHealthEnd = std::max((pattacker->health + 9) / 10, 0);
+		int attackerUnitCost = (attackerVisualHealthStart - attackerVisualHealthEnd) * Unit::GetUnitCost(pattacker->m_properties.m_type);
+		if (pdefendingplayer->PowerStatus() == 0) {
+			pdefendingplayer->m_powerMeter.AddCharge(0.5 * attackerUnitCost);
+		}
+		if (pattackingplayer->PowerStatus() == 0) {
+			pattackingplayer->m_powerMeter.AddCharge(attackerUnitCost);
+		}
 		if (FAttackUsesAmmo(*pdefender, *pattacker)) {
 			--pdefender->m_properties.m_ammo;
 		}
@@ -991,7 +1019,6 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	}
 
 	if (pattacker->health <= 0) {
-		std::cout << "Attacking Unit Destroyed by counterattack" << std::endl;
 		pAttackerTile->TryDestroyUnit();
 		return Result::Succeeded;
 	}
@@ -1175,23 +1202,23 @@ Result GameState::DoMoveAction(int& x, int& y, const Action& action) {
 	return Result::Succeeded;
 }
 
-// This isn't quite right.  We should always add 10*health and not round to nearest multiple of ten
 void GameState::HealUnits(int health) {
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
 			MapTile* pTile = nullptr;
 			m_spmap->TryGetTile(x, y, &pTile);
 			Unit* punit = pTile->TryGetUnit();
-			punit->health = (punit->health + health * 10) / 10 * 10;
-			punit->health = std::max(punit->health, 100);
+			if (punit != nullptr && punit->m_owner == &GetCurrentPlayer()) {
+				punit->health = std::min(punit->health + health * 10, 100);
+			}
 		}
 	}
 }
 
-// TODO: Need to manage COMeter state - Deduct charge.  Increase meter capacity
 Result GameState::DoCOPowerAction() {
 	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
 	GetCurrentPlayer().SetPowerStatus(1);
+	GetCurrentPlayer().m_powerMeter.UseCop();
 	switch (type) {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(2);
@@ -1203,6 +1230,7 @@ Result GameState::DoCOPowerAction() {
 Result GameState::DoSCOPowerAction() {
 	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
 	GetCurrentPlayer().SetPowerStatus(2);
+	GetCurrentPlayer().m_powerMeter.UseScop();
 	switch (type) {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(5);

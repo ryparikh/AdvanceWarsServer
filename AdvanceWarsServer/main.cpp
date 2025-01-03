@@ -62,6 +62,10 @@ int main() noexcept {
 				outFile << "Action: " << jaction.dump() << std::endl;
 				newGameState = awaiServer.do_action(gameId, vecActions[action]);
 				outFile << "GameState: " << std::endl << newGameState.dump() << std::endl;
+				if (totalActions % 1000 == 0) {
+					time_point endTime = std::chrono::steady_clock::now();
+					std::cout << "Processed Actions: " << totalActions << ", Processed Time (ms): " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << std::endl;
+				}
 			}
 			std::cout << "GameState: " << std::endl << newGameState.dump() << std::endl;
 			outFile.close();

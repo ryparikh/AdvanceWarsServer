@@ -37,7 +37,6 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 }
 
 /*static*/ tx_response AdvanceWarsServer::post_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body) {
-	time_point startTime = std::chrono::steady_clock::now();
 	std::string gameId = parameters.find("gameid")->second;
 	AdvanceWarsServer& server = AdvanceWarsServer::getInstance();
 
@@ -51,8 +50,6 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 	response_body = jsonResponseBody.dump();
 	tx_response resp(response_status::code::OK);
 	resp.add_header("Access-Control-Allow-Origin", "*");
-	time_point endTime = std::chrono::steady_clock::now();
-	std::clog << "Post game action: " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << "\n";
 	return resp;
 }
 
@@ -143,7 +140,6 @@ Result AdvanceWarsServer::get_valid_actions(const std::string& gameId, std::vect
 }
 
 json AdvanceWarsServer::do_action(const std::string& gameId, const Action& action) {
-	time_point startTime = std::chrono::steady_clock::now();
 	const auto& game = m_gameCache.find(gameId.c_str());
 	game->second->DoAction(action);
 	std::vector<Action> vecActions;
@@ -152,9 +148,6 @@ json AdvanceWarsServer::do_action(const std::string& gameId, const Action& actio
 		game->second->EndTurn();
 		game->second->CheckPlayerResigns();
 	}
-
-	time_point endTime = std::chrono::steady_clock::now();
-	std::clog << "Do action: " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << "\n";
 
 	json j;
 	to_json(j, *game->second);

@@ -652,13 +652,45 @@ Result GameState::DoAction(const Action& action) noexcept {
 	case Action::Type::MoveCombine:
 		return DoMoveCombineAction(x, y, action);
 	case Action::Type::MoveLoad:
-		return Result::Failed;
+		return DoMoveLoadAction(x, y, action);
 	case Action::Type::MoveWait:
 		return DoMoveAction(x, y, action);
 	case Action::Type::Repair:
+		return Result::Failed;
 	case Action::Type::Unload:
+		return DoUnloadAction(x, y, action);
+	}
+	return Result::Succeeded;
+}
+
+Result GameState::DoUnloadAction(int x, int y, const Action& action) {
+	MapTile* pmaptileDest = nullptr;
+	if (action.m_optDirection.has_value()) {
+		switch (action.m_optDirection.value()) {
+		case Action::Direction::North:
+			IfFailedReturn(m_spmap->TryGetTile(x, y - 1, &pmaptileDest));
+			break;
+		case Action::Direction::East:
+			IfFailedReturn(m_spmap->TryGetTile(x + 1, y, &pmaptileDest));
+			break;
+		case Action::Direction::South:
+			IfFailedReturn(m_spmap->TryGetTile(x, y + 1, &pmaptileDest));
+			break;
+		case Action::Direction::West:
+			IfFailedReturn(m_spmap->TryGetTile(x - 1, y, &pmaptileDest));
+			break;
+		}
+	}
+
+	if (pmaptileDest == nullptr) {
 		return Result::Failed;
 	}
+
+	MapTile* ptile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
+	Unit* punitTransport = ptile->TryGetUnit();
+	Unit* pUnit = punitTransport->Unload(*action.m_optUnloadIndex);
+	pmaptileDest->TryAddUnit(pUnit);
 	return Result::Succeeded;
 }
 
@@ -698,7 +730,28 @@ Result GameState::DoMoveCombineAction(int x, int y, const Action& action) {
 }
 
 Result GameState::DoMoveLoadAction(int x, int y, const Action& action) {
-	return Result::Failed;
+	if (!action.m_optTarget.has_value()) {
+		return Result::Failed;
+	}
+
+	MapTile* ptile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
+
+	MapTile* pDest = nullptr;
+	const std::pair<int, int>& pairDestination = action.m_optTarget.value();
+
+	std::unique_ptr<Unit> spunitSource(ptile->SpDetachUnit());
+	x = pairDestination.first;
+	y = pairDestination.second;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pDest));
+	Unit* punitDest = pDest->TryGetUnit();
+	if (!punitDest->CanLoad(spunitSource->m_properties.m_type)) {
+		return Result::Failed;
+	}
+
+	spunitSource->m_moved = true;
+	punitDest->Load(spunitSource.release());
+	return Result::Succeeded;
 }
 
 Result GameState::DoCaptureAction(int x, int y, const Action& action) {
@@ -1164,6 +1217,10 @@ void to_json(json& j, const Action& action) {
 	if (action.m_optUnitType.has_value()) {
 		j["unit"] = UnitProperties::getTypename(*action.m_optUnitType);
 	}
+
+	if (action.m_optUnloadIndex.has_value()) {
+		j["unloadIndex"] = action.m_optUnloadIndex.value();
+	}
 }
 
 /*static*/ Action::Type Action::fromTypeString(std::string strType) {
@@ -1257,5 +1314,10 @@ void from_json(json& j, Action& action) {
 		else if (strDirection == "west") {
 			action.m_optDirection = Action::Direction::West;
 		}
+	}
+
+	if (j.contains("unloadIndex")) {
+		int unloadIndex = -1;
+		j.at("unloadIndex").get_to(unloadIndex);
 	}
 }

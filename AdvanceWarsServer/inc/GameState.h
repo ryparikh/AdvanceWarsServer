@@ -99,6 +99,7 @@ struct Action {
 	Action(Type type, int xSource, int ySource, Direction direction, int xTarget, int yTarget) : m_type(type), m_optSource({ xSource, ySource }), m_optTarget({ xTarget, yTarget }), m_optDirection(direction) {}
 	// Used for Repair, Unload
 	Action(Type type, int xSource, int ySource, Direction direction) : m_type(type), m_optSource({ xSource, ySource }), m_optDirection(direction) {}
+	Action(Type type, int xSource, int ySource, Direction direction, int i) : m_type(type), m_optSource({ xSource, ySource }), m_optDirection(direction), m_optUnloadIndex(i) {}
 	// Used for Buy Actions
 	Action(Type type, int xSource, int ySource, UnitProperties::Type unitType) : m_type(type), m_optSource({ xSource, ySource }), m_optUnitType(unitType) {}
 
@@ -150,6 +151,8 @@ struct Action {
 
 	// Which unit are we buying
 	std::optional<UnitProperties::Type> m_optUnitType;
+
+	std::optional<int> m_optUnloadIndex;
 };
 
 class MoveNode {
@@ -209,6 +212,7 @@ private:
 	Result DoMoveCombineAction(int x, int y, const Action& action);
 	Result DoMoveLoadAction(int x, int y, const Action& action);
 	Result DoCaptureAction(int x, int y, const Action& action);
+	Result DoUnloadAction(int x, int y, const Action& action);
 	Result DoCOPowerAction();
 	Result DoSCOPowerAction();
 	int calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars);

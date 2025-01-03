@@ -230,7 +230,7 @@ int Unit::CLoadedUnits() const noexcept {
 
 Unit* Unit::Unload(int i) {
 	Unit* punit = m_vecLanderUnits[i];
-	m_vecLanderUnits[i] = nullptr;
+	m_vecLanderUnits.erase(m_vecLanderUnits.begin() + i);
 	return punit;
 }
 

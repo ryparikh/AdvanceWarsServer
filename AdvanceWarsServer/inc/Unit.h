@@ -96,6 +96,7 @@ public:
 	bool IsVehicle() const noexcept;
 	bool IsHidden() const noexcept;
 	bool CanLoad(UnitProperties::Type type) const noexcept;
+	//TODO leaks memory should be unique_ptr
 	void Load(Unit* pUnit);
 	int CLoadedUnits() const noexcept;
 	Unit* GetLoadedUnit(int i) const noexcept;

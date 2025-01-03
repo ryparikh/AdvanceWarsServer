@@ -203,7 +203,7 @@ private:
 
 	MoveNode* AddNewNodeToGraph(std::vector<Action>& vecActions, std::vector<std::unique_ptr<MoveNode>>& vecMoves, MoveNode** pMoveUpdate, int movement, int fuel, int x, int y) const noexcept;
 
-	void CreateMovementGraph(int x, int y, const Unit& unit, std::vector<std::unique_ptr<MoveNode>>& vecMoves);
+	int GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest);
 
 	// Actions
 	Result DoAttackAction(int x, int y, const Action& action);

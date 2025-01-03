@@ -348,6 +348,75 @@ bool GameState::FAtUnitCap() const noexcept {
 	return totalUnits >= m_nUnitCap;
 }
 
+int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
+	const MapTile* pmaptile;
+	m_spmap->TryGetTile(xSrc, ySrc, &pmaptile);
+	const Unit* pUnit = pmaptile->TryGetUnit();
+	MovementTypes movementType = pUnit->m_properties.m_movementType;
+	int maxMovement = pUnit->m_properties.m_movement + GetCOMovementBonus(GetCurrentPlayer().m_co.m_type, *pUnit);
+	std::vector<std::unique_ptr<MoveNode>> vecNodes;
+	vecNodes.emplace_back(new MoveNode(maxMovement, pUnit->m_properties.m_fuel, xSrc, ySrc));
+	std::queue<MoveNode*> queueMoveNodes;
+	std::vector<Action> vecActions;
+	queueMoveNodes.push(vecNodes.back().get());
+	while (!queueMoveNodes.empty()) {
+		MoveNode* pTop = queueMoveNodes.front();
+		queueMoveNodes.pop();
+
+		if (pTop->m_visited) {
+			continue;
+		}
+
+		const int xCurr = pTop->m_x;
+		const int yCurr = pTop->m_y;
+		// Add moves for current position
+		MapTile* pCurrentTile = nullptr;
+		m_spmap->TryGetTile(xCurr, yCurr, &pCurrentTile);
+
+		pTop->m_visited = true;
+		if (pTop->m_movement == 0) {
+			continue;
+		}
+
+		// TODO: Refactor
+		// Search north
+		if (pTop->m_pnorth == nullptr || pTop->m_pnorth->m_visited == false) {
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y - 1, movementType, pTop->m_movement, pTop->m_fuel);
+			if (movementRemaining >= 0 && fuelRemaining >= 0) {
+				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_pnorth, movementRemaining, fuelRemaining, pTop->m_x, pTop->m_y - 1));
+			}
+		}
+
+		// Search east
+		if (pTop->m_peast == nullptr || pTop->m_peast->m_visited == false) {
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x + 1, pTop->m_y, movementType, pTop->m_movement, pTop->m_fuel);
+			if (movementRemaining >= 0 && fuelRemaining >= 0) {
+				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_peast, movementRemaining, fuelRemaining, pTop->m_x + 1, pTop->m_y));
+			}
+		}
+		// Search south 
+		if (pTop->m_psouth == nullptr || pTop->m_psouth->m_visited == false) {
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y + 1, movementType, pTop->m_movement, pTop->m_fuel);
+			if (movementRemaining >= 0 && fuelRemaining >= 0) {
+				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_psouth, movementRemaining, fuelRemaining, pTop->m_x, pTop->m_y + 1));
+			}
+		}
+		// Search west
+		if (pTop->m_pwest == nullptr || pTop->m_pwest->m_visited == false) {
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x - 1, pTop->m_y, movementType, pTop->m_movement, pTop->m_fuel);
+			if (movementRemaining >= 0 && fuelRemaining >= 0) {
+				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_pwest, movementRemaining, fuelRemaining, pTop->m_x - 1, pTop->m_y));
+			}
+		}
+	}
+
+	for (auto& node : vecNodes) {
+		if (node->m_x == xDest && node->m_y == yDest) {
+			return node->m_fuel;
+		}
+	}
+}
+
 Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept {
 	const MapTile* pmaptile;
 	m_spmap->TryGetTile(x, y, &pmaptile);
@@ -705,6 +774,7 @@ Result GameState::DoMoveCombineAction(int x, int y, const Action& action) {
 	MapTile* pDest = nullptr;
 	const std::pair<int, int>& pairDestination = action.m_optTarget.value();
 
+	ptile->TryGetUnit()->m_properties.m_fuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
 	std::unique_ptr<Unit> spunitSource(ptile->SpDetachUnit());
 	x = pairDestination.first;
 	y = pairDestination.second;
@@ -715,14 +785,16 @@ Result GameState::DoMoveCombineAction(int x, int y, const Action& action) {
 	punitDest->m_properties.m_ammo = std::min(GetUnitInfo(spunitSource->m_properties.m_type).m_ammo, punitDest->m_properties.m_ammo + spunitSource->m_properties.m_ammo);
 	punitDest->m_properties.m_fuel = std::min(GetUnitInfo(spunitSource->m_properties.m_type).m_fuel, punitDest->m_properties.m_fuel + spunitSource->m_properties.m_fuel);
 	
-	int healthTotal = punitDest->health + spunitSource->health;
-	if (healthTotal > 100) {
-		int refundUnits = (healthTotal + 9) / 10 - 10;
+	int healthDest = (punitDest->health + 9) / 10;
+	int healthSrc = (spunitSource->health + 9) / 10;
+	if ((healthDest + healthSrc) > 10) {
+		int refundUnits = healthDest + healthSrc - 10;
 		GetCurrentPlayer().m_funds += refundUnits * Unit::GetUnitCost(spunitSource->m_properties.m_type);
 		punitDest->health = 100;
 	}
 	else {
-		punitDest->health = healthTotal;
+		std::cout << healthDest << ", " << healthSrc << ", " << punitDest->health << ", " << spunitSource->health << std::endl;
+		punitDest->health = (healthDest + healthSrc) * 10;
 	}
 
 	punitDest->m_moved = true;
@@ -740,6 +812,7 @@ Result GameState::DoMoveLoadAction(int x, int y, const Action& action) {
 	MapTile* pDest = nullptr;
 	const std::pair<int, int>& pairDestination = action.m_optTarget.value();
 
+	ptile->TryGetUnit()->m_properties.m_fuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
 	std::unique_ptr<Unit> spunitSource(ptile->SpDetachUnit());
 	x = pairDestination.first;
 	y = pairDestination.second;
@@ -907,7 +980,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	}
 
 	attackDamage = calculateDamage(pdefendingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
-	if (attackDamage > 0) {
+	if (attackDamage >= 0) {
 		pattacker->health -= attackDamage;
 		if (FAttackUsesAmmo(*pdefender, *pattacker)) {
 			--pdefender->m_properties.m_ammo;
@@ -922,6 +995,8 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		pAttackerTile->TryDestroyUnit();
 		return Result::Succeeded;
 	}
+
+	//TODO: Check for rout victory?
 
 	return Result::Succeeded;
 }
@@ -1081,12 +1156,12 @@ Result GameState::DoMoveAction(int& x, int& y, const Action& action) {
 		return Result::Succeeded;
 	}
 
+	punit->m_properties.m_fuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
 	punit = ptile->SpDetachUnit();
 	x = pairDestination.first;
 	y = pairDestination.second;
 	IfFailedReturn(m_spmap->TryGetTile(x, y, &pDest));
 	pDest->TryAddUnit(punit);
-	//TODO: Need to account for fuel usage
 
 	// Reset capture points when moving off of property.
 	if (ptile->m_spPropertyInfo != nullptr && ptile->m_spPropertyInfo->m_capturePoints != 20) {
@@ -1113,6 +1188,7 @@ void GameState::HealUnits(int health) {
 	}
 }
 
+// TODO: Need to manage COMeter state - Deduct charge.  Increase meter capacity
 Result GameState::DoCOPowerAction() {
 	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
 	GetCurrentPlayer().SetPowerStatus(1);
@@ -1181,7 +1257,7 @@ bool GameState::CheckPlayerResigns() noexcept {
 	// if army value is less than half opponent value
 	// if army units is less than half opponent units
 	// forfeit
-	if ((nCurrentPlayerArmyValue < (nEnemyPlayerArmyValue / 3)) || (nCurrentPlayerUnits < (nEnemyPlayerUnits / 3))) {
+	if ((nCurrentPlayerArmyValue < (nEnemyPlayerArmyValue / 3)) && (nCurrentPlayerUnits < (nEnemyPlayerUnits / 3))) {
 		std::cout << "CAM: " << nCurrentPlayerArmyValue << std::endl;
 		std::cout << "EAM: " << nEnemyPlayerArmyValue << std::endl;
 		std::cout << "CU: " << nCurrentPlayerUnits << std::endl;

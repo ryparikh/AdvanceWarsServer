@@ -64,6 +64,16 @@ Unit::Unit(const UnitProperties::Type& type, const Player* owner): m_owner(owner
 	m_properties = GetUnitInfo(type);
 }
 
+Unit* Unit::Clone(const Player* pNewOwner) const {
+	std::unique_ptr<Unit> spClone(new Unit(m_properties.m_type, pNewOwner));
+	spClone->health = health;
+	spClone->m_moved = m_moved;
+	spClone->m_hidden = m_hidden;
+	for (const Unit* pLoadedUnit : m_vecLanderUnits) {
+		spClone->m_vecLanderUnits.emplace_back(pLoadedUnit->Clone(pNewOwner));
+	}
+	return spClone.release();
+}
 
 bool Unit::IsVehicle() const noexcept {
 	return UnitProperties::IsVehicle(m_properties.m_type);

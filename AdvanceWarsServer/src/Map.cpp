@@ -133,6 +133,42 @@ Result Map::TryDestroyUnit(unsigned int x, unsigned int y) noexcept {
 	return Result::Succeeded;
 }
 
+Map* Map::Clone(const std::array<Player, 2>& arrPlayers) const {
+	std::unique_ptr<Map> spNewMap{ new Map() };
+	spNewMap->m_vecvecMapTile.reserve(GetRows());
+	for (int y = 0; y < GetRows(); ++y) {
+		std::vector<MapTile> vecCloneTiles;
+		vecCloneTiles.reserve(GetCols());
+		for (int x = 0; x < GetCols(); ++x) {
+			const MapTile* pTile;
+			TryGetTile(x, y, &pTile);
+			const Player* pNewPropertyOwner = nullptr;
+			if (pTile->m_spPropertyInfo != nullptr && pTile->m_spPropertyInfo->m_owner != nullptr) {
+				if (pTile->m_spPropertyInfo->m_owner->m_armyType == arrPlayers[0].m_armyType) {
+					pNewPropertyOwner = &arrPlayers[0];
+				}
+				else if (pTile->m_spPropertyInfo->m_owner->m_armyType == arrPlayers[1].m_armyType) {
+					pNewPropertyOwner = &arrPlayers[1];
+				}
+			}
+
+			const Unit* pUnit = pTile->TryGetUnit();
+			const Player* pNewUnitOwner = nullptr;
+			if (pUnit != nullptr) {
+				if (pUnit->m_owner->m_armyType == arrPlayers[0].m_armyType) {
+					pNewUnitOwner = &arrPlayers[0];
+				}
+				else
+					pNewUnitOwner = &arrPlayers[1];
+			}
+
+			vecCloneTiles.emplace_back(std::move(pTile->Clone(pNewPropertyOwner, pNewUnitOwner)));
+		}
+		spNewMap->m_vecvecMapTile.emplace_back(std::move(vecCloneTiles));
+	}
+
+	return spNewMap.release();
+}
 void to_json(json& j, const Map& map) {
 
 	json jsonMap = json::array();

@@ -173,7 +173,39 @@ public:
 class GameState {
 public:
 	GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept;
+	GameState(const GameState& other) noexcept;
+	GameState& operator=(const GameState& other) noexcept;
 
+	bool isTerminal() const {
+		return m_fGameOver;
+	}
+
+	std::vector<Action> getLegalActions() const {
+		std::vector<Action> vecActions;
+		GetValidActions(vecActions);
+		return vecActions;
+	}
+
+	GameState applyAction(const Action& action) {
+		GameState actedGameState{Clone()};
+		actedGameState.DoAction(action);
+		actedGameState.CheckPlayerResigns();
+		return actedGameState;
+	}
+
+	double evaluate(int playerPerspective) const {
+		if (!m_fGameOver || m_winningPlayer == 2) {
+			return 0;
+		}
+
+		if (m_winningPlayer == playerPerspective) {
+			return 1;
+		}
+
+		return -1;
+	}
+
+	GameState Clone();
 	Result InitializeGame() noexcept;
 	Result DoAction(const Action& action) noexcept;
 	Map* TryGetMap() const noexcept;
@@ -231,8 +263,10 @@ private:
 	int m_nTurnCount = 0;
 	bool m_isFirstPlayerTurn{ true };
 	bool m_fGameOver = false;
+	int m_winningPlayer = -1;
 };
 
 void to_json(json& j, const GameState& gameState);
 void to_json(json& j, const Action& action);
 void from_json(json& j, Action& action);
+void from_json(json& j, GameState& gameState);

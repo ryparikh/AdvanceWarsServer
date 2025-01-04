@@ -24,6 +24,7 @@ public:
 	Result TryAddUnit(unsigned int x, unsigned int y, const UnitProperties::Type& type, const Player* owner) noexcept;
 	Result TryDestroyUnit(unsigned int x, unsigned int y) noexcept;
 	Result Capture(unsigned int x, unsigned int y, const Player* player) noexcept;
+	Map* Clone(const std::array<Player, 2>& arrPlayers) const;
 private:
 	std::vector<std::vector<MapTile>> m_vecvecMapTile;
 };

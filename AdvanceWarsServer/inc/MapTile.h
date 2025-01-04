@@ -13,7 +13,9 @@ struct PropertyInfo{
 class MapTile final
 {
 public:
+	//MapTile();
 	MapTile(const Terrain& terrain, int nFileID);
+	MapTile(MapTile&& maptile);
 
 	const Terrain& GetTerrain() const {
 		return m_terrain;
@@ -27,6 +29,7 @@ public:
 	Result TryAddUnit(Unit* pUnit) noexcept;
 	Result TryDestroyUnit() noexcept;
 	Result Capture(const Player* owner);
+	MapTile Clone(const Player* pNewPropertOwner, const Player* pNewUnitOwner) const;
 
 	const Terrain& m_terrain;
 	const int m_nFileID;

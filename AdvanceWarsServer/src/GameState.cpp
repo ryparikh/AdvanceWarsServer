@@ -226,18 +226,34 @@ MoveNode* GameState::AddNewNodeToGraph(std::vector<Action>& vecActions, std::vec
 }
 
 bool GameState::CanUnitAttack(const Unit& attacker, const Unit& defender) const noexcept {
-	if (attacker.m_properties.m_primaryWeapon == UnitProperties::Weapon::MachineGun) {
-		return vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)] > -1;
+	int baseDamage = -1;
+	if (defender.IsFootsoldier()) {
+		if (attacker.m_properties.m_primaryWeapon == UnitProperties::Weapon::MachineGun) {
+			baseDamage = vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+		}
+		else if (attacker.m_properties.m_secondaryWeapon == UnitProperties::Weapon::MachineGun) {
+			baseDamage = vrgSecondaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+		}
+		else if (attacker.m_properties.m_ammo > 0) {
+			baseDamage = vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+		}
 	}
 	else {
-		if (attacker.m_properties.m_ammo > 0) {
-			return vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)] > -1;
-		} else if (attacker.m_properties.m_secondaryWeapon != UnitProperties::Weapon::Invalid) {
-			return vrgSecondaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)] > -1;
+		if (attacker.m_properties.m_primaryWeapon == UnitProperties::Weapon::MachineGun) {
+			baseDamage = vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+		}
+		else if (attacker.m_properties.m_ammo > 0) {
+			baseDamage = vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+			if (baseDamage == -1 && attacker.m_properties.m_secondaryWeapon != UnitProperties::Weapon::Invalid) {
+				baseDamage = vrgSecondaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+			}
+		}
+		else if (attacker.m_properties.m_ammo == 0 && attacker.m_properties.m_secondaryWeapon != UnitProperties::Weapon::Invalid) {
+			baseDamage = vrgSecondaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
 		}
 	}
 
-	return false;
+	return baseDamage > -1;
 }
 
 int GameState::GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept {
@@ -343,19 +359,19 @@ bool GameState::FAttackUsesAmmo(const Unit& attacker, const Unit& defender) cons
 }
 
 bool GameState::FAtUnitCap() const noexcept {
-	int totalUnits = 0;
-	for (int x = 0; x < m_spmap->GetCols(); ++x) {
-		for (int y = 0; y < m_spmap->GetRows(); ++y) {
-			const MapTile* pTile = nullptr;
-			m_spmap->TryGetTile(x, y, &pTile);
-			const Unit* pUnit = pTile->TryGetUnit();
-			if (pUnit != nullptr && pUnit->m_owner == &GetCurrentPlayer()) {
-				++totalUnits;
-			}
-		}
-	}
+	//int totalUnits = 0;
+	//for (int x = 0; x < m_spmap->GetCols(); ++x) {
+	//	for (int y = 0; y < m_spmap->GetRows(); ++y) {
+	//		const MapTile* pTile = nullptr;
+	//		m_spmap->TryGetTile(x, y, &pTile);
+	//		const Unit* pUnit = pTile->TryGetUnit();
+	//		if (pUnit != nullptr && pUnit->m_owner == &GetCurrentPlayer()) {
+	//			++totalUnits;
+	//		}
+	//	}
+	//}
 
-	return totalUnits >= m_nUnitCap;
+	return GetCurrentPlayer().m_unitsCached >= m_nUnitCap;
 }
 
 int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
@@ -630,7 +646,10 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 					unit.m_movementType == MovementTypes::Tires ||
 					unit.m_movementType == MovementTypes::Treads) &&
 					Unit::GetUnitCost(unit.m_type) * 10 <= funds) {
-					vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
+					// TODO: How to win if players both build pipe runners
+					if (unit.m_type != UnitProperties::Type::Piperunner) {
+						vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
+					}
 				}
 			}
 			break;
@@ -703,17 +722,17 @@ Result GameState::DoAction(const Action& action) noexcept {
 	std::vector<Action> vecActions;
 	int x = source.first;
 	int y = source.second;
-	GetValidActions(x, y, vecActions);
-	bool fValid = false;
-	for (const Action& validAction : vecActions) {
-		if (validAction == action) {
-			fValid = true;
-		}
-	}
+	//GetValidActions(x, y, vecActions);
+	//bool fValid = false;
+	//for (const Action& validAction : vecActions) {
+	//	if (validAction == action) {
+	//		fValid = true;
+	//	}
+	//}
 
-	if (!fValid) {
-		return Result::Failed;
-	}
+	//if (!fValid) {
+	//	return Result::Failed;
+	//}
 
 	switch (action.m_type) {
 	default:
@@ -855,6 +874,8 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		ptile->Capture(&GetCurrentPlayer());
 		if (fHqCapture) {
 			m_fGameOver = true;
+			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+			//std::cout << "HQ Capture Win: " << m_winningPlayer << std::endl;
 		}
 
 		int totalProperties = 0;
@@ -871,6 +892,8 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		}
 		if (totalProperties >= m_nCaptureLimit) {
 			m_fGameOver = true;
+			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+			//std::cout << "Capture Limit Win: " << m_winningPlayer << std::endl;
 		}
 	}
 
@@ -1014,17 +1037,13 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 			--pdefender->m_properties.m_ammo;
 		}
 	}
-	else 		{
-		return Result::Failed;
-	}
 
 	if (pattacker->health <= 0) {
 		pAttackerTile->TryDestroyUnit();
 		return Result::Succeeded;
 	}
 
-	//TODO: Check for rout victory?
-
+	//TODO: Check for rout victory condition
 	return Result::Succeeded;
 }
 
@@ -1048,6 +1067,9 @@ int GameState::calculateDamage(const Player* pattackingplayer, const CommandingO
 		}
 		else if (attacker.m_properties.m_ammo > 0) {
 			baseDamage = vrgPrimaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+			if (baseDamage == -1 && attacker.m_properties.m_secondaryWeapon != UnitProperties::Weapon::Invalid) {
+				baseDamage = vrgSecondaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
+			}
 		}
 		else if (attacker.m_properties.m_ammo == 0 && attacker.m_properties.m_secondaryWeapon != UnitProperties::Weapon::Invalid) {
 			baseDamage = vrgSecondaryWeaponDamage[static_cast<int>(attacker.m_properties.m_type)][static_cast<int>(defender.m_properties.m_type)];
@@ -1130,7 +1152,7 @@ int GameState::GetMaxGoodLuck(const Player& player) noexcept {
 			return 94;
 		}
 	default:
-		return 9;
+		return 0;
 	}
 }
 
@@ -1256,8 +1278,20 @@ bool GameState::IsFirstPlayerTurn() const noexcept {
 }
 
 bool GameState::CheckPlayerResigns() noexcept {
+	if (m_fGameOver) {
+		return false;
+	}
+
 	if (m_nTurnCount < 14) {
 		return false;
+	}
+
+	if (m_nTurnCount > 100) {
+		m_fGameOver = true;
+		m_winningPlayer = 2;
+		//std::cout << "Turn count exceeded" << std::endl;
+		//std::cout << "Winning player: " << m_winningPlayer << std::endl;
+		return true;
 	}
 
 	int nCurrentPlayerArmyValue = 0;
@@ -1286,14 +1320,53 @@ bool GameState::CheckPlayerResigns() noexcept {
 	// if army units is less than half opponent units
 	// forfeit
 	if ((nCurrentPlayerArmyValue < (nEnemyPlayerArmyValue / 3)) && (nCurrentPlayerUnits < (nEnemyPlayerUnits / 3))) {
-		std::cout << "CAM: " << nCurrentPlayerArmyValue << std::endl;
-		std::cout << "EAM: " << nEnemyPlayerArmyValue << std::endl;
-		std::cout << "CU: " << nCurrentPlayerUnits << std::endl;
-		std::cout << "EU: " << nEnemyPlayerUnits << std::endl;
+		//std::cout << "CAM: " << nCurrentPlayerArmyValue << std::endl;
+		//std::cout << "EAM: " << nEnemyPlayerArmyValue << std::endl;
+		//std::cout << "CU: " << nCurrentPlayerUnits << std::endl;
+		//std::cout << "EU: " << nEnemyPlayerUnits << std::endl;
+		m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
+		//std::cout << "Forfeit by player" << (m_isFirstPlayerTurn ? 0 : 1) << std::endl;
+		//std::cout << "Winning player" << m_winningPlayer << std::endl;
 		m_fGameOver = true;
-		m_isFirstPlayerTurn = !m_isFirstPlayerTurn;
 	}
-	return false;
+
+	return true;
+}
+
+GameState::GameState(const GameState& other) noexcept :
+	m_arrPlayers{ other.m_arrPlayers }
+{
+	m_guid = other.m_guid;
+	m_spmap.reset(other.m_spmap->Clone(m_arrPlayers));
+	m_nUnitCap = other.m_nUnitCap;
+	m_nCaptureLimit = other.m_nCaptureLimit;
+	m_nTurnCount = other.m_nTurnCount;
+	m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
+	m_fGameOver = other.m_fGameOver;
+	m_winningPlayer = other.m_winningPlayer;
+}
+
+GameState GameState::Clone() {
+	return *this;
+}
+
+GameState& GameState::operator=(const GameState& other) noexcept {
+	if (this == &other) {
+		return *this;
+	}
+
+	{
+		m_arrPlayers = other.m_arrPlayers;
+		m_guid = other.m_guid;
+		m_spmap.reset(other.m_spmap->Clone(m_arrPlayers));
+		m_nUnitCap = other.m_nUnitCap;
+		m_nCaptureLimit = other.m_nCaptureLimit;
+		m_nTurnCount = other.m_nTurnCount;
+		m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
+		m_fGameOver = other.m_fGameOver;
+		m_winningPlayer = other.m_winningPlayer;
+	}
+	return *this;
 }
 
 void to_json(json& j, const GameState& gameState) {
@@ -1423,5 +1496,12 @@ void from_json(json& j, Action& action) {
 	if (j.contains("unloadIndex")) {
 		int unloadIndex = -1;
 		j.at("unloadIndex").get_to(unloadIndex);
+	}
+}
+
+void from_json(json& j, GameState& gameState) {
+	if (j.contains("map")) {
+		std::string map;
+		j.at("map").get_to(map);
 	}
 }

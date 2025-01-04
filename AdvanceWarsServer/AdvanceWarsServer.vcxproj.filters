@@ -125,6 +125,9 @@
     <ClInclude Include="inc\AdvanceWarsServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\MonteCarloTreeSearch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\AWBW\MapSources\From_Wharf_To_Wilds.txt">

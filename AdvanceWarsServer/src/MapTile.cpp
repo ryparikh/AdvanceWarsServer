@@ -1,4 +1,5 @@
 #include <MapTile.h>
+#include <TerrainInfo.h>
 
 /*static*/ bool MapTile::IsProperty(Terrain::Type type) {
 	return type == Terrain::Type::Airport ||
@@ -30,6 +31,7 @@ Result MapTile::Capture(const Player* owner) {
 }
 
 Result MapTile::TryAddUnit(const UnitProperties::Type& type, const Player* player) noexcept {
+	++player->m_unitsCached;
 	m_spUnit.reset(new Unit(type, player));
 	return Result::Succeeded;
 }
@@ -52,8 +54,32 @@ Unit* MapTile::SpDetachUnit() noexcept {
 }
 
 Result MapTile::TryDestroyUnit() noexcept {
+	--m_spUnit->m_owner->m_unitsCached;
 	m_spUnit.reset();
 	return Result::Succeeded;
+}
+//
+//MapTile::MapTile(): m_nFileID(-1), m_terrain(GetTerrainInfo(Terrain::Type::Plain)){
+//}
+
+MapTile::MapTile(MapTile&& maptile):m_terrain(maptile.m_terrain), m_nFileID(maptile.m_nFileID){
+	m_spUnit = std::move(maptile.m_spUnit);
+	m_spPropertyInfo = std::move(maptile.m_spPropertyInfo);
+}
+
+MapTile MapTile::Clone(const Player* pNewPropertyOwner, const Player* pNewUnitOwner) const {
+	MapTile clone(m_terrain, m_nFileID);
+	if (m_spUnit != nullptr) {
+		clone.m_spUnit.reset(m_spUnit->Clone(pNewUnitOwner));
+	}
+
+	if (m_spPropertyInfo != nullptr) {
+		clone.m_spPropertyInfo.reset(new PropertyInfo());
+		clone.m_spPropertyInfo->m_capturePoints = m_spPropertyInfo->m_capturePoints;
+		clone.m_spPropertyInfo->m_owner = pNewPropertyOwner;
+	}
+
+	return clone;
 }
 
 TerrainFileID toTerrainFileId(const MapTile& maptile, const PropertyInfo* pproperty) {
@@ -166,8 +192,8 @@ void to_json(json& j, const MapTile& maptile) {
 }
 
 void to_json(json& j, const PropertyInfo& propertyInfo) {
-	j = { {
+	j = {
 			{"capture-points", propertyInfo.m_capturePoints},
 			{"owner", propertyInfo.m_owner != nullptr ? propertyInfo.m_owner->getArmyTypeJson() : "neutral"}
-		} };
+		};
 }

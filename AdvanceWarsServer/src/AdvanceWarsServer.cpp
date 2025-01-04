@@ -115,6 +115,11 @@ json AdvanceWarsServer::create_new_game(std::string& gameId) {
 	return j;
 }
 
+GameState AdvanceWarsServer::CloneGameState(const std::string& gameId) const {
+	const auto& game = m_gameCache.find(gameId.c_str());
+	return game->second->Clone();
+}
+
 json AdvanceWarsServer::get_actions(const std::string& gameId, int x, int y) const {
 	const auto& game = m_gameCache.find(gameId.c_str());
 	std::vector<Action> vecActions;

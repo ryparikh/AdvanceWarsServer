@@ -47,6 +47,8 @@ public:
 	json get_actions(const std::string& gameId, int x, int y) const;
 	json do_action(const std::string& gameId, const Action& action);
 	bool game_over(const std::string& gameId);
+
+	GameState CloneGameState(const std::string& gameId) const;
 private:
 	static std::unique_ptr<AdvanceWarsServer> s_spServer;
 	asio::io_context m_io_context;

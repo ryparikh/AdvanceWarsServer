@@ -89,6 +89,7 @@ class Unit {
 public:
 	static int GetUnitCost(const UnitProperties::Type& type);
 	Unit(const UnitProperties::Type& type, const Player* owner);
+	Unit* Clone(const Player* pNewOwner) const;
 	bool IsTransport() const noexcept;
 	bool IsFootsoldier() const noexcept;
 	bool IsAirUnit() const noexcept;

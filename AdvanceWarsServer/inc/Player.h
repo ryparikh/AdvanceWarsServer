@@ -56,6 +56,7 @@ public:
 	int m_powerStatus{ 0 };
 	ArmyType m_armyType{ ArmyType::Invalid };
 	std::string getArmyTypeJson() const;
+	mutable int m_unitsCached = 0;
 };
 
 void to_json(json& j, const Player& gameState);

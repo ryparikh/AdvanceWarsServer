@@ -185,6 +185,7 @@
     <ClInclude Include="inc\MapParser.h" />
     <ClInclude Include="inc\MapTile.h" />
     <ClInclude Include="inc\MapView.h" />
+    <ClInclude Include="inc\MonteCarloTreeSearch.h" />
     <ClInclude Include="inc\MovementTypes.h" />
     <ClInclude Include="inc\Player.h" />
     <ClInclude Include="inc\Result.h" />

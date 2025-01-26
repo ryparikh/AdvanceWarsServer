@@ -405,6 +405,20 @@ void to_json(json& j, const Unit& unit) {
 	to_json(j, unit.m_properties);
 	j["owner"] = unit.m_owner->getArmyTypeJson();
 	j["health"] = unit.health;
+	j["moved"] = unit.m_moved;
+	j["hidden"] = unit.m_hidden;
+	if (unit.m_vecLanderUnits.size() == 1) {
+		json loadedUnit;
+		to_json(loadedUnit, *unit.m_vecLanderUnits[0]);
+		j["loaded-units"] = { loadedUnit };
+	}
+	else if (unit.m_vecLanderUnits.size() == 2) {
+		json loadedUnit;
+		to_json(loadedUnit, *unit.m_vecLanderUnits[0]);
+		json loadedUnit2;
+		to_json(loadedUnit2, *unit.m_vecLanderUnits[1]);
+		j["loaded-units"] = { loadedUnit, loadedUnit2 };
+	}
 }
 
 void from_json(const std::array<Player, 2>& arrPlayers, json& j, Unit& unit) {
@@ -418,6 +432,17 @@ void from_json(const std::array<Player, 2>& arrPlayers, json& j, Unit& unit) {
 	}
 	else if (arrPlayers[1].m_armyType == Player::armyTypefromString(armyType)) {
 		unit.m_owner = &arrPlayers[1];
+	}
+
+	j.at("moved").get_to(unit.m_moved);
+	j.at("hidden").get_to(unit.m_hidden);
+
+	if (j.contains("loaded-units")) {
+		for (auto& jUnit : j.at("loaded-units")) {
+			Unit* ploadedUnit = new Unit();
+			from_json(arrPlayers, jUnit, *ploadedUnit);
+			unit.m_vecLanderUnits.emplace_back(ploadedUnit);
+		}
 	}
 }
 

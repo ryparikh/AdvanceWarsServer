@@ -57,6 +57,9 @@
     <ClCompile Include="src\Unit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\JsonSubsystemTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Map.h">
@@ -122,6 +125,9 @@
     <ClInclude Include="inc\MonteCarloTreeSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\SubsystemTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\AWBW\MapSources\From_Wharf_To_Wilds.txt">
@@ -132,5 +138,9 @@
     <ResourceCompile Include="AdvanceWarsServer.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test\json\combat\infantry-roads.json" />
+    <None Include="test\json\combat\infantry-plains.json" />
   </ItemGroup>
 </Project>

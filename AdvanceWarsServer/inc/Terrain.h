@@ -2,7 +2,6 @@
 
 #include <map>
 #include "MovementTypes.h"
-#include "TerrainFileId.h"
 
 struct Terrain {
 	enum class Type : int {

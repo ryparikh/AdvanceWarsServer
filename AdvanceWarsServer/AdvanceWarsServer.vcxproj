@@ -163,6 +163,7 @@
     <ClCompile Include="src\AdvanceWarsServer.cpp" />
     <ClCompile Include="src\CommandingOfficier.cpp" />
     <ClCompile Include="src\GameState.cpp" />
+    <ClCompile Include="src\JsonSubsystemTest.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\MapParser.cpp" />
     <ClCompile Include="src\MapTile.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="inc\MovementTypes.h" />
     <ClInclude Include="inc\Player.h" />
     <ClInclude Include="inc\Result.h" />
+    <ClInclude Include="inc\SubsystemTest.h" />
     <ClInclude Include="inc\Terrain.h" />
     <ClInclude Include="inc\TerrainFileId.h" />
     <ClInclude Include="inc\TerrainInfo.h" />
@@ -199,6 +201,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AdvanceWarsServer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test\json\combat\infantry-roads.json" />
+    <None Include="test\json\combat\infantry-plains.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

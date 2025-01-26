@@ -1,6 +1,7 @@
 #include <MapTile.h>
 #include <MapParser.h>
 #include <TerrainInfo.h>
+#include <TerrainFileId.h>
 
 /*static*/ bool MapTile::IsProperty(Terrain::Type type) {
 	return type == Terrain::Type::Airport ||

@@ -1157,7 +1157,7 @@ int GameState::GetMaxGoodLuck(const Player& player) noexcept {
 			return 94;
 		}
 	default:
-		return 0;
+		return 9;
 	}
 }
 
@@ -1187,7 +1187,7 @@ int GameState::GetMaxBadLuck(const Player& player) noexcept {
 			return 44;
 		}
 	default:
-		return 0;
+		return 9;
 	}
 }
 Result GameState::DoMoveAction(int& x, int& y, const Action& action) {

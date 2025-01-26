@@ -13,6 +13,7 @@ class Map;
 
 struct Action {
 	enum class Type {
+		// TODO: Need action for "hide"/"unhide" unit
 		Invalid = -1,
 		Attack,
 		EndTurn,

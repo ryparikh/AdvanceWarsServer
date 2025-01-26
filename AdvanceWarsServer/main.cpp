@@ -4,13 +4,11 @@
 #include <thread>
 #include "AdvanceWarsServer.h"
 #include "MonteCarloTreeSearch.h"
+#include "SubsystemTest.h"
 
 int main(int argc, char* argv[]) noexcept {
 	try {
-		AdvanceWarsServer& awaiServer = AdvanceWarsServer::getInstance();
-		std::thread thread([&]() {
-			awaiServer.run();
-		});
+
 
 		if (argc != 2) { // Check if the user provided exactly one argument
 			std::cerr << "Usage: " << argv[0] << " <option>\n";
@@ -24,6 +22,10 @@ int main(int argc, char* argv[]) noexcept {
 		std::string argument = argv[1];
 
 		if (argument == "-sim-random-move-game") {
+			AdvanceWarsServer& awaiServer = AdvanceWarsServer::getInstance();
+			std::thread thread([&]() {
+				awaiServer.run();
+			});
 
 			// Simulate Game
 			std::thread gameRunner([&]() {
@@ -41,7 +43,7 @@ int main(int argc, char* argv[]) noexcept {
 					std::vector<Action> vecActions;
 					awaiServer.get_valid_actions(gameId, vecActions);
 					// Generate a random number
-					std::uniform_int_distribution<int> actionDistribution(0, vecActions.size() - 1);
+					std::uniform_int_distribution<int> actionDistribution(0, static_cast<int>(vecActions.size() - 1));
 					int action = actionDistribution(luckGen);
 					json jaction;
 					to_json(jaction, vecActions[action]);
@@ -63,9 +65,14 @@ int main(int argc, char* argv[]) noexcept {
 			});
 
 			gameRunner.join();
-
+			thread.join();
 		}
 		else if (argument == "-sim-mcts-game") {
+			AdvanceWarsServer& awaiServer = AdvanceWarsServer::getInstance();
+			std::thread thread([&]() {
+				awaiServer.run();
+			});
+
 			std::thread gameRunner([&]() {
 				std::string gameId;
 				json j = awaiServer.create_new_game(gameId);
@@ -104,22 +111,9 @@ int main(int argc, char* argv[]) noexcept {
 			return -1;
 		}
 		else if (argument == "-test") {
-
-#include "Test.h"
-
-			GameState state;
-
-			json j;
-			std::stringstream(test) >> j;
-			GameState::from_json(j, state);
-			std::vector<Action> vecActions;
-			state.GetValidActions(vecActions);
-			state.DoAction(Action(Action::Type::MoveAttack, 2, 2, Action::Direction::South, 2, 2));
-			state.DoAction(Action(Action::Type::EndTurn));
+			JsonTestSuite suite("test/json");
+			suite.run();
 		}
-
-		//testRunner1.join();
-		thread.join();
 	}
 	catch (...) {
 		std::cout << "exception was thrown" << std::endl;

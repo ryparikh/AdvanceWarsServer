@@ -404,5 +404,37 @@ void to_json(json& j, const UnitProperties& unitproperties) {
 void to_json(json& j, const Unit& unit) {
 	to_json(j, unit.m_properties);
 	j["owner"] = unit.m_owner->getArmyTypeJson();
-	j["health"] = (unit.health + 9) / 10;
+	j["health"] = unit.health;
 }
+
+void from_json(const std::array<Player, 2>& arrPlayers, json& j, Unit& unit) {
+	from_json(j, unit.m_properties);
+	j.at("health").get_to(unit.health);
+
+	std::string armyType;
+	j.at("owner").get_to(armyType);
+	if (arrPlayers[0].m_armyType == Player::armyTypefromString(armyType)) {
+		unit.m_owner = &arrPlayers[0];
+	}
+	else if (arrPlayers[1].m_armyType == Player::armyTypefromString(armyType)) {
+		unit.m_owner = &arrPlayers[1];
+	}
+}
+
+void from_json(json& j, UnitProperties& unitProperties) {
+	if (j.contains("type")) {
+		std::string typeName;
+		j.at("type").get_to(typeName);
+		UnitProperties::Type type = UnitProperties::unitTypeFromString(typeName);
+		unitProperties = GetUnitInfo(type);
+	}
+
+	if (j.contains("ammo")) {
+		j.at("ammo").get_to(unitProperties.m_ammo);
+	}
+
+	if (j.contains("fuel")) {
+		j.at("fuel").get_to(unitProperties.m_fuel);
+	}
+}
+

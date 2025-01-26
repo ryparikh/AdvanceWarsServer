@@ -44,12 +44,55 @@ std::string Player::getArmyTypeJson() const {
 	}
 }
 
+/*static*/ Player::ArmyType Player::armyTypefromString(const std::string& strTypename) {
+	if (strTypename == "orange-star") {
+		return ArmyType::OrangeStar;
+	}
+
+	if (strTypename == "blue-moon") {
+		return ArmyType::BlueMoon;
+	}
+
+	return ArmyType::Invalid;
+}
+
 void to_json(json& j, const Player& player) {
+	json power_meter;
+	PowerMeter::to_json(power_meter, player.m_powerMeter);
 	j = { 
 			{"co", player.m_co},
-			{"power-meter", {player.m_powerMeter.GetCharge(), player.m_powerMeter.GetTotalCharge()}},
+			{"power-meter", power_meter},
 			{"power-status", player.m_powerStatus},
 			{"funds", player.m_funds},
 			{"armyType", player.getArmyTypeJson()}
 	};
+}
+
+void from_json(json& j, Player& player) {
+	from_json(j.at("co"), player.m_co);
+	j.at("funds").get_to(player.m_funds);
+
+	std::string armyType;
+	j.at("armyType").get_to(armyType);
+	player.m_armyType = Player::armyTypefromString(armyType);
+
+	j.at("power-status").get_to(player.m_powerStatus);
+
+	PowerMeter::from_json(j.at("power-meter"), player.m_powerMeter);
+}
+
+/*static*/ void PowerMeter::to_json(json& j, const PowerMeter& powerMeter) {
+	j = {
+		{"cop-stars", powerMeter.m_nCopStars},
+		{"scop-stars", powerMeter.m_nScopStars},
+		{"charge", powerMeter.m_nCharge},
+		{"star-value", powerMeter.m_nStarValue},
+	};
+}
+
+/*static*/ void PowerMeter::from_json(json& j, PowerMeter& powerMeter) {
+	j.at("cop-stars").get_to(powerMeter.m_nCopStars);
+	j.at("scop-stars").get_to(powerMeter.m_nScopStars);
+	j.at("charge").get_to(powerMeter.m_nCharge);
+	j.at("star-value").get_to(powerMeter.m_nStarValue);
 }

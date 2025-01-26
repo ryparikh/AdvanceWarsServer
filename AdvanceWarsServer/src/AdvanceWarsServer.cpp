@@ -111,7 +111,7 @@ json AdvanceWarsServer::create_new_game(std::string& gameId) {
 	m_gameCache.emplace(gameId, gameState);
 	const auto& game = m_gameCache.find(gameId.c_str());
 	json j;
-	to_json(j, *game->second);
+	GameState::to_json(j, *game->second);
 	return j;
 }
 
@@ -155,7 +155,7 @@ json AdvanceWarsServer::do_action(const std::string& gameId, const Action& actio
 	}
 
 	json j;
-	to_json(j, *game->second);
+	GameState::to_json(j, *game->second);
 	return j;
 }
 

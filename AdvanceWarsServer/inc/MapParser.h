@@ -14,6 +14,5 @@ class MapParser
 {
 public:
 	Result TryCreateFromFile(std::filesystem::path filePath, const std::array<Player, 2>& players, std::unique_ptr<Map>& spMap) noexcept;
-private:
 	static Terrain::Type ToTerrainType(TerrainFileID terrainID) noexcept;
 };

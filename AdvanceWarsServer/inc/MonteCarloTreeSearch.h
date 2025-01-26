@@ -36,7 +36,7 @@ public:
 		auto root = std::make_shared<MCTSNode<StateType, ActionType>>(rootState, ActionType());
 
 		std::cout << "Start Run" << std::endl;
-		for (int i = 0; i < iterations; ++i) {
+		for (int i = 1; i <= iterations; ++i) {
 			auto node = select(root);
 			if (!node->state.isTerminal()) {
 				expand(node);
@@ -54,7 +54,7 @@ public:
 
 	std::shared_ptr<MCTSNode<StateType, ActionType>> run(std::shared_ptr<MCTSNode<StateType, ActionType>> root, int iterations, int playerPerspective) {
 		std::cout << "Start Run" << std::endl;
-		for (int i = 0; i < iterations; ++i) {
+		for (int i = 1; i <= iterations; ++i) {
 			auto node = select(root);
 			if (!node->state.isTerminal()) {
 				expand(node);

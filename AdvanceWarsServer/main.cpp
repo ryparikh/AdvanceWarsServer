@@ -73,22 +73,22 @@ int main(int argc, char* argv[]) noexcept {
 				std::ofstream outFile("D:/awai/mcts_" + gameId + ".awai");
 
 				json jstate;
-				to_json(jstate, rootState);
+				GameState::to_json(jstate, rootState);
 				outFile << "Game State: " << jstate.dump() << std::endl;
-				int moves = 1;
+				int moves = 50;
 				auto root = std::make_shared<MCTSNode<GameState, Action>>(rootState, Action());
 				//while (!rootState.isTerminal()) {
 				while (moves > 0) {
 					int player = rootState.IsFirstPlayerTurn() ? 0 : 1;
 					MCTS<GameState, Action> mcts;
-					auto bestNode = mcts.run(root, 1, player); // Run MCTS with 100000iterations
+					auto bestNode = mcts.run(root, 1000, player); // Run MCTS with 100000iterations
 					json jaction;
 					to_json(jaction, bestNode->action);
 					std::cout << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
 					std::cout << "Visits: " << bestNode->visits << ", Total value: " << bestNode->totalValue << std::endl;
 					outFile << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
 					rootState = rootState.applyAction(bestNode->action);
-					to_json(jstate, rootState);
+					GameState::to_json(jstate, rootState);
 					std::cout << "Game State: " << jstate.dump() << std::endl;
 					outFile << "Game State: " << jstate.dump() << std::endl;
 					--moves;
@@ -107,36 +107,15 @@ int main(int argc, char* argv[]) noexcept {
 
 #include "Test.h"
 
-			Player player1(CommandingOfficier::Type::Andy, Player::ArmyType::OrangeStar);
-			Player player2(CommandingOfficier::Type::Adder, Player::ArmyType::BlueMoon);
-			std::array<Player, 2> arrPlayers{ std::move(player1), std::move(player2) };
-			GameState state("", std::move(arrPlayers));
+			GameState state;
 
 			json j;
 			std::stringstream(test) >> j;
-			from_json(j, state);
-			// Run test
-			//std::thread testRunner1([&]() {
-			//	awaiServer.create_new_game("test-game1");
-			//	// P1 T1
-			//	awaiServer.do_action("test-game1", Action(Action::Type::Buy, 10, 2, UnitProperties::Type::Infantry));
-			//	awaiServer.do_action("test-game1", Action(Action::Type::EndTurn));
-			//	// P2 T1
-			//	awaiServer.do_action("test-game1", Action(Action::Type::MoveWait, 7, 13, 7, 11));
-			//	awaiServer.do_action("test-game1", Action(Action::Type::EndTurn));
-			//	// P1 T2
-			//	awaiServer.do_action("test-game1", Action(Action::Type::MoveWait, 10, 2, 10, 4));
-			//	awaiServer.do_action("test-game1", Action(Action::Type::EndTurn));
-			//	// P2 T2
-			//	awaiServer.do_action("test-game1", Action(Action::Type::MoveWait, 7, 11, 7, 8));
-			//	awaiServer.do_action("test-game1", Action(Action::Type::EndTurn));
-			//	// P1 T3
-			//	awaiServer.do_action("test-game1", Action(Action::Type::MoveWait, 10, 4, 10, 7));
-			//	awaiServer.do_action("test-game1", Action(Action::Type::EndTurn));
-			//	// P2 T3
-			//	awaiServer.do_action("test-game1", Action(Action::Type::MoveAttack, 7, 8, Action::Direction::North, 10, 8));
-			//	awaiServer.do_action("test-game1", Action(Action::Type::EndTurn));
-			//});
+			GameState::from_json(j, state);
+			std::vector<Action> vecActions;
+			state.GetValidActions(vecActions);
+			state.DoAction(Action(Action::Type::MoveAttack, 2, 2, Action::Direction::South, 2, 2));
+			state.DoAction(Action(Action::Type::EndTurn));
 		}
 
 		//testRunner1.join();

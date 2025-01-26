@@ -172,6 +172,7 @@ public:
 
 class GameState {
 public:
+	GameState() noexcept;
 	GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept;
 	GameState(const GameState& other) noexcept;
 	GameState& operator=(const GameState& other) noexcept;
@@ -211,6 +212,7 @@ public:
 	Map* TryGetMap() const noexcept;
 	const std::string& GetId() const noexcept;
 	const std::array<Player, 2>& GetPlayers() const noexcept;
+	std::array<Player, 2>& GetPlayers() noexcept { return m_arrPlayers; }
 	bool IsFirstPlayerTurn() const noexcept;
 	Result GetValidActions(std::vector<Action>& vecActions) const noexcept;
 	Result GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept;
@@ -221,6 +223,8 @@ public:
 		return m_fGameOver;
 	}
 
+	static void to_json(json& j, const GameState& gameState);
+	static void from_json(json& j, GameState& gameState);
 private:
 	Result BeginTurn() noexcept;
 	Result ResupplyApcUnits(int x, int y) noexcept;
@@ -266,7 +270,5 @@ private:
 	int m_winningPlayer = -1;
 };
 
-void to_json(json& j, const GameState& gameState);
 void to_json(json& j, const Action& action);
 void from_json(json& j, Action& action);
-void from_json(json& j, GameState& gameState);

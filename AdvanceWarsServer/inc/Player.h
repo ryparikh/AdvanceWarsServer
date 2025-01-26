@@ -3,6 +3,7 @@
 
 class PowerMeter final {
 public:
+	PowerMeter() {}
 	PowerMeter(const CommandingOfficier::Type& type) noexcept;
 	void AddCharge(int charge) noexcept;
 	bool FCopCharged() const noexcept {
@@ -23,6 +24,9 @@ public:
 		return (m_nCopStars + m_nScopStars) * m_nStarValue;
 	}
 
+	static void to_json(json& j, const PowerMeter& powerMeter);
+	static void from_json(json& j, PowerMeter& powerMeter);
+
 private:
 	void IncreaseStarCost() noexcept;
 
@@ -41,6 +45,7 @@ public:
 		BlueMoon = 2,
 	};
 
+	Player() {}
 	Player(CommandingOfficier::Type type, ArmyType army) : m_co{ type }, m_armyType(army), m_powerMeter{ type } {}
 	int PowerStatus() const {
 		return m_powerStatus;
@@ -56,7 +61,10 @@ public:
 	int m_powerStatus{ 0 };
 	ArmyType m_armyType{ ArmyType::Invalid };
 	std::string getArmyTypeJson() const;
+	static ArmyType armyTypefromString(const std::string& strTypename);
 	mutable int m_unitsCached = 0;
 };
 
-void to_json(json& j, const Player& gameState);
+void to_json(json& j, const Player& player);
+void from_json(json& j, Player& player);
+

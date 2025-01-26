@@ -47,6 +47,7 @@ struct CommandingOfficier {
 };
 
 void to_json(json& j, const CommandingOfficier& co);
+void from_json(json& j, CommandingOfficier& co);
 
 using DamageChart = std::array<std::pair<int, int>, static_cast<int>(UnitProperties::Type::Size)>;
 using DamageCharts = std::array<DamageChart, 3>;

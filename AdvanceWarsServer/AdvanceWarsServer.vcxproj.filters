@@ -33,9 +33,6 @@
     <ClCompile Include="src\MapTile.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\MapView.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\TerrainInfo.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
@@ -69,9 +66,6 @@
       <Filter>Source Files\inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\MapTile.h">
-      <Filter>Source Files\inc</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\MapView.h">
       <Filter>Source Files\inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\MovementTypes.h">

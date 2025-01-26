@@ -1,11 +1,3 @@
 #pragma once
 
-auto test = R"({
-	"activePlayer":0,
-	"gameId" : "c111b216-187e-47a6-a45c-2c6b0b9675b3",
-	"map" : [
-		[{"terrain":15}, {"terrain":15}, {"terrain":15}],
-		[{"terrain":15}, {"terrain":15, "unit":{"ammo":0,"fuel":99,"health":10,"owner":"orange-star","type":"infantry"}}, {"terrain":15, "unit":{"ammo":0,"fuel":99,"health":10,"owner":"blue-moon","type":"infantry"}}],
-		[{"terrain":15}, {"terrain":15}, {"terrain":15}]
-	],
-	"players" : [{"armyType":"orange-star", "co" : "Andy", "funds" : 3000, "power-meter" : [0, 54000], "power-status" : 0}, { "armyType":"blue-moon","co" : "Adder","funds" : 0,"power-meter" : [0,45000],"power-status" : 0 }]})";
+auto test = R"({"activePlayer":0,"cap-limit":21,"game-over":false,"gameId":"370b9c3b-8ff1-4c0e-8ebc-6936b88acb96","map":[[{"property":{"capture-points":20,"owner":"orange-star"},"terrain":42},{"terrain":1},{"terrain":1},{"terrain":1},{"terrain":1}],[{"terrain":1},{"property":{"capture-points":20,"owner":"orange-star"},"terrain":39},{"terrain":1},{"terrain":1},{"terrain":1}],[{"terrain":1},{"terrain":1},{"terrain":1,"unit":{"ammo":0,"fuel":99,"health":100,"owner":"orange-star","type":"infantry"}},{"terrain":1},{"terrain":1}],[{"terrain":1},{"terrain":1},{"terrain":1,"unit":{"ammo":0,"fuel":99,"health":100,"owner":"blue-moon","type":"infantry"}},{"property":{"capture-points":20,"owner":"blue-moon"},"terrain":44},{"terrain":1}],[{"terrain":1},{"terrain":1},{"terrain":1},{"terrain":1},{"property":{"capture-points":20,"owner":"blue-moon"},"terrain":47}]],"players":[{"armyType":"orange-star","co":"Andy","funds":2000,"power-meter":{"charge":0,"cop-stars":3,"scop-stars":3,"star-value":9000},"power-status":0},{"armyType":"blue-moon","co":"Adder","funds":0,"power-meter":{"charge":0,"cop-stars":2,"scop-stars":3,"star-value":9000},"power-status":0}],"turn-count":1,"unit-cap":50,"winner":-1})";

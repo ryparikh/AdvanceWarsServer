@@ -7,12 +7,16 @@
 #include <random>
 
 #include "MapParser.h"
-const std::string mapChoiceFilePath = R"(.\res\AWBW\MapSources\Lefty.txt)";
+const std::string mapChoiceFilePath = R"(.\res\AWBW\MapSources\MCTS.txt)";
 
 using time_point = std::chrono::time_point<std::chrono::steady_clock>;
 GameState::GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept :
 	m_guid(guid),
 	m_arrPlayers(std::move(arrPlayers)) {
+}
+
+GameState::GameState() noexcept
+{
 }
 
 Result GameState::InitializeGame() noexcept {
@@ -24,14 +28,15 @@ Result GameState::InitializeGame() noexcept {
 	std::clog << "File load time: " << std::chrono::duration<double, std::milli>(fileEndTime - fileStartTime).count() << "\n";
 
 	// Headquarters
-	m_spmap->Capture(6, 5, &GetPlayers()[0]);
-	m_spmap->Capture(7, 13, &GetPlayers()[1]);
+	m_spmap->Capture(0, 0, &GetPlayers()[0]);
+	m_spmap->Capture(4, 4, &GetPlayers()[1]);
 	// Bases
-	m_spmap->Capture(5, 0, &GetPlayers()[0]);
-	m_spmap->Capture(10, 2, &GetPlayers()[0]);
-	m_spmap->Capture(11, 10, &GetPlayers()[1]);
-	m_spmap->Capture(12, 15, &GetPlayers()[1]);
-	m_spmap->TryAddUnit(7, 13, UnitProperties::Type::Infantry, &GetPlayers()[1]);
+	m_spmap->Capture(1, 1, &GetPlayers()[0]);
+	m_spmap->Capture(3, 3, &GetPlayers()[1]);
+	//m_spmap->Capture(11, 10, &GetPlayers()[1]);
+	//m_spmap->Capture(12, 15, &GetPlayers()[1]);
+	m_spmap->TryAddUnit(2, 2, UnitProperties::Type::Infantry, &GetPlayers()[0]);
+	m_spmap->TryAddUnit(2, 3, UnitProperties::Type::Infantry, &GetPlayers()[1]);
 
 	BeginTurn();
 	return Result::Succeeded;
@@ -620,7 +625,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 		return Result::Succeeded;
 	}
 	else {
-		if (MapTile::IsProperty(pmaptile->m_terrain.m_type) && pmaptile->m_spPropertyInfo->m_owner != &GetCurrentPlayer()) {
+		if (MapTile::IsProperty(pmaptile->m_pterrain->m_type) && pmaptile->m_spPropertyInfo->m_owner != &GetCurrentPlayer()) {
 			return Result::Succeeded;
 		}
 
@@ -863,19 +868,19 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		return Result::Failed;
 	}
 
-	if (!MapTile::IsProperty(ptile->m_terrain.m_type) || ptile->m_spPropertyInfo->m_owner == &GetCurrentPlayer()) {
+	if (!MapTile::IsProperty(ptile->m_pterrain->m_type) || ptile->m_spPropertyInfo->m_owner == &GetCurrentPlayer()) {
 		return Result::Failed;
 	}
 
 	int& cp = ptile->m_spPropertyInfo->m_capturePoints;
 	cp -= ((pUnit->health + 9)/ 10);
 	if (cp <= 0) {
-		bool fHqCapture = ptile->m_terrain.m_type == Terrain::Type::Headquarters;
+		bool fHqCapture = ptile->m_pterrain->m_type == Terrain::Type::Headquarters;
 		ptile->Capture(&GetCurrentPlayer());
 		if (fHqCapture) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
-			//std::cout << "HQ Capture Win: " << m_winningPlayer << std::endl;
+			std::cout << "HQ Capture Win: " << m_winningPlayer << std::endl;
 		}
 
 		int totalProperties = 0;
@@ -893,7 +898,7 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		if (totalProperties >= m_nCaptureLimit) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
-			//std::cout << "Capture Limit Win: " << m_winningPlayer << std::endl;
+			std::cout << "Capture Limit Win: " << m_winningPlayer << std::endl;
 		}
 	}
 
@@ -1289,8 +1294,8 @@ bool GameState::CheckPlayerResigns() noexcept {
 	if (m_nTurnCount > 100) {
 		m_fGameOver = true;
 		m_winningPlayer = 2;
-		//std::cout << "Turn count exceeded" << std::endl;
-		//std::cout << "Winning player: " << m_winningPlayer << std::endl;
+		std::cout << "Turn count exceeded" << std::endl;
+		std::cout << "Winning player: " << m_winningPlayer << std::endl;
 		return true;
 	}
 
@@ -1320,13 +1325,13 @@ bool GameState::CheckPlayerResigns() noexcept {
 	// if army units is less than half opponent units
 	// forfeit
 	if ((nCurrentPlayerArmyValue < (nEnemyPlayerArmyValue / 3)) && (nCurrentPlayerUnits < (nEnemyPlayerUnits / 3))) {
-		//std::cout << "CAM: " << nCurrentPlayerArmyValue << std::endl;
-		//std::cout << "EAM: " << nEnemyPlayerArmyValue << std::endl;
-		//std::cout << "CU: " << nCurrentPlayerUnits << std::endl;
-		//std::cout << "EU: " << nEnemyPlayerUnits << std::endl;
+		std::cout << "CAM: " << nCurrentPlayerArmyValue << std::endl;
+		std::cout << "EAM: " << nEnemyPlayerArmyValue << std::endl;
+		std::cout << "CU: " << nCurrentPlayerUnits << std::endl;
+		std::cout << "EU: " << nEnemyPlayerUnits << std::endl;
 		m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
-		//std::cout << "Forfeit by player" << (m_isFirstPlayerTurn ? 0 : 1) << std::endl;
-		//std::cout << "Winning player" << m_winningPlayer << std::endl;
+		std::cout << "Forfeit by player" << (m_isFirstPlayerTurn ? 0 : 1) << std::endl;
+		std::cout << "Winning player" << m_winningPlayer << std::endl;
 		m_fGameOver = true;
 	}
 
@@ -1369,11 +1374,18 @@ GameState& GameState::operator=(const GameState& other) noexcept {
 	return *this;
 }
 
-void to_json(json& j, const GameState& gameState) {
-	j = { { "gameId", gameState.GetId()},
+void GameState::to_json(json& j, const GameState& gameState) {
+	j = {
+		{ "gameId", gameState.GetId()},
 		  { "map", *gameState.TryGetMap()},
 		  { "players", gameState.GetPlayers()},
-		  { "activePlayer", gameState.IsFirstPlayerTurn() ? 0 : 1 } };
+		  { "unit-cap", gameState.m_nUnitCap },
+		  { "cap-limit", gameState.m_nCaptureLimit},
+		  { "turn-count", gameState.m_nTurnCount},
+		  { "activePlayer", gameState.IsFirstPlayerTurn() ? 0 : 1 },
+		  { "game-over", gameState.m_fGameOver },
+		  { "winner", gameState.m_winningPlayer },
+	};
 }
 
 void to_json(json& j, const Action& action) {
@@ -1499,9 +1511,27 @@ void from_json(json& j, Action& action) {
 	}
 }
 
-void from_json(json& j, GameState& gameState) {
-	if (j.contains("map")) {
-		std::string map;
-		j.at("map").get_to(map);
+void GameState::from_json(json& j, GameState& gameState) {
+	j.at("gameId").get_to(gameState.m_guid);
+
+	int i = 0;
+	for (auto& jplayer : j.at("players")) {
+		Player player;
+		::from_json(jplayer, player);
+		gameState.m_arrPlayers[i] = player;
+		++i;
 	}
+
+	// We need to instantiate the players first so we can set owner pointers
+	gameState.m_spmap.reset(new Map());
+	Map::from_test_json(gameState.m_arrPlayers, j.at("map"), *gameState.m_spmap);
+
+	j.at("unit-cap").get_to(gameState.m_nUnitCap);
+	j.at("cap-limit").get_to(gameState.m_nCaptureLimit);
+	j.at("turn-count").get_to(gameState.m_nTurnCount);
+	j.at("game-over").get_to(gameState.m_fGameOver);
+	j.at("winner").get_to(gameState.m_winningPlayer);
+	int activePlayer;
+	j.at("activePlayer").get_to(activePlayer);
+	gameState.m_isFirstPlayerTurn = activePlayer == 0;
 }

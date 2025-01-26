@@ -25,6 +25,7 @@ public:
 	Result TryDestroyUnit(unsigned int x, unsigned int y) noexcept;
 	Result Capture(unsigned int x, unsigned int y, const Player* player) noexcept;
 	Map* Clone(const std::array<Player, 2>& arrPlayers) const;
+	static void from_test_json(const std::array<Player, 2>& arrPlayers, json& j, Map& map);
 private:
 	std::vector<std::vector<MapTile>> m_vecvecMapTile;
 };

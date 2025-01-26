@@ -88,6 +88,7 @@ struct UnitProperties final
 class Unit {
 public:
 	static int GetUnitCost(const UnitProperties::Type& type);
+	Unit() {}
 	Unit(const UnitProperties::Type& type, const Player* owner);
 	Unit* Clone(const Player* pNewOwner) const;
 	bool IsTransport() const noexcept;
@@ -111,3 +112,5 @@ public:
 };
 
 void to_json(json& j, const Unit& unit);
+void from_json(const std::array<Player, 2>& arrPlayers, json& j, Unit& unit);
+void from_json(json& j, UnitProperties& unit);

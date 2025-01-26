@@ -169,6 +169,7 @@ Map* Map::Clone(const std::array<Player, 2>& arrPlayers) const {
 
 	return spNewMap.release();
 }
+
 void to_json(json& j, const Map& map) {
 
 	json jsonMap = json::array();
@@ -183,4 +184,19 @@ void to_json(json& j, const Map& map) {
 	}
 
 	j = jsonMap;
+}
+
+/*static*/ void Map::from_test_json(const std::array<Player, 2>& arrPlayers, json& j, Map& map) {
+	int x = 0;
+	int y = 0;
+	for (auto& jrow: j) {
+		map.m_vecvecMapTile.emplace_back();
+		for (auto& jmaptile : jrow) {
+			MapTile maptile;
+			from_json(arrPlayers, jmaptile, maptile);
+			map.m_vecvecMapTile[y].emplace_back(std::move(maptile));
+			++x;
+		}
+		++y;
+	}
 }

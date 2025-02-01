@@ -249,5 +249,8 @@
     <None Include="test\json\transport\apc\unload-infantry.json" />
     <None Include="test\json\transport\apc\resupply-after-movement.json" />
     <None Include="test\json\transport\apc\resupply-begin-turn.json" />
+    <None Include="test\json\transport\apc\load-mech.json" />
+    <None Include="test\json\transport\apc\multiple-loads-unloads.json" />
+    <None Include="test\json\transport\apc\unload-mech.json" />
   </ItemGroup>
 </Project>

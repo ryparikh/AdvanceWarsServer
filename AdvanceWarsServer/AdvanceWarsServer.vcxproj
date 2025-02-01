@@ -309,12 +309,20 @@
     <None Include="test\json\combat\tank\road\road\tankRoad0_NoAmmo-tankRoad0_NoAmmo.json" />
     <None Include="test\json\transport\apc\load-infantry.json" />
     <None Include="test\json\transport\apc\load-mech.json" />
+    <None Include="test\json\transport\apc\load-multiple-infantry-fails.json" />
     <None Include="test\json\transport\apc\move-unload-infantry.json" />
     <None Include="test\json\transport\apc\multiple-loads-unloads.json" />
     <None Include="test\json\transport\apc\resupply-after-movement.json" />
     <None Include="test\json\transport\apc\resupply-begin-turn.json" />
     <None Include="test\json\transport\apc\unload-infantry.json" />
     <None Include="test\json\transport\apc\unload-mech.json" />
+    <None Include="test\json\transport\tcopter\load-infantry.json" />
+    <None Include="test\json\transport\tcopter\load-mech.json" />
+    <None Include="test\json\transport\tcopter\load-multiple-infantry-fails.json" />
+    <None Include="test\json\transport\tcopter\move-unload-infantry.json" />
+    <None Include="test\json\transport\tcopter\multiple-loads-unloads.json" />
+    <None Include="test\json\transport\tcopter\unload-infantry.json" />
+    <None Include="test\json\transport\tcopter\unload-mech.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

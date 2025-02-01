@@ -8,6 +8,7 @@ struct JsonSubsystemTest {
 	GameState initialGameState;
 	GameState finalGameState;
 	std::vector<Action> vecActions;
+	std::vector<Action> vecFailedActions;
 };
 
 void from_json(json& j, JsonSubsystemTest& test);

@@ -7,11 +7,24 @@
 
 void from_json(json& j, JsonSubsystemTest& test) {
 	GameState::from_json(j.at("initial-game-state"), test.initialGameState);
-	GameState::from_json(j.at("final-game-state"), test.finalGameState);
-	for (auto& jAction : j.at("actions")) {
-		Action action;
-		from_json(jAction, action);
-		test.vecActions.emplace_back(action);
+	if (j.contains("final-game-state")) {
+		GameState::from_json(j.at("final-game-state"), test.finalGameState);
+	}
+
+	if (j.contains("actions")) {
+		for (auto& jAction : j.at("actions")) {
+			Action action;
+			from_json(jAction, action);
+			test.vecActions.emplace_back(action);
+		}
+	}
+
+	if (j.contains("failedActions")) {
+		for (auto& jAction : j.at("failedActions")) {
+			Action action;
+			from_json(jAction, action);
+			test.vecFailedActions.emplace_back(action);
+		}
 	}
 }
 
@@ -36,20 +49,31 @@ Result JsonTestRunner::run() {
 	JsonSubsystemTest test;
 	from_json(j, test);
 
-	for (const Action& action : test.vecActions) {
-		IfFailedReturn(test.initialGameState.DoAction(action));
+	if (!test.vecActions.empty()) {
+		for (const Action& action : test.vecActions) {
+			IfFailedReturn(test.initialGameState.DoAction(action));
+		}
+
+		json actedGameState;
+		GameState::to_json(actedGameState, test.initialGameState);
+		json expectedGameState;
+		GameState::to_json(expectedGameState, test.finalGameState);
+		m_strActual = actedGameState.dump();
+		m_strExpected = expectedGameState.dump();
+
+		if (m_strActual != m_strExpected) {
+			return Result::Failed;
+		}
 	}
 
-	json actedGameState;
-	GameState::to_json(actedGameState, test.initialGameState);
-	json expectedGameState;
-	GameState::to_json(expectedGameState, test.finalGameState);
-	m_strActual = actedGameState.dump();
-	m_strExpected = expectedGameState.dump();
-
-	if (m_strActual != m_strExpected) {
-		return Result::Failed;
+	if (!test.vecFailedActions.empty()) {
+		for (const Action& action : test.vecFailedActions) {
+			if (test.initialGameState.DoAction(action) == Result::Succeeded) {
+				return Result::Failed;
+			}
+		}
 	}
+
 
 	return Result::Succeeded;
 }

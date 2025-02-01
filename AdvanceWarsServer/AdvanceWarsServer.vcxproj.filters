@@ -252,5 +252,13 @@
     <None Include="test\json\transport\apc\load-mech.json" />
     <None Include="test\json\transport\apc\multiple-loads-unloads.json" />
     <None Include="test\json\transport\apc\unload-mech.json" />
+    <None Include="test\json\transport\tcopter\load-infantry.json" />
+    <None Include="test\json\transport\tcopter\load-mech.json" />
+    <None Include="test\json\transport\tcopter\load-multiple-infantry-fails.json" />
+    <None Include="test\json\transport\apc\load-multiple-infantry-fails.json" />
+    <None Include="test\json\transport\tcopter\move-unload-infantry.json" />
+    <None Include="test\json\transport\tcopter\unload-infantry.json" />
+    <None Include="test\json\transport\tcopter\unload-mech.json" />
+    <None Include="test\json\transport\tcopter\multiple-loads-unloads.json" />
   </ItemGroup>
 </Project>

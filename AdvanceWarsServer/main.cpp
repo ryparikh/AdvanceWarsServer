@@ -111,8 +111,13 @@ int main(int argc, char* argv[]) noexcept {
 			return -1;
 		}
 		else if (argument == "-test") {
+			time_point startTime = std::chrono::steady_clock::now();
+
 			JsonTestSuite suite("test/json");
 			suite.run();
+
+			time_point endTime = std::chrono::steady_clock::now();
+			std::cout << "Tests took to simulate: " << std::chrono::duration<double>(endTime - startTime).count() << "s" << std::endl;
 		}
 	}
 	catch (...) {

@@ -248,7 +248,7 @@ Unit* Unit::Unload(int i) {
 	switch (type)
 	{
 	case UnitProperties::Type::AntiAir:
-		return "antiair";
+		return "anti-air";
 	case UnitProperties::Type::Apc:
 		return "apc";
 	case UnitProperties::Type::Artillery:
@@ -315,7 +315,7 @@ bool Unit::IsHidden() const noexcept {
 }
 
 /*static*/ const UnitProperties::Type UnitProperties::unitTypeFromString(const std::string& strTypename) {
-	if (strTypename == "antiair") {
+	if (strTypename == "anti-air") {
 		return UnitProperties::Type::AntiAir;
 	} else if (strTypename == "apc") {
 		return UnitProperties::Type::Apc;

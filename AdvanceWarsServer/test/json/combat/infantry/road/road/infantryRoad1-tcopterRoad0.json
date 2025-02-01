@@ -14,6 +14,20 @@
           "terrain": 42
         },
         {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 134
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 113
+        },
+        {
           "terrain": 15,
           "unit": {
             "ammo": 0,
@@ -28,14 +42,28 @@
         {
           "terrain": 15,
           "unit": {
-            "ammo": 0,
+            "ammo": 2,
             "fuel": 99,
             "health": 100,
             "hidden": false,
             "moved": false,
             "owner": "blue-moon",
-            "type": "infantry"
+            "type": "tcopter"
           }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 113
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 113
         },
         {
           "property": {
@@ -81,9 +109,9 @@
   "actions": [
     {
       "type": "move-attack",
-      "source": [ 1, 0 ],
+      "source": [ 3, 0 ],
       "direction": "east",
-      "target": [ 1, 0 ]
+      "target": [ 3, 0 ]
     }
   ],
   "final-game-state": {
@@ -101,11 +129,25 @@
           "terrain": 42
         },
         {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 134
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 113
+        },
+        {
           "terrain": 15,
           "unit": {
             "ammo": 0,
             "fuel": 99,
-            "health": 68,
+            "health": 100,
             "hidden": false,
             "moved": true,
             "owner": "orange-star",
@@ -115,14 +157,28 @@
         {
           "terrain": 15,
           "unit": {
-            "ammo": 0,
+            "ammo": 2,
             "fuel": 99,
-            "health": 45,
+            "health": 67,
             "hidden": false,
             "moved": false,
             "owner": "blue-moon",
-            "type": "infantry"
+            "type": "tcopter"
           }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 113
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 113
         },
         {
           "property": {
@@ -139,27 +195,26 @@
         "co": "Andy",
         "funds": 2000,
         "power-meter": {
-          "charge": 550,
+          "charge": 750,
           "cop-stars": 3,
           "scop-stars": 3,
           "star-value": 9000
         },
         "power-status": 0,
-        "luck-policy":  1
+        "luck-policy": 1
       },
       {
         "armyType": "blue-moon",
         "co": "Adder",
         "funds": 0,
         "power-meter": {
-          "charge": 650,
+          "charge": 1500,
           "cop-stars": 2,
           "scop-stars": 3,
           "star-value": 9000
         },
         "power-status": 0,
-        "luck-policy":  2
-
+        "luck-policy": 2
       }
     ],
     "turn-count": 1,

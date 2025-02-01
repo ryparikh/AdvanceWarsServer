@@ -1126,6 +1126,10 @@ int GameState::calculateDamage(const Player* pattackingplayer, const CommandingO
 
 	int attackValue = rgCharts[static_cast<int>(attackerCO)][GetCurrentPlayer().PowerStatus()][static_cast<int>(attacker.m_properties.m_type)].first + 10 * nComTowers;
 	int defenceValue = rgCharts[static_cast<int>(defenderCO)][GetEnemyPlayer().PowerStatus()][static_cast<int>(defender.m_properties.m_type)].second;
+	if (defender.IsAirUnit()) {
+		defenderTerrainStars = 0;
+	}
+
 	int attackerHealth = (attacker.health + 9) / 10;
 	int defenderHealth = (defender.health + 9) / 10;
 	double damage = ((baseDamage * attackValue / 100.0) + goodLuckRoll - badLuckRoll) * attackerHealth / 10.0 * ((200 - (defenceValue + defenderTerrainStars * defenderHealth)) / 100.0);

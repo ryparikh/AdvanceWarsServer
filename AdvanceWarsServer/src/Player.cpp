@@ -64,7 +64,8 @@ void to_json(json& j, const Player& player) {
 			{"power-meter", power_meter},
 			{"power-status", player.m_powerStatus},
 			{"funds", player.m_funds},
-			{"armyType", player.getArmyTypeJson()}
+			{"armyType", player.getArmyTypeJson()},
+			{"luck-policy", player.m_luckPolicy }
 	};
 }
 
@@ -79,6 +80,8 @@ void from_json(json& j, Player& player) {
 	j.at("power-status").get_to(player.m_powerStatus);
 
 	PowerMeter::from_json(j.at("power-meter"), player.m_powerMeter);
+
+	j.at("luck-policy").get_to(player.m_luckPolicy);
 }
 
 /*static*/ void PowerMeter::to_json(json& j, const PowerMeter& powerMeter) {

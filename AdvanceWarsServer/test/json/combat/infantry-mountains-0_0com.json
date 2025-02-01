@@ -3,7 +3,7 @@
     "activePlayer": 0,
     "cap-limit": 21,
     "game-over": false,
-    "gameId": "bcc5b8fe-1b4a-4c33-af99-0ac650b585ed",
+    "gameId": "infantry-combat-mountains",
     "map": [
       [
         {
@@ -13,29 +13,8 @@
           },
           "terrain": 42
         },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
         {
-          "property": {
-            "capture-points": 20,
-            "owner": "orange-star"
-          },
-          "terrain": 39
-        },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
-        { "terrain": 1 },
-        {
-          "terrain": 1,
+          "terrain": 2,
           "unit": {
             "ammo": 0,
             "fuel": 99,
@@ -46,14 +25,8 @@
             "type": "infantry"
           }
         },
-        { "terrain": 1 },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
-        { "terrain": 1 },
         {
-          "terrain": 1,
+          "terrain": 2,
           "unit": {
             "ammo": 0,
             "fuel": 99,
@@ -64,20 +37,6 @@
             "type": "infantry"
           }
         },
-        {
-          "property": {
-            "capture-points": 20,
-            "owner": "blue-moon"
-          },
-          "terrain": 44
-        },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 },
         {
           "property": {
             "capture-points": 20,
@@ -98,7 +57,8 @@
           "scop-stars": 3,
           "star-value": 9000
         },
-        "power-status": 0
+        "power-status": 0,
+        "luck-policy": 1
       },
       {
         "armyType": "blue-moon",
@@ -110,7 +70,8 @@
           "scop-stars": 3,
           "star-value": 9000
         },
-        "power-status": 0
+        "power-status": 0,
+        "luck-policy": 2
       }
     ],
     "turn-count": 1,
@@ -120,16 +81,16 @@
   "actions": [
     {
       "type": "move-attack",
-      "source": [ 2, 2 ],
-      "direction": "south",
-      "target": [ 2, 2 ]
+      "source": [ 1, 0 ],
+      "direction": "east",
+      "target": [ 1, 0 ]
     }
   ],
   "final-game-state": {
     "activePlayer": 0,
     "cap-limit": 21,
     "game-over": false,
-    "gameId": "bcc5b8fe-1b4a-4c33-af99-0ac650b585ed",
+    "gameId": "infantry-combat-mountains",
     "map": [
       [
         {
@@ -139,71 +100,30 @@
           },
           "terrain": 42
         },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
         {
-          "property": {
-            "capture-points": 20,
-            "owner": "orange-star"
-          },
-          "terrain": 39
-        },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
-        { "terrain": 1 },
-        {
-          "terrain": 1,
+          "terrain": 2,
           "unit": {
             "ammo": 0,
             "fuel": 99,
-            "health": 71,
+            "health": 74,
             "hidden": false,
             "moved": true,
             "owner": "orange-star",
             "type": "infantry"
           }
         },
-        { "terrain": 1 },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
-        { "terrain": 1 },
         {
-          "terrain": 1,
+          "terrain": 2,
           "unit": {
             "ammo": 0,
             "fuel": 99,
-            "health": 51,
+            "health": 67,
             "hidden": false,
             "moved": false,
             "owner": "blue-moon",
             "type": "infantry"
           }
         },
-        {
-          "property": {
-            "capture-points": 20,
-            "owner": "blue-moon"
-          },
-          "terrain": 44
-        },
-        { "terrain": 1 }
-      ],
-      [
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 },
-        { "terrain": 1 },
         {
           "property": {
             "capture-points": 20,
@@ -219,24 +139,26 @@
         "co": "Andy",
         "funds": 2000,
         "power-meter": {
-          "charge": 400,
+          "charge": 350,
           "cop-stars": 3,
           "scop-stars": 3,
           "star-value": 9000
         },
-        "power-status": 0
+        "power-status": 0,
+        "luck-policy":  1
       },
       {
         "armyType": "blue-moon",
         "co": "Adder",
         "funds": 0,
         "power-meter": {
-          "charge": 500,
+          "charge": 400,
           "cop-stars": 2,
           "scop-stars": 3,
           "star-value": 9000
         },
-        "power-status": 0
+        "power-status": 0,
+        "luck-policy":  2
       }
     ],
     "turn-count": 1,

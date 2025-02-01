@@ -1087,12 +1087,30 @@ int GameState::calculateDamage(const Player* pattackingplayer, const CommandingO
 
 	std::random_device rd;
 	std::mt19937 luckGen(rd());
-	std::uniform_int_distribution<int> goodLuckDistribution(0, GetMaxGoodLuck(GetCurrentPlayer()));
+	std::uniform_int_distribution<int> goodLuckDistribution(0, GetMaxGoodLuck(*pattackingplayer));
 	// Generate a random number
-	int goodLuckRoll = goodLuckDistribution(luckGen);
+	int goodLuckRoll = 0;
+	if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysLowestValue) {
+		goodLuckRoll = goodLuckDistribution.min();
+	}
+	else if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysHighestValue) {
+		goodLuckRoll = goodLuckDistribution.max();
+	}
+	else {
+		goodLuckRoll = goodLuckDistribution(luckGen);
+	}
 
-	std::uniform_int_distribution<int> badLuckDistribution(0, GetMaxBadLuck(GetCurrentPlayer()));
+	std::uniform_int_distribution<int> badLuckDistribution(0, GetMaxBadLuck(*pattackingplayer));
 	int badLuckRoll = badLuckDistribution(luckGen);
+	if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysLowestValue) {
+		badLuckRoll = badLuckDistribution.max();
+	}
+	else if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysHighestValue) {
+		badLuckRoll = badLuckDistribution.min();
+	}
+	else {
+		badLuckRoll = badLuckDistribution(luckGen);
+	}
 
 	int nComTowers = 0;
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
@@ -1187,7 +1205,7 @@ int GameState::GetMaxBadLuck(const Player& player) noexcept {
 			return 44;
 		}
 	default:
-		return 9;
+		return 0;
 	}
 }
 Result GameState::DoMoveAction(int& x, int& y, const Action& action) {

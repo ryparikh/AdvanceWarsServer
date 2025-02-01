@@ -37,6 +37,12 @@ private:
 	int m_nStarValue{ 9000 };
 };
 
+enum class LuckPolicy {
+	None = 0,
+	AlwaysLowestValue,
+	AlwaysHighestValue,
+};
+
 class Player final {
 public:
 	enum class ArmyType : int {
@@ -63,6 +69,7 @@ public:
 	std::string getArmyTypeJson() const;
 	static ArmyType armyTypefromString(const std::string& strTypename);
 	mutable int m_unitsCached = 0;
+	LuckPolicy m_luckPolicy = LuckPolicy::None;
 };
 
 void to_json(json& j, const Player& player);

@@ -140,7 +140,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test\json\combat\infantry-roads.json" />
-    <None Include="test\json\combat\infantry-plains.json" />
+    <None Include="test\json\combat\infantry-plains-0_0com.json" />
+    <None Include="test\json\combat\infantry-roads-0_0com.json" />
+    <None Include="test\json\combat\infantry-mountains-0_0com.json" />
+    <None Include="test\json\combat\infantry-city-0_0com.json" />
   </ItemGroup>
 </Project>

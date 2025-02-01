@@ -59,6 +59,7 @@ JsonTestSuite::JsonTestSuite(const std::filesystem::path& filePath) :
 }
 
 void JsonTestSuite::run() {
+	int failures = 0;
 	for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(m_filePath)) {
 		if (!dir_entry.is_regular_file()) {
 			continue;
@@ -66,8 +67,13 @@ void JsonTestSuite::run() {
 		JsonTestRunner runner(dir_entry);
 		Result result = runner.run();
 		if (result == Result::Failed) {
+			++failures;
 			std::wcout << "Failure: " << runner.GetFilepath() << "\n" << std::endl;
 			std::cout << "Expected output:\n" << runner.GetExpected() << "\n\n" << "Actual output:\n" << runner.GetActual() << "\n" << std::endl;;
 		}
+	}
+
+	if (failures == 0) {
+		std::cout << "Tests Passed" << std::endl;
 	}
 }

@@ -244,5 +244,10 @@
     <None Include="test\json\combat\infantry\road\mountain\infantryRoad0-infantryMountain1.json" />
     <None Include="test\json\combat\infantry\road\mountain\infantryRoad0-infantryMountain2.json" />
     <None Include="test\json\combat\infantry\plains\plains\infantryPlains0-infantryPlains0.json" />
+    <None Include="test\json\transport\apc\load-infantry.json" />
+    <None Include="test\json\transport\apc\move-unload-infantry.json" />
+    <None Include="test\json\transport\apc\unload-infantry.json" />
+    <None Include="test\json\transport\apc\resupply-after-movement.json" />
+    <None Include="test\json\transport\apc\resupply-begin-turn.json" />
   </ItemGroup>
 </Project>

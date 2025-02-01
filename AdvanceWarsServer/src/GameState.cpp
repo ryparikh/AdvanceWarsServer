@@ -143,11 +143,12 @@ Result GameState::ResupplyApcUnits(int x, int y) noexcept {
 
 	auto resupplyUnit = [&](int xResupply, int yResupply) -> Result {
 		MapTile* pTile = nullptr;
-		IfFailedReturn(m_spmap->TryGetTile(x, y - 1, &pTile));
+		IfFailedReturn(m_spmap->TryGetTile(xResupply, yResupply, &pTile));
 		if (pTile != nullptr) {
 			Unit* pUnit = pTile->TryGetUnit();
 			if (pUnit != nullptr && pUnit->m_owner == pResupplyTile->m_spUnit->m_owner) {
 				pUnit->m_properties.m_fuel = GetUnitInfo(pUnit->m_properties.m_type).m_fuel;
+				pUnit->m_properties.m_ammo = GetUnitInfo(pUnit->m_properties.m_type).m_ammo;
 			}
 		}
 		return Result::Succeeded;
@@ -794,6 +795,7 @@ Result GameState::DoUnloadAction(int x, int y, const Action& action) {
 	Unit* punitTransport = ptile->TryGetUnit();
 	Unit* pUnit = punitTransport->Unload(*action.m_optUnloadIndex);
 	pmaptileDest->TryAddUnit(pUnit);
+	pUnit->m_moved = true;
 	return Result::Succeeded;
 }
 

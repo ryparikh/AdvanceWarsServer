@@ -37,7 +37,7 @@ Result JsonTestRunner::run() {
 	from_json(j, test);
 
 	for (const Action& action : test.vecActions) {
-		test.initialGameState.DoAction(action);
+		IfFailedReturn(test.initialGameState.DoAction(action));
 	}
 
 	json actedGameState;

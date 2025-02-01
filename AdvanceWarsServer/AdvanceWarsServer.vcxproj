@@ -307,6 +307,11 @@
     <None Include="test\json\combat\infantry\plains\plains\infantryPlains0-infantryPlains0.json" />
     <None Include="test\json\combat\tank\road\road\tankRoad0-infantryRoad0.json" />
     <None Include="test\json\combat\tank\road\road\tankRoad0_NoAmmo-tankRoad0_NoAmmo.json" />
+    <None Include="test\json\transport\apc\load-infantry.json" />
+    <None Include="test\json\transport\apc\move-unload-infantry.json" />
+    <None Include="test\json\transport\apc\resupply-after-movement.json" />
+    <None Include="test\json\transport\apc\resupply-begin-turn.json" />
+    <None Include="test\json\transport\apc\unload-infantry.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

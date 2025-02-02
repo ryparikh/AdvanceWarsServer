@@ -10,6 +10,7 @@ class MCTSNode {
 public:
 	std::shared_ptr<MCTSNode> parent;
 	std::vector<std::shared_ptr<MCTSNode>> children;
+	std::vector<ActionType> legalActions;
 	ActionType action;
 	StateType state;
 	int visits;
@@ -17,10 +18,11 @@ public:
 
 	MCTSNode(const StateType& state, const ActionType& action, std::shared_ptr<MCTSNode> parent = nullptr)
 		: state(state), action(action), parent(parent), visits(0), totalValue(0.0) {
+		legalActions = state.getLegalActions();
 	}
 
 	bool isFullyExpanded() const {
-		return !children.empty() && children.size() == state.getLegalActions().size();
+		return !children.empty() && children.size() == legalActions.size();
 	}
 
 	bool isLeaf() const {
@@ -79,7 +81,7 @@ private:
 	}
 
 	void expand(std::shared_ptr<MCTSNode<StateType, ActionType>> node) {
-		for (const auto& action : node->state.getLegalActions()) {
+		for (const auto& action : node->legalActions) {
 			auto newState = node->state.applyAction(action);
 			node->children.push_back(std::make_shared<MCTSNode<StateType, ActionType>>(newState, action, node));
 		}

@@ -260,5 +260,12 @@
     <None Include="test\json\transport\tcopter\unload-infantry.json" />
     <None Include="test\json\transport\tcopter\unload-mech.json" />
     <None Include="test\json\transport\tcopter\multiple-loads-unloads.json" />
+    <None Include="test\json\transport\blackboat\load-infantry.json" />
+    <None Include="test\json\transport\blackboat\load-infantry-multiple.json" />
+    <None Include="test\json\transport\blackboat\load-mech.json" />
+    <None Include="test\json\transport\blackboat\load-mech-multiple.json" />
+    <None Include="test\json\transport\lander\load-multiple-units.json" />
+    <None Include="test\json\transport\crusier\load-multiple-units.json" />
+    <None Include="test\json\transport\carrier\load-multiple-units.json" />
   </ItemGroup>
 </Project>

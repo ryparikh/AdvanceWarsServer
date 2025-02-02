@@ -316,6 +316,13 @@
     <None Include="test\json\transport\apc\resupply-begin-turn.json" />
     <None Include="test\json\transport\apc\unload-infantry.json" />
     <None Include="test\json\transport\apc\unload-mech.json" />
+    <None Include="test\json\transport\blackboat\load-infantry-multiple.json" />
+    <None Include="test\json\transport\blackboat\load-infantry.json" />
+    <None Include="test\json\transport\blackboat\load-mech-multiple.json" />
+    <None Include="test\json\transport\blackboat\load-mech.json" />
+    <None Include="test\json\transport\carrier\load-multiple-units.json" />
+    <None Include="test\json\transport\crusier\load-multiple-units.json" />
+    <None Include="test\json\transport\lander\load-multiple-units.json" />
     <None Include="test\json\transport\tcopter\load-infantry.json" />
     <None Include="test\json\transport\tcopter\load-mech.json" />
     <None Include="test\json\transport\tcopter\load-multiple-infantry-fails.json" />

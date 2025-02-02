@@ -82,13 +82,13 @@ int main(int argc, char* argv[]) noexcept {
 				json jstate;
 				GameState::to_json(jstate, rootState);
 				outFile << "Game State: " << jstate.dump() << std::endl;
-				int moves = 50;
+				int moves = 1;
 				auto root = std::make_shared<MCTSNode<GameState, Action>>(rootState, Action());
 				//while (!rootState.isTerminal()) {
 				while (moves > 0) {
 					int player = rootState.IsFirstPlayerTurn() ? 0 : 1;
 					MCTS<GameState, Action> mcts;
-					auto bestNode = mcts.run(root, 1000, player); // Run MCTS with 100000iterations
+					auto bestNode = mcts.run(root, 100, player); // Run MCTS with 100000iterations
 					json jaction;
 					to_json(jaction, bestNode->action);
 					std::cout << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;

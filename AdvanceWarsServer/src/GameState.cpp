@@ -59,13 +59,12 @@ Result GameState::BeginTurn() noexcept {
 	// Add Funds
 	int player = IsFirstPlayerTurn() ? 0 : 1;
 	int newFunds = 0;
-	int repairFunds = 0;
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
 			const MapTile* pTile = nullptr;
 			m_spmap->TryGetTile(x, y, &pTile);
 			const Terrain& terrain = pTile->GetTerrain();
-			if (MapTile::IsProperty(terrain.m_type) && (terrain.m_type != Terrain::Type::ComTower || terrain.m_type != Terrain::Type::Lab) && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player]) {
+			if (MapTile::IsProperty(terrain.m_type) && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player]) {
 				newFunds += 1000;
 			}
 		}
@@ -86,14 +85,15 @@ Result GameState::BeginTurn() noexcept {
 					ResupplyApcUnits(x, y);
 				}
 
-				// This isn't using correct units for health
-				if (MapTile::IsProperty(terrain.m_type) && (terrain.m_type != Terrain::Type::ComTower || terrain.m_type != Terrain::Type::Lab) && pUnit->m_owner == &m_arrPlayers[player]) {
+				if (MapTile::IsProperty(terrain.m_type) && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab && pUnit->m_owner == &m_arrPlayers[player]) {
 					Unit* pUnit = pTile->TryGetUnit();
-					if (pUnit != nullptr && pUnit->health < 10) {
-						int repairAmount = std::min(10 - pUnit->health, 2);
-						repairFunds += Unit::GetUnitCost(pUnit->m_properties.m_type) * repairAmount;
-						if (repairFunds <= m_arrPlayers[player].m_funds) {
-							m_arrPlayers[player].m_funds -= repairFunds;
+					pUnit->m_properties.m_fuel = GetUnitInfo(pUnit->m_properties.m_type).m_fuel;
+					pUnit->m_properties.m_ammo = GetUnitInfo(pUnit->m_properties.m_type).m_ammo;
+					if (pUnit != nullptr && pUnit->health < 100) {
+						int repairAmount = std::min(100 - pUnit->health, 20);
+						int unitRepairFunds = Unit::GetUnitCost(pUnit->m_properties.m_type) * (repairAmount/10);
+						if (unitRepairFunds <= m_arrPlayers[player].m_funds) {
+							m_arrPlayers[player].m_funds -= unitRepairFunds;
 							pUnit->health += repairAmount;
 						}
 					}
@@ -117,6 +117,10 @@ Result GameState::BeginTurn() noexcept {
 				pUnit->m_properties.m_fuel -= isHidden ? pUnit->m_properties.m_fuelCostPerDay.second : pUnit->m_properties.m_fuelCostPerDay.first;
 				if (pUnit->m_properties.m_fuel <= 0) {
 					m_spmap->TryDestroyUnit(x, y);
+					if (FPlayerRouted(GetCurrentPlayer())) {
+						m_fGameOver = true;
+						m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
+					}
 				}
 			}
 		}
@@ -447,6 +451,8 @@ int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
 			return node->m_fuel;
 		}
 	}
+
+	return -1;
 }
 
 Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept {
@@ -578,7 +584,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 						vecActions.emplace_back(Action::Type::MoveLoad, x, y, pTop->m_x, pTop->m_y);
 					}
 					// Can combine if the unit you are combining with is not full health. Can't combine with itself
-					else if (pCurrentTileUnit->m_properties.m_type == pUnit->m_properties.m_type && x != xCurr && y != yCurr) {
+					else if (pCurrentTileUnit->m_properties.m_type == pUnit->m_properties.m_type && (x != xCurr || y != yCurr)) {
 						if (((pUnit->IsTransport() && pCurrentTileUnit->CLoadedUnits() == 0 && pUnit->CLoadedUnits() == 0) || !pUnit->IsTransport()) &&
 							(pCurrentTileUnit->health <= 90)){
 							vecActions.emplace_back(Action::Type::MoveCombine, x, y, pTop->m_x, pTop->m_y);
@@ -728,17 +734,17 @@ Result GameState::DoAction(const Action& action) noexcept {
 	std::vector<Action> vecActions;
 	int x = source.first;
 	int y = source.second;
-	//GetValidActions(x, y, vecActions);
-	//bool fValid = false;
-	//for (const Action& validAction : vecActions) {
-	//	if (validAction == action) {
-	//		fValid = true;
-	//	}
-	//}
+	GetValidActions(x, y, vecActions);
+	bool fValid = false;
+	for (const Action& validAction : vecActions) {
+		if (validAction == action) {
+			fValid = true;
+		}
+	}
 
-	//if (!fValid) {
-	//	return Result::Failed;
-	//}
+	if (!fValid) {
+		return Result::Failed;
+	}
 
 	switch (action.m_type) {
 	default:
@@ -810,7 +816,12 @@ Result GameState::DoMoveCombineAction(int x, int y, const Action& action) {
 	MapTile* pDest = nullptr;
 	const std::pair<int, int>& pairDestination = action.m_optTarget.value();
 
-	ptile->TryGetUnit()->m_properties.m_fuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
+	int newFuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
+	if (newFuel == -1) {
+		return Result::Failed;
+	}
+
+	ptile->TryGetUnit()->m_properties.m_fuel = newFuel;
 	std::unique_ptr<Unit> spunitSource(ptile->SpDetachUnit());
 	x = pairDestination.first;
 	y = pairDestination.second;
@@ -847,7 +858,12 @@ Result GameState::DoMoveLoadAction(int x, int y, const Action& action) {
 	MapTile* pDest = nullptr;
 	const std::pair<int, int>& pairDestination = action.m_optTarget.value();
 
-	ptile->TryGetUnit()->m_properties.m_fuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
+	int newFuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
+	if (newFuel == -1) {
+		return Result::Failed;
+	}
+
+	ptile->TryGetUnit()->m_properties.m_fuel = newFuel;
 	std::unique_ptr<Unit> spunitSource(ptile->SpDetachUnit());
 	x = pairDestination.first;
 	y = pairDestination.second;
@@ -1018,8 +1034,13 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		}
 	}
 
+	pattacker->m_moved = true;
 	if (pdefender->health <= 0) {
 		pDefenderTile->TryDestroyUnit();
+		if (FPlayerRouted(*pdefendingplayer)) {
+			m_fGameOver = true;
+			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+		}
 		return Result::Succeeded;
 	}
 
@@ -1047,11 +1068,29 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 
 	if (pattacker->health <= 0) {
 		pAttackerTile->TryDestroyUnit();
+		if (FPlayerRouted(*pattackingplayer)) {
+			m_fGameOver = true;
+			m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
+		}
 		return Result::Succeeded;
 	}
 
 	//TODO: Check for rout victory condition
 	return Result::Succeeded;
+}
+
+bool GameState::FPlayerRouted(const Player& player) const noexcept {
+	for (int y = 0; y < m_spmap->GetRows(); ++y) {
+		for (int x = 0; x < m_spmap->GetCols(); ++x) {
+			const Unit* punit = nullptr;
+			m_spmap->TryGetUnit(x, y, &punit);
+			if (punit != nullptr && punit->m_owner == &player) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 int GameState::calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars) {
@@ -1234,7 +1273,12 @@ Result GameState::DoMoveAction(int& x, int& y, const Action& action) {
 		return Result::Succeeded;
 	}
 
-	punit->m_properties.m_fuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
+	int newFuel = GetFuelAfterMove(x, y, pairDestination.first, pairDestination.second);
+	if (newFuel == -1) {
+		return Result::Failed;
+	}
+
+	punit->m_properties.m_fuel = newFuel;
 	punit = ptile->SpDetachUnit();
 	x = pairDestination.first;
 	y = pairDestination.second;
@@ -1250,6 +1294,7 @@ Result GameState::DoMoveAction(int& x, int& y, const Action& action) {
 	if (punit->m_properties.m_type == UnitProperties::Type::Apc) {
 		ResupplyApcUnits(x, y);
 	}
+
 	return Result::Succeeded;
 }
 

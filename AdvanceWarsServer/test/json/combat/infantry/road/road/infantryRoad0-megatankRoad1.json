@@ -18,14 +18,23 @@
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133
         },
         {
           "property": {
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
         },
         {
           "terrain": 15,
@@ -56,14 +65,14 @@
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133
         },
         {
           "property": {
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133
         },
         {
           "property": {
@@ -133,14 +142,23 @@
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133
         },
         {
           "property": {
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
         },
         {
           "terrain": 15
@@ -162,14 +180,14 @@
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133
         },
         {
           "property": {
             "capture-points": 20,
             "owner": "neutral"
           },
-          "terrain": 113
+          "terrain": 133
         },
         {
           "property": {

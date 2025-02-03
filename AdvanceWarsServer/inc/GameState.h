@@ -259,6 +259,7 @@ private:
 	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 	void HealUnits(int health);
 	bool FAtUnitCap() const noexcept;
+	bool FPlayerRouted(const Player& player) const noexcept;
 private:
 	std::string m_guid;
 	std::unique_ptr<Map> m_spmap;

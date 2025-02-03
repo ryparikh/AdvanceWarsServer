@@ -1,0 +1,298 @@
+{
+  "initial-game-state": {
+    "activePlayer": 1,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "infantry-combat-roads",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 42
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 0,
+            "fuel": 0,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "battleship"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 0,
+            "fuel": 1,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "battleship"
+          }
+        },
+        {
+          "terrain": 41,
+          "unit": {
+            "ammo": 0,
+            "fuel": 9,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "battleship"
+          },
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          }
+        },
+        {
+          "terrain": 40,
+          "unit": {
+            "ammo": 0,
+            "fuel": 9,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "bcopter"
+          },
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          }
+        },
+        {
+          "terrain": 2,
+          "unit": {
+            "ammo": 0,
+            "fuel": 2,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "bcopter"
+          }
+        },
+        {
+          "terrain": 2,
+          "unit": {
+            "ammo": 0,
+            "fuel": 0,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "bcopter"
+          }
+        },
+        {
+          "terrain": 1,
+          "unit": {
+            "ammo": 0,
+            "fuel": 0,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 34,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          },
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 47
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 2000,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "end-turn"
+    }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "infantry-combat-roads",
+    "map": [
+      [
+       {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 42
+        },
+        {
+          "terrain": 28
+        },
+        {
+          "terrain": 28
+        },
+        {
+          "terrain": 41,
+          "unit": {
+            "ammo": 9,
+            "fuel": 98,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "battleship"
+          },
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          }
+        },
+        {
+          "terrain": 40,
+          "unit": {
+            "ammo": 6,
+            "fuel": 97,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "bcopter"
+          },
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          }
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 1,
+          "unit": {
+            "ammo": 0,
+            "fuel": 0,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 34,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          },
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 47
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 5000,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+
+      }
+    ],
+    "turn-count": 2,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

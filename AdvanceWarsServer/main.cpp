@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) noexcept {
 	try {
 
 
-		if (argc != 2) { // Check if the user provided exactly one argument
+		if (argc < 2) { // Check if the user provided exactly one argument
 			std::cerr << "Usage: " << argv[0] << " <option>\n";
 			std::cerr << "Options:\n";
 			std::cerr << "  -sim-random-move-game : Simulate a random move game.\n";
@@ -111,9 +111,14 @@ int main(int argc, char* argv[]) noexcept {
 			return -1;
 		}
 		else if (argument == "-test") {
+			std::string testFilePath = "test/json";
+			if (argc == 3) {
+				testFilePath = argv[2];
+			}
+
 			time_point startTime = std::chrono::steady_clock::now();
 
-			JsonTestSuite suite("test/json");
+			JsonTestSuite suite(testFilePath);
 			suite.run();
 
 			time_point endTime = std::chrono::steady_clock::now();

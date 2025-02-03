@@ -329,6 +329,10 @@
     <None Include="test\json\misc\begin-turn-funds.json" />
     <None Include="test\json\misc\begin-turn-repair-enough-funds.json" />
     <None Include="test\json\misc\begin-turn-repair-not-enough-funds.json" />
+    <None Include="test\json\misc\end-game-capturelimit-player0.json" />
+    <None Include="test\json\misc\end-game-hqcap-player0.json" />
+    <None Include="test\json\misc\end-game-hqcap-player1.json" />
+    <None Include="test\json\misc\end-game-labcapture-player0.json" />
     <None Include="test\json\misc\end-game-rout-counterattack.json" />
     <None Include="test\json\misc\end-game-rout-direct-attack.json" />
     <None Include="test\json\misc\end-game-rout-indirect-attack.json" />

@@ -556,7 +556,8 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 						MapTile* pAttackTile = nullptr;
 						if (m_spmap->TryGetTile(xAtt, yAtt, &pAttackTile) == Result::Succeeded) {
 							const Unit* pAttackUnit = pAttackTile->TryGetUnit();
-							if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
+							if ((/*if it is a pipe seem*/) ||
+								(pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit))) {
 								vecActions.emplace_back(Action::Type::MoveAttack, x, y, direction, xCurr, yCurr);
 							}
 						}
@@ -899,6 +900,17 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
 			std::cout << "HQ Capture Win: " << m_winningPlayer << std::endl;
+			return Result::Succeeded;
+		}
+		// Add logic to test if all labs are lost
+		else if (ptile->m_pterrain->m_type == Terrain::Type::Lab) {
+			if (!m_spmap->FHasHeadquarters()) {
+				if (!FEnemyHasLabs()) {
+					m_fGameOver = true;
+					m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+					return Result::Succeeded;
+				}
+			}
 		}
 
 		int totalProperties = 0;
@@ -923,6 +935,19 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 	return Result::Succeeded;
 }
 
+bool GameState::FEnemyHasLabs() const noexcept {
+	for (int y = 0; y < m_spmap->GetRows(); ++y) {
+		for (int x = 0; x < m_spmap->GetCols(); ++x) {
+			const MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			if (pTile->GetTerrain().m_type == Terrain::Type::Lab && pTile->m_spPropertyInfo->m_owner == &GetEnemyPlayer()) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
 Result GameState::DoBuyAction(int x, int y, const Action& action) {
 	MapTile* ptile = nullptr;
 	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));

@@ -33,6 +33,10 @@ Result Map::TryAddTile(unsigned int x, unsigned int y, Terrain::Type terrainType
 		return Result::Failed;
 	}
 
+	if (terrainType == Terrain::Type::Headquarters) {
+		m_fHasHeadquarters = true;
+	}
+
 	return Result::Succeeded;
 }
 
@@ -194,6 +198,9 @@ void to_json(json& j, const Map& map) {
 		for (auto& jmaptile : jrow) {
 			MapTile maptile;
 			from_json(arrPlayers, jmaptile, maptile);
+			if (maptile.GetTerrain().m_type == Terrain::Type::Headquarters) {
+				map.m_fHasHeadquarters = true;
+			}
 			map.m_vecvecMapTile[y].emplace_back(std::move(maptile));
 			++x;
 		}

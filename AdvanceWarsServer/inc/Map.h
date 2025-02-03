@@ -26,8 +26,10 @@ public:
 	Result Capture(unsigned int x, unsigned int y, const Player* player) noexcept;
 	Map* Clone(const std::array<Player, 2>& arrPlayers) const;
 	static void from_test_json(const std::array<Player, 2>& arrPlayers, json& j, Map& map);
+	bool FHasHeadquarters() const noexcept { return m_fHasHeadquarters; }
 private:
 	std::vector<std::vector<MapTile>> m_vecvecMapTile;
+	bool m_fHasHeadquarters{ false };
 };
 
 void to_json(json& j, const Map& map);

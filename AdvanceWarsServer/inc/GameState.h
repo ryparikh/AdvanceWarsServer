@@ -224,6 +224,7 @@ public:
 		return m_fGameOver;
 	}
 
+	bool FEnemyHasLabs() const noexcept;
 	static void to_json(json& j, const GameState& gameState);
 	static void from_json(json& j, GameState& gameState);
 private:

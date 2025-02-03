@@ -293,5 +293,9 @@
     <None Include="test\json\misc\end-game-rout-counterattack.json" />
     <None Include="test\json\misc\end-game-rout-direct-attack.json" />
     <None Include="test\json\misc\end-game-rout-no-gas-unit.json" />
+    <None Include="test\json\misc\end-game-capturelimit-player0.json" />
+    <None Include="test\json\misc\end-game-hqcap-player0.json" />
+    <None Include="test\json\misc\end-game-hqcap-player1.json" />
+    <None Include="test\json\misc\end-game-labcapture-player0.json" />
   </ItemGroup>
 </Project>

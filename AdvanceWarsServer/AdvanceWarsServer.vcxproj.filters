@@ -297,5 +297,7 @@
     <None Include="test\json\misc\end-game-hqcap-player0.json" />
     <None Include="test\json\misc\end-game-hqcap-player1.json" />
     <None Include="test\json\misc\end-game-labcapture-player0.json" />
+    <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-copower.json" />
+    <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-enemycopower.json" />
   </ItemGroup>
 </Project>

@@ -253,7 +253,7 @@ private:
 	Result DoUnloadAction(int x, int y, const Action& action);
 	Result DoCOPowerAction();
 	Result DoSCOPowerAction();
-	int calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars);
+	int calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars);
 
 	int GetMaxGoodLuck(const Player& player) noexcept;
 	int GetMaxBadLuck(const Player& player) noexcept;

@@ -245,6 +245,8 @@
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-bcopterRoad0.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-bcopterRoad1.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-bcopterRoad2.json" />
+    <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-copower.json" />
+    <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-enemycopower.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad1.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad2.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-mechRoad0.json" />

@@ -556,8 +556,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 						MapTile* pAttackTile = nullptr;
 						if (m_spmap->TryGetTile(xAtt, yAtt, &pAttackTile) == Result::Succeeded) {
 							const Unit* pAttackUnit = pAttackTile->TryGetUnit();
-							if ((/*if it is a pipe seem*/) ||
-								(pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit))) {
+							if (pAttackUnit != nullptr && pAttackUnit->m_owner != &GetCurrentPlayer() && CanUnitAttack(*pUnit, *pAttackUnit)) {
 								vecActions.emplace_back(Action::Type::MoveAttack, x, y, direction, xCurr, yCurr);
 							}
 						}
@@ -1036,7 +1035,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	}
 
 	// Calculate Attacker damange
-	int attackDamage = calculateDamage(pattackingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pDefenderTile->GetTerrain().m_defense);
+	int attackDamage = calculateDamage(pattackingplayer, pdefendingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pDefenderTile->GetTerrain().m_defense);
 	if (attackDamage <= -1) {
 		if (!fSonjaPower) {
 			return Result::Failed;
@@ -1074,7 +1073,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		return Result::Succeeded;
 	}
 
-	attackDamage = calculateDamage(pdefendingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
+	attackDamage = calculateDamage(pdefendingplayer, pattackingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
 	if (attackDamage >= 0) {
 		int attackerVisualHealthStart = (pattacker->health + 9) / 10;
 		pattacker->health -= attackDamage;
@@ -1118,7 +1117,7 @@ bool GameState::FPlayerRouted(const Player& player) const noexcept {
 	return true;
 }
 
-int GameState::calculateDamage(const Player* pattackingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars) {
+int GameState::calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars) {
 	int baseDamage = -1;
 	// Use machine gun against footsolider
 	if (defender.IsFootsoldier()) {
@@ -1190,8 +1189,8 @@ int GameState::calculateDamage(const Player* pattackingplayer, const CommandingO
 		}
 	}
 
-	int attackValue = rgCharts[static_cast<int>(attackerCO)][GetCurrentPlayer().PowerStatus()][static_cast<int>(attacker.m_properties.m_type)].first + 10 * nComTowers;
-	int defenceValue = rgCharts[static_cast<int>(defenderCO)][GetEnemyPlayer().PowerStatus()][static_cast<int>(defender.m_properties.m_type)].second;
+	int attackValue = rgCharts[static_cast<int>(attackerCO)][pattackingplayer->PowerStatus()][static_cast<int>(attacker.m_properties.m_type)].first + 10 * nComTowers;
+	int defenceValue = rgCharts[static_cast<int>(defenderCO)][pdefendingplayer->PowerStatus()][static_cast<int>(defender.m_properties.m_type)].second;
 	if (defender.IsAirUnit()) {
 		defenderTerrainStars = 0;
 	}

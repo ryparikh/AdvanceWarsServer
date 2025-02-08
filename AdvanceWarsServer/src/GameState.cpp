@@ -472,6 +472,9 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 			for (int i = 0; i < cLoadedUnits; ++i) {
 				const Unit* pUnloadUnit = pUnit->GetLoadedUnit(i);
 				const MapTile* pUnloadDestination = nullptr;
+				if (terrain.m_movementCostMap.find(pUnloadUnit->m_properties.m_movementType)->second == -1) {
+					continue;
+				}
 				// north
 				Result result = m_spmap->TryGetTile(x, y - 1, &pUnloadDestination);
 				if (result == Result::Succeeded) {
@@ -1035,7 +1038,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	}
 
 	// Calculate Attacker damange
-	int attackDamage = calculateDamage(pattackingplayer, pdefendingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pDefenderTile->GetTerrain().m_defense);
+	int attackDamage = calculateDamage(pattackingplayer, pdefendingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pAttackerTile->GetTerrain(), pDefenderTile->GetTerrain());
 	if (attackDamage <= -1) {
 		if (!fSonjaPower) {
 			return Result::Failed;
@@ -1073,7 +1076,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		return Result::Succeeded;
 	}
 
-	attackDamage = calculateDamage(pdefendingplayer, pattackingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pAttackerTile->GetTerrain().m_defense);
+	attackDamage = calculateDamage(pdefendingplayer, pattackingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pDefenderTile->GetTerrain(), pAttackerTile->GetTerrain());
 	if (attackDamage >= 0) {
 		int attackerVisualHealthStart = (pattacker->health + 9) / 10;
 		pattacker->health -= attackDamage;
@@ -1117,7 +1120,8 @@ bool GameState::FPlayerRouted(const Player& player) const noexcept {
 	return true;
 }
 
-int GameState::calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, int defenderTerrainStars) {
+int GameState::calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, const Terrain& attackerTerrain, const Terrain& defenderTerrain) {
+	int defenderTerrainStars = defenderTerrain.m_defense;
 	int baseDamage = -1;
 	// Use machine gun against footsolider
 	if (defender.IsFootsoldier()) {
@@ -1191,6 +1195,8 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 
 	int attackValue = rgCharts[static_cast<int>(attackerCO)][pattackingplayer->PowerStatus()][static_cast<int>(attacker.m_properties.m_type)].first + 10 * nComTowers;
 	int defenceValue = rgCharts[static_cast<int>(defenderCO)][pdefendingplayer->PowerStatus()][static_cast<int>(defender.m_properties.m_type)].second;
+
+	attackValue += GetCOTerrainModifier(*pattackingplayer, attackerCO, attackerTerrain.m_type);
 	if (defender.IsAirUnit()) {
 		defenderTerrainStars = 0;
 	}
@@ -1204,6 +1210,41 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 
 	damage = std::ceil(damage * 20.0) / 20.0;
 	return std::floor(damage);
+}
+
+
+int GameState::GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Terrain::Type& terrainType) const noexcept {
+	switch (co) {
+	case CommandingOfficier::Type::Jake:
+		if (terrainType != Terrain::Type::Plain) {
+			break;
+		}
+
+		if (player.m_powerStatus == 1) {
+			return 20;
+		}
+		else if (player.m_powerStatus == 2) {
+			return 40;
+		}
+		
+		return 10;
+	case CommandingOfficier::Type::Koal:
+		if (terrainType != Terrain::Type::Road) {
+			break;
+		}
+
+		if (player.m_powerStatus == 1) {
+			return 20;
+		}
+		else if (player.m_powerStatus == 2) {
+			return 30;
+		}
+		
+		return 10;
+	default:
+		break;
+	}
+	return 0;
 }
 
 int GameState::GetMaxGoodLuck(const Player& player) noexcept {
@@ -1347,6 +1388,29 @@ Result GameState::DoCOPowerAction() {
 	return Result::Succeeded;
 }
 
+Result GameState::ResupplyPlayersUnits(const Player* player) {
+	auto tryResupplyUnit = [&](int xResupply, int yResupply) -> Result {
+		MapTile* pTile = nullptr;
+		IfFailedReturn(m_spmap->TryGetTile(xResupply, yResupply, &pTile));
+		if (pTile != nullptr) {
+			Unit* pUnit = pTile->TryGetUnit();
+			if (pUnit != nullptr && pUnit->m_owner == player) {
+				pUnit->m_properties.m_fuel = GetUnitInfo(pUnit->m_properties.m_type).m_fuel;
+				pUnit->m_properties.m_ammo = GetUnitInfo(pUnit->m_properties.m_type).m_ammo;
+			}
+		}
+		return Result::Succeeded;
+	};
+
+
+	for (int y = 0; y < m_spmap->GetCols(); ++y) {
+		for (int x = 0; x < m_spmap->GetRows(); ++x) {
+			IfFailedReturn(tryResupplyUnit(x, y));
+		}
+	}
+	return Result::Succeeded;
+}
+
 Result GameState::DoSCOPowerAction() {
 	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
 	GetCurrentPlayer().SetPowerStatus(2);
@@ -1354,6 +1418,9 @@ Result GameState::DoSCOPowerAction() {
 	switch (type) {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(5);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Jess:
+			IfFailedReturn(ResupplyPlayersUnits(&GetCurrentPlayer()));
 			return Result::Succeeded;
 	}
 	return Result::Succeeded;

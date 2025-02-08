@@ -256,6 +256,7 @@ private:
 	Result ResupplyPlayersUnits(const Player* player);
 	int calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, const Terrain& attackerTerrain, const Terrain& defenderTerrain);
 	int GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Terrain::Type& terrainType) const noexcept;
+	int GetCOIndirectRangeModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 
 	int GetMaxGoodLuck(const Player& player) noexcept;
 	int GetMaxBadLuck(const Player& player) noexcept;

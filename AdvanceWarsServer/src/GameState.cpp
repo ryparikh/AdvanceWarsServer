@@ -572,6 +572,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 				}
 				// Indirect combat can only happen from the same square
 				else if (attackRange.first > 1 && x == xCurr && y == yCurr) {
+					attackRange.second += GetCOIndirectRangeModifier(&GetCurrentPlayer(), GetCurrentPlayer().m_co.m_type, *pUnit);
 					AddIndirectAttackActions(xCurr, yCurr, *pUnit, attackRange.first, attackRange.second, vecActions);
 				}
 
@@ -1212,6 +1213,21 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 	return std::floor(damage);
 }
 
+
+int GameState::GetCOIndirectRangeModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& unit) const noexcept {
+	switch (co) {
+	default:
+		break;
+	case CommandingOfficier::Type::Jake:
+		if (player.PowerStatus() != 0 && unit.IsVehicle()) {
+			return 1;
+		}
+
+		break;
+	}
+
+	return 0;
+}
 
 int GameState::GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Terrain::Type& terrainType) const noexcept {
 	switch (co) {

@@ -78,12 +78,12 @@ int main(int argc, char* argv[]) noexcept {
 					}
 				}
 				simulationMoves += totalActions;
+				GameState::to_json(jsonState, rootState);
 				std::cout << "GameState: " << std::endl << jsonState.dump() << std::endl;
 				outFile.close();
 				time_point endTime = std::chrono::steady_clock::now();
 				std::clog << "Game took to simulate: " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << "\n";
 				std::cout << "TotalActions: " << totalActions << std::endl;
-
 			};
 
 			// This vector will hold the futures for the running games.
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) noexcept {
 			futures.reserve(maxConcurrentGames);
 
 			time_point startTimeTotalSim = std::chrono::steady_clock::now();
-			for (int i = 0; i < 2000; ++i) {
+			for (int i = 0; i < 1; ++i) {
 				// Launch a game simulation asynchronously.
 				futures.push_back(std::async(std::launch::async, runGameSimulation));
 

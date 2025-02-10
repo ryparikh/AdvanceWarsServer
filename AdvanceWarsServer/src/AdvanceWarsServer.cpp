@@ -1,5 +1,5 @@
 #include "AdvanceWarsServer.h"
-#include <objbase.h>
+#include "Platform.h"
 
 std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 /*static*/ AdvanceWarsServer& AdvanceWarsServer::getInstance() {
@@ -90,18 +90,7 @@ int AdvanceWarsServer::run() {
 }
 
 json AdvanceWarsServer::create_new_game(std::string& gameId) {
-	GUID guid;
-	HRESULT hCreateGuid = CoCreateGuid(&guid);
-	if (hCreateGuid != S_OK) {
-		std::cerr << "Failed to create GUID" << std::endl;
-		return "";
-	}
-	// Convert GUID to a string
-	RPC_CSTR szUuid = NULL;
-	if (::UuidToStringA(&guid, &szUuid) == RPC_S_OK) {
-		gameId = (char*)szUuid;
-		::RpcStringFreeA(&szUuid);
-	}
+	gameId = Platform::createUuid();
 
 	Player player1(CommandingOfficier::Type::Andy, Player::ArmyType::OrangeStar);
 	Player player2(CommandingOfficier::Type::Adder, Player::ArmyType::BlueMoon);
@@ -151,7 +140,6 @@ json AdvanceWarsServer::do_action(const std::string& gameId, const Action& actio
 	// Only action left is EndTurn;
 	if (!game->second->FGameOver() && game->second->GetValidActions(vecActions) == Result::Succeeded && vecActions.size() == 1) {
 		game->second->EndTurn();
-		game->second->CheckPlayerResigns();
 	}
 
 	json j;

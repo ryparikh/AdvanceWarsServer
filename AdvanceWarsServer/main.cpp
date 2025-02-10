@@ -2,9 +2,11 @@
 #include <fstream>
 #include <random>
 #include <thread>
+#include <future>
 #include "AdvanceWarsServer.h"
 #include "MonteCarloTreeSearch.h"
 #include "SubsystemTest.h"
+#include "Platform.h"
 
 int main(int argc, char* argv[]) noexcept {
 	try {
@@ -22,26 +24,39 @@ int main(int argc, char* argv[]) noexcept {
 		std::string argument = argv[1];
 
 		if (argument == "-sim-random-move-game") {
-			AdvanceWarsServer& awaiServer = AdvanceWarsServer::getInstance();
-			std::thread thread([&]() {
-				awaiServer.run();
-			});
+			// Determine the number of available CPU cores.
+			unsigned int maxConcurrentGames = std::thread::hardware_concurrency();
+			if (maxConcurrentGames == 0) {
+				maxConcurrentGames = 2; // Fallback if hardware_concurrency() is not able to detect the core count.
+			}
 
-			// Simulate Game
-			std::thread gameRunner([&]() {
-				std::string gameId;
-				json newGameState = awaiServer.create_new_game(gameId);
-				std::ofstream outFile("./games/" + gameId + ".awai");
+			std::vector<std::thread> threads;
+			threads.reserve(maxConcurrentGames);
+
+			std::atomic<int> simulationMoves = 0;
+			auto runGameSimulation = [&]() {
+				std::fstream filestream("./res/AWBW/MapSources/MCTS.json", std::ios::in);
+				if (filestream.fail() || filestream.eof())
+				{
+					return;
+				}
+
+				json jsonState;
+				filestream >> jsonState;
+				GameState rootState;
+				GameState::from_json(jsonState, rootState);
+
+				std::ofstream outFile("D:/awai/random-move-game/" + Platform::createUuid() + ".awai");
 
 				time_point startTime = std::chrono::steady_clock::now();
-				std::cout << "GameState: " << std::endl << newGameState.dump() << std::endl;
-				outFile << "GameState: " << std::endl << newGameState.dump() << std::endl;
+				std::cout << "GameState: " << std::endl << jsonState.dump() << std::endl;
+				outFile << "GameState: " << std::endl << jsonState.dump() << std::endl;
 				std::random_device rd;
 				std::mt19937 luckGen(rd());
 				int totalActions = 0;
-				while (!awaiServer.game_over(gameId)) {
+				while (!rootState.isTerminal()) {
 					std::vector<Action> vecActions;
-					awaiServer.get_valid_actions(gameId, vecActions);
+					vecActions = rootState.getLegalActions();
 					// Generate a random number
 					std::uniform_int_distribution<int> actionDistribution(0, static_cast<int>(vecActions.size() - 1));
 					int action = actionDistribution(luckGen);
@@ -50,65 +65,100 @@ int main(int argc, char* argv[]) noexcept {
 					//std::cout << "Action: " << jaction.dump() << std::endl;
 					++totalActions;
 					outFile << "Action: " << jaction.dump() << std::endl;
-					newGameState = awaiServer.do_action(gameId, vecActions[action]);
-					outFile << "GameState: " << std::endl << newGameState.dump() << std::endl;
+					rootState.DoAction(vecActions[action]);
+					//GameState::to_json(jsonState, rootState);
+					//outFile << "GameState: " << std::endl << jsonState.dump() << std::endl;
 					if (totalActions % 1000 == 0) {
 						time_point endTime = std::chrono::steady_clock::now();
 						std::cout << "Processed Actions: " << totalActions << ", Processed Time (ms): " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << std::endl;
 					}
+
+					if (totalActions == 300000) {
+						break;
+					}
 				}
-				std::cout << "GameState: " << std::endl << newGameState.dump() << std::endl;
+				simulationMoves += totalActions;
+				std::cout << "GameState: " << std::endl << jsonState.dump() << std::endl;
 				outFile.close();
 				time_point endTime = std::chrono::steady_clock::now();
 				std::clog << "Game took to simulate: " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << "\n";
 				std::cout << "TotalActions: " << totalActions << std::endl;
-			});
 
-			gameRunner.join();
-			thread.join();
+			};
+
+			// This vector will hold the futures for the running games.
+			std::vector<std::future<void>> futures;
+			futures.reserve(maxConcurrentGames);
+
+			time_point startTimeTotalSim = std::chrono::steady_clock::now();
+			for (int i = 0; i < 2000; ++i) {
+				// Launch a game simulation asynchronously.
+				futures.push_back(std::async(std::launch::async, runGameSimulation));
+
+				// If we've reached the concurrency limit, check for finished games.
+				while (futures.size() >= maxConcurrentGames) {
+					// Iterate over the futures and remove the ones that are done.
+					for (auto it = futures.begin(); it != futures.end(); ) {
+						if (it->wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
+							it = futures.erase(it);
+						}
+						else {
+							++it;
+						}
+					}
+					// Sleep a little to avoid busy-waiting.
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				}
+			}
+
+			// Wait for any remaining games to finish.
+			for (auto &fut : futures) {
+				fut.wait();
+			}			
+
+			time_point endTimeTotalSim = std::chrono::steady_clock::now();
+			std::clog << "\n\n\n\nTook to simulate: " << std::chrono::duration<double, std::milli>(endTimeTotalSim - startTimeTotalSim).count() << std::endl;
+			std::cout << "TotalActions: " << simulationMoves << std::endl;
 		}
 		else if (argument == "-sim-mcts-game") {
-			AdvanceWarsServer& awaiServer = AdvanceWarsServer::getInstance();
-			std::thread thread([&]() {
-				awaiServer.run();
-			});
+			std::fstream filestream("./res/AWBW/MapSources/MCTS.json", std::ios::in);
+			if (filestream.fail() || filestream.eof())
+			{
+				return -1;
+			}
 
-			std::thread gameRunner([&]() {
-				std::string gameId;
-				json j = awaiServer.create_new_game(gameId);
-				GameState rootState = awaiServer.CloneGameState(gameId);
-				std::ofstream outFile("D:/awai/mcts_" + gameId + ".awai");
+			json j;
+			filestream >> j;
+			GameState rootState;
+			GameState::from_json(j, rootState);
 
-				json jstate;
+			std::ofstream outFile("D:/awai/mcts_" + Platform::createUuid() + ".awai");
+
+			json jstate;
+			GameState::to_json(jstate, rootState);
+			outFile << "Game State: " << jstate.dump() << std::endl;
+			auto root = std::make_shared<MCTSNode<GameState, Action>>(rootState, Action());
+			while (!rootState.isTerminal()) {
+				int player = rootState.IsFirstPlayerTurn() ? 0 : 1;
+				MCTS<GameState, Action> mcts;
+				auto bestNode = mcts.run(root, 10000);
+				json jaction;
+				to_json(jaction, bestNode->action);
+				outFile << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
+				std::cout << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
+				rootState = rootState.applyAction(bestNode->action);
 				GameState::to_json(jstate, rootState);
 				outFile << "Game State: " << jstate.dump() << std::endl;
-				int moves = 1;
-				auto root = std::make_shared<MCTSNode<GameState, Action>>(rootState, Action());
-				//while (!rootState.isTerminal()) {
-				while (moves > 0) {
-					int player = rootState.IsFirstPlayerTurn() ? 0 : 1;
-					MCTS<GameState, Action> mcts;
-					auto bestNode = mcts.run(root, 100, player); // Run MCTS with 100000iterations
-					json jaction;
-					to_json(jaction, bestNode->action);
-					std::cout << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
-					std::cout << "Visits: " << bestNode->visits << ", Total value: " << bestNode->totalValue << std::endl;
-					outFile << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
-					rootState = rootState.applyAction(bestNode->action);
-					GameState::to_json(jstate, rootState);
-					std::cout << "Game State: " << jstate.dump() << std::endl;
-					outFile << "Game State: " << jstate.dump() << std::endl;
-					--moves;
-					bestNode->parent.reset();
-					root = bestNode;
-				}
+				std::cout << "Game State: " << jstate.dump() << std::endl;
+				bestNode->parent->detachNode(bestNode);
+				bestNode->parent->freeMemory();
+				bestNode->parent.reset();
+				root = bestNode;
+			}
 
-				outFile.close();
-			});
+			outFile.close();
 
-			gameRunner.join();
-			thread.detach();
-			return -1;
+			return 0;
 		}
 		else if (argument == "-test") {
 			std::string testFilePath = "test/json";

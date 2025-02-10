@@ -29,14 +29,14 @@ Result GameState::InitializeGame() noexcept {
 
 	// Headquarters
 	m_spmap->Capture(0, 0, &GetPlayers()[0]);
-	m_spmap->Capture(4, 4, &GetPlayers()[1]);
+	m_spmap->Capture(5, 5, &GetPlayers()[1]);
 	// Bases
 	m_spmap->Capture(1, 1, &GetPlayers()[0]);
-	m_spmap->Capture(3, 3, &GetPlayers()[1]);
+	m_spmap->Capture(4, 4, &GetPlayers()[1]);
 	//m_spmap->Capture(11, 10, &GetPlayers()[1]);
 	//m_spmap->Capture(12, 15, &GetPlayers()[1]);
-	m_spmap->TryAddUnit(2, 2, UnitProperties::Type::Infantry, &GetPlayers()[0]);
-	m_spmap->TryAddUnit(2, 3, UnitProperties::Type::Infantry, &GetPlayers()[1]);
+	m_spmap->TryAddUnit(1, 1, UnitProperties::Type::Infantry, &GetPlayers()[0]);
+	m_spmap->TryAddUnit(4, 4, UnitProperties::Type::Infantry, &GetPlayers()[1]);
 
 	BeginTurn();
 	return Result::Succeeded;
@@ -85,7 +85,7 @@ Result GameState::BeginTurn() noexcept {
 					ResupplyApcUnits(x, y);
 				}
 
-				if (MapTile::IsProperty(terrain.m_type) && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab && pUnit->m_owner == &m_arrPlayers[player]) {
+				if (MapTile::IsProperty(terrain.m_type) && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player] && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab && pUnit->m_owner == &m_arrPlayers[player]) {
 					Unit* pUnit = pTile->TryGetUnit();
 					pUnit->m_properties.m_fuel = GetUnitInfo(pUnit->m_properties.m_type).m_fuel;
 					pUnit->m_properties.m_ammo = GetUnitInfo(pUnit->m_properties.m_type).m_ammo;
@@ -572,7 +572,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 				}
 				// Indirect combat can only happen from the same square
 				else if (attackRange.first > 1 && x == xCurr && y == yCurr) {
-					attackRange.second += GetCOIndirectRangeModifier(&GetCurrentPlayer(), GetCurrentPlayer().m_co.m_type, *pUnit);
+					attackRange.second += GetCOIndirectRangeModifier(GetCurrentPlayer(), GetCurrentPlayer().m_co.m_type, *pUnit);
 					AddIndirectAttackActions(xCurr, yCurr, *pUnit, attackRange.first, attackRange.second, vecActions);
 				}
 
@@ -847,6 +847,11 @@ Result GameState::DoMoveCombineAction(int x, int y, const Action& action) {
 		punitDest->health = (healthDest + healthSrc) * 10;
 	}
 
+	// Reset capture points when moving off of property.
+	if (ptile->m_spPropertyInfo != nullptr && ptile->m_spPropertyInfo->m_capturePoints != 20) {
+		ptile->m_spPropertyInfo->m_capturePoints = 20;
+	}
+
 	punitDest->m_moved = true;
 	return Result::Succeeded;
 }
@@ -879,6 +884,12 @@ Result GameState::DoMoveLoadAction(int x, int y, const Action& action) {
 
 	spunitSource->m_moved = true;
 	punitDest->Load(spunitSource.release());
+
+	// Reset capture points when moving off of property.
+	if (ptile->m_spPropertyInfo != nullptr && ptile->m_spPropertyInfo->m_capturePoints != 20) {
+		ptile->m_spPropertyInfo->m_capturePoints = 20;
+	}
+
 	return Result::Succeeded;
 }
 
@@ -902,7 +913,6 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		if (fHqCapture) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
-			std::cout << "HQ Capture Win: " << m_winningPlayer << std::endl;
 			return Result::Succeeded;
 		}
 		// Add logic to test if all labs are lost
@@ -931,7 +941,6 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		if (totalProperties >= m_nCaptureLimit) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
-			std::cout << "Capture Limit Win: " << m_winningPlayer << std::endl;
 		}
 	}
 
@@ -1065,6 +1074,9 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	pattacker->m_moved = true;
 	if (pdefender->health <= 0) {
 		pDefenderTile->TryDestroyUnit();
+		if (pDefenderTile->m_spPropertyInfo != nullptr && pDefenderTile->m_spPropertyInfo->m_capturePoints != 20) {
+			pDefenderTile->m_spPropertyInfo->m_capturePoints = 20;
+		}
 		if (FPlayerRouted(*pdefendingplayer)) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
@@ -1096,6 +1108,9 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 
 	if (pattacker->health <= 0) {
 		pAttackerTile->TryDestroyUnit();
+		if (pAttackerTile->m_spPropertyInfo != nullptr && pAttackerTile->m_spPropertyInfo->m_capturePoints != 20) {
+			pAttackerTile->m_spPropertyInfo->m_capturePoints = 20;
+		}
 		if (FPlayerRouted(*pattackingplayer)) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;

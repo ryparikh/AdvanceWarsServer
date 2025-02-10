@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "Reward.h"
 
 // Node class for MCTS
 template <typename StateType, typename ActionType>
@@ -22,11 +23,32 @@ public:
 	}
 
 	bool isFullyExpanded() const {
-		return !children.empty() && children.size() == legalActions.size();
+		return !children.empty() && children.size() == state.getLegalActions().size();
 	}
 
 	bool isLeaf() const {
 		return children.empty();
+	}
+
+	void detachNode(std::shared_ptr<MCTSNode> spNode) {
+		for (auto it = children.begin(); it != children.end(); ++it) {
+			if (it->get() == spNode.get()) {
+				children.erase(it);
+				return;
+			}
+		}
+	}
+
+	void freeMemory() {
+		if (children.empty()) {
+			parent.reset();
+			return;
+		}
+
+		for (auto& child : children) {
+			child->freeMemory();
+			child.reset();
+		}
 	}
 };
 
@@ -34,63 +56,47 @@ public:
 template <typename StateType, typename ActionType>
 class MCTS {
 public:
-	std::shared_ptr<MCTSNode<StateType, ActionType>> run(const StateType& rootState, int iterations, int playerPerspective) {
-		auto root = std::make_shared<MCTSNode<StateType, ActionType>>(rootState, ActionType());
+	std::shared_ptr<MCTSNode<StateType, ActionType>> run(std::shared_ptr<MCTSNode<StateType, ActionType>> root, int iterations) {
+		expand(root);
+		for (int i = 0; i < iterations; ++i) {
+			if ((i + 1) % 500 == 0) {
+				std::cout << "simmed iterations: " << i << std::endl;
+			}
 
-		std::cout << "Start Run" << std::endl;
-		for (int i = 1; i <= iterations; ++i) {
 			auto node = select(root);
 			if (!node->state.isTerminal()) {
 				expand(node);
 			}
-			double reward = simulate(node, playerPerspective);
-			backpropagate(node, reward, playerPerspective);
 
-			if (i % 10 == 0) {
-				std::cout << "Iterations: " << i << std::endl;
-			}
+			Reward reward = simulate(node);
+			backpropagate(node, reward);
 		}
 
 		return bestChild(root, 0.0);
 	}
-
-	std::shared_ptr<MCTSNode<StateType, ActionType>> run(std::shared_ptr<MCTSNode<StateType, ActionType>> root, int iterations, int playerPerspective) {
-		std::cout << "Start Run" << std::endl;
-		for (int i = 1; i <= iterations; ++i) {
-			auto node = select(root);
-			if (!node->state.isTerminal()) {
-				expand(node);
-			}
-			double reward = simulate(node, playerPerspective);
-			backpropagate(node, reward, playerPerspective);
-
-			if (i % 10 == 0) {
-				std::cout << "Iterations: " << i << std::endl;
-			}
-		}
-
-		return bestChild(root, 0.0);
-	}
-
 private:
 	std::shared_ptr<MCTSNode<StateType, ActionType>> select(std::shared_ptr<MCTSNode<StateType, ActionType>> node) {
 		while (!node->isLeaf() && !node->state.isTerminal()) {
 			node = bestChild(node, sqrt(2.0));
 		}
+
 		return node;
 	}
 
 	void expand(std::shared_ptr<MCTSNode<StateType, ActionType>> node) {
+		if (node->isFullyExpanded()) {
+			return;
+		}
+
 		for (const auto& action : node->legalActions) {
 			auto newState = node->state.applyAction(action);
 			node->children.push_back(std::make_shared<MCTSNode<StateType, ActionType>>(newState, action, node));
 		}
 	}
 
-	double simulate(std::shared_ptr<MCTSNode<StateType, ActionType>> node, int playerPerspective) {
+	Reward simulate(std::shared_ptr<MCTSNode<StateType, ActionType>> node) {
 		StateType state{ node->state };
 		int totalSimStates = 0;
-		//std::wcout << "Start Rollout" << std::endl;
 		time_point startTime = std::chrono::steady_clock::now();
 		while (!state.isTerminal()) {
 			auto actions = state.getLegalActions();
@@ -98,24 +104,30 @@ private:
 			ActionType action = actions[rand() % actions.size()];
 			++totalSimStates;
 			state = state.applyAction(action);
+			if (totalSimStates > 100000) {
+				break;
+			}
 		}
 		time_point endTime = std::chrono::steady_clock::now();
-		std::cout << "Processed Actions: " << totalSimStates << ", Processed Time (ms): " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << std::endl;
-		double eval = state.evaluate(playerPerspective);
-		//std::cout << "Player: " << playerPerspective << ", Evaluation: " << eval << std::endl;
-		return eval;
+		Reward reward = { state.getCurrentPlayer(), state.getEvaluationForCurrentPlayer() };
+		return reward;
 	}
 
-	void backpropagate(std::shared_ptr<MCTSNode<StateType, ActionType>> node, double reward, int rootPlayerPerspective) {
+	void backpropagate(std::shared_ptr<MCTSNode<StateType, ActionType>> node, Reward reward) {
 		while (node != nullptr) {
 			node->visits++;
-			int playerTurn = node->state.IsFirstPlayerTurn() ? 0 : 1;
-			if (rootPlayerPerspective == playerTurn) {
-				node->totalValue += reward;
+			bool invertReward = node->state.getCurrentPlayer() != reward.player;
+			if (node->action.m_type == Action::Type::EndTurn) {
+				invertReward = !invertReward;
+			}
+
+			if (!invertReward) {
+				node->totalValue += reward.value;
 			}
 			else {
-				node->totalValue += (reward * -1);
+				node->totalValue += reward.value * -1;
 			}
+
 			node = node->parent;
 		}
 	}

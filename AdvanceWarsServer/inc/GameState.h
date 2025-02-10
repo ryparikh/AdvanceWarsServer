@@ -6,6 +6,7 @@
 #include "Map.h"
 #include "Player.h"
 #include "Result.h"
+#include "Reward.h"
 
 class Map;
 
@@ -191,7 +192,7 @@ public:
 	GameState applyAction(const Action& action) {
 		GameState actedGameState{Clone()};
 		actedGameState.DoAction(action);
-		actedGameState.CheckPlayerResigns();
+		//actedGameState.CheckPlayerResigns();
 		return actedGameState;
 	}
 
@@ -205,6 +206,28 @@ public:
 		}
 
 		return -1;
+	}
+
+	int getWinningPlayer() const {
+		return m_winningPlayer;
+	}
+
+	int getEvaluationForCurrentPlayer() const {
+		if (!m_fGameOver || m_winningPlayer == 2) {
+			return 0;
+		}
+
+		int player = m_isFirstPlayerTurn ? 0 : 1;
+		if (m_winningPlayer == player) {
+			return 1;
+		}
+		else {
+			return -1;
+		}
+	}
+
+	int getCurrentPlayer() const {
+		return m_isFirstPlayerTurn ? 0 : 1;
 	}
 
 	GameState Clone();

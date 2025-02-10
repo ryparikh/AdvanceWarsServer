@@ -60,6 +60,9 @@
     <ClCompile Include="src\JsonSubsystemTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\win32\Platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Map.h">
@@ -126,6 +129,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\SubsystemTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Reward.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -286,7 +295,6 @@
     <None Include="test\json\misc\begin-turn-fuel-out_of_fuel.json" />
     <None Include="test\json\misc\begin-turn-funds.json" />
     <None Include="test\json\misc\begin-turn-repair-enough-funds.json" />
-    <None Include="test\json\misc\begin-turn-repair-not-enough-funds.json" />
     <None Include="test\json\captures\infantry-join-capture.json" />
     <None Include="test\json\captures\infantry-stops-capture.json" />
     <None Include="test\json\misc\end-game-rout-indirect-attack.json" />
@@ -299,5 +307,7 @@
     <None Include="test\json\misc\end-game-labcapture-player0.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-copower.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-enemycopower.json" />
+    <None Include="test\json\misc\begin-turn-no-repair-enemy-property.json" />
+    <None Include="test\json\misc\begin-turn-repair-not-enough-funds.json" />
   </ItemGroup>
 </Project>

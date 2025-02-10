@@ -171,6 +171,7 @@
     <ClCompile Include="src\TerrainInfo.cpp" />
     <ClCompile Include="src\Unit.cpp" />
     <ClCompile Include="src\UnitInfo.cpp" />
+    <ClCompile Include="src\win32\Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\asio-1.30.2\asio-1.30.2\include\asio.hpp" />
@@ -186,8 +187,10 @@
     <ClInclude Include="inc\MapTile.h" />
     <ClInclude Include="inc\MonteCarloTreeSearch.h" />
     <ClInclude Include="inc\MovementTypes.h" />
+    <ClInclude Include="inc\Platform.h" />
     <ClInclude Include="inc\Player.h" />
     <ClInclude Include="inc\Result.h" />
+    <ClInclude Include="inc\Reward.h" />
     <ClInclude Include="inc\SubsystemTest.h" />
     <ClInclude Include="inc\Terrain.h" />
     <ClInclude Include="inc\TerrainFileId.h" />
@@ -329,8 +332,8 @@
     <None Include="test\json\misc\begin-turn-fuel-out_of_fuel.json" />
     <None Include="test\json\misc\begin-turn-fuel.json" />
     <None Include="test\json\misc\begin-turn-funds.json" />
+    <None Include="test\json\misc\begin-turn-no-repair-enemy-property.json" />
     <None Include="test\json\misc\begin-turn-repair-enough-funds.json" />
-    <None Include="test\json\misc\begin-turn-repair-not-enough-funds.json" />
     <None Include="test\json\misc\end-game-capturelimit-player0.json" />
     <None Include="test\json\misc\end-game-hqcap-player0.json" />
     <None Include="test\json\misc\end-game-hqcap-player1.json" />

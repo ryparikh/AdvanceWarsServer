@@ -7,7 +7,7 @@
 #include <random>
 
 #include "MapParser.h"
-const std::string mapChoiceFilePath = R"(.\res\AWBW\MapSources\MCTS.txt)";
+const std::string mapChoiceFilePath = R"(.\res\AWBW\MapSources\Lefty.txt)";
 
 using time_point = std::chrono::time_point<std::chrono::steady_clock>;
 GameState::GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept :
@@ -28,15 +28,15 @@ Result GameState::InitializeGame() noexcept {
 	std::clog << "File load time: " << std::chrono::duration<double, std::milli>(fileEndTime - fileStartTime).count() << "\n";
 
 	// Headquarters
-	m_spmap->Capture(0, 0, &GetPlayers()[0]);
-	m_spmap->Capture(5, 5, &GetPlayers()[1]);
+	m_spmap->Capture(6, 5, &GetPlayers()[0]);
+	m_spmap->Capture(11, 10, &GetPlayers()[1]);
 	// Bases
-	m_spmap->Capture(1, 1, &GetPlayers()[0]);
-	m_spmap->Capture(4, 4, &GetPlayers()[1]);
-	//m_spmap->Capture(11, 10, &GetPlayers()[1]);
-	//m_spmap->Capture(12, 15, &GetPlayers()[1]);
-	m_spmap->TryAddUnit(1, 1, UnitProperties::Type::Infantry, &GetPlayers()[0]);
-	m_spmap->TryAddUnit(4, 4, UnitProperties::Type::Infantry, &GetPlayers()[1]);
+	m_spmap->Capture(5, 0, &GetPlayers()[0]);
+	m_spmap->Capture(10, 2, &GetPlayers()[0]);
+	m_spmap->Capture(7, 13, &GetPlayers()[1]);
+	m_spmap->Capture(12, 15, &GetPlayers()[1]);
+	//m_spmap->TryAddUnit(1, 1, UnitProperties::Type::Infantry, &GetPlayers()[0]);
+	m_spmap->TryAddUnit(7, 13, UnitProperties::Type::Infantry, &GetPlayers()[1]);
 
 	BeginTurn();
 	return Result::Succeeded;

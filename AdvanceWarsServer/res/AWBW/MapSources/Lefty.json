@@ -1,0 +1,560 @@
+{
+  "activePlayer": 0,
+  "cap-limit": 21,
+  "game-over": false,
+  "gameId": "game",
+  "map": [
+    [
+      { "terrain": 2 },
+      { "terrain": 2 },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "orange-star"
+        },
+        "terrain": 39
+      },
+      { "terrain": 15 },
+      { "terrain": 19 },
+      { "terrain": 1 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 36
+      },
+      { "terrain": 1 },
+      { "terrain": 30 },
+      { "terrain": 30 },
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 28 }
+    ],
+    [
+      { "terrain": 2 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 2 },
+      { "terrain": 2 },
+      { "terrain": 21 },
+      { "terrain": 19 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 31 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 30 },
+      { "terrain": 28 },
+      { "terrain": 28 }
+    ],
+    [
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 27 },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "orange-star"
+        },
+        "terrain": 39
+      },
+      { "terrain": 3 },
+      { "terrain": 31 },
+      { "terrain": 1 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 28 }
+    ],
+    [
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 2 },
+      { "terrain": 28 },
+      { "terrain": 2 },
+      { "terrain": 31 },
+      { "terrain": 31 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 1 }
+    ],
+    [
+      { "terrain": 1 },
+      { "terrain": 1 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 112 },
+      { "terrain": 15 },
+      { "terrain": 15 },
+      { "terrain": 15 },
+      { "terrain": 19 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 32 },
+      { "terrain": 31 },
+      { "terrain": 31 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      }
+    ],
+    [
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "orange-star"
+        },
+        "terrain": 42
+      },
+      { "terrain": 20 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 32 },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 19 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 1 }
+    ],
+    [
+      { "terrain": 29 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 16 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 32 },
+      { "terrain": 30 },
+      { "terrain": 112 },
+      { "terrain": 25 },
+      { "terrain": 15 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 133
+      },
+      { "terrain": 3 }
+    ],
+    [
+      { "terrain": 30 },
+      { "terrain": 30 },
+      { "terrain": 30 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 20 },
+      { "terrain": 1 },
+      { "terrain": 18 },
+      { "terrain": 112 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 3 },
+      { "terrain": 30 },
+      { "terrain": 30 },
+      { "terrain": 27 },
+      { "terrain": 30 },
+      { "terrain": 112 },
+      { "terrain": 1 }
+    ],
+    [
+      { "terrain": 1 },
+      { "terrain": 112 },
+      { "terrain": 29 },
+      { "terrain": 27 },
+      { "terrain": 29 },
+      { "terrain": 29 },
+      { "terrain": 3 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 112 },
+      { "terrain": 20 },
+      { "terrain": 1 },
+      { "terrain": 18 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 29 },
+      { "terrain": 29 },
+      { "terrain": 29 }
+    ],
+    [
+      { "terrain": 3 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 133
+      },
+      { "terrain": 15 },
+      { "terrain": 23 },
+      { "terrain": 112 },
+      { "terrain": 29 },
+      { "terrain": 31 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 16 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 30 }
+    ],
+    [
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 21 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 2 },
+      { "terrain": 31 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 18 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "blue-moon"
+        },
+        "terrain": 47
+      },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      }
+    ],
+    [
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 32 },
+      { "terrain": 32 },
+      { "terrain": 31 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 21 },
+      { "terrain": 15 },
+      { "terrain": 15 },
+      { "terrain": 15 },
+      { "terrain": 112 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 1 },
+      { "terrain": 1 }
+    ],
+    [
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 32 },
+      { "terrain": 32 },
+      { "terrain": 2 },
+      { "terrain": 28 },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 1 }
+    ],
+    [
+      { "terrain": 28 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 1 },
+      { "terrain": 32 },
+      { "terrain": 3 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "blue-moon"
+        },
+        "terrain": 44,
+        "unit": {
+          "ammo": 0,
+          "fuel": 99,
+          "health": 100,
+          "hidden": false,
+          "moved": false,
+          "owner": "blue-moon",
+          "type": "infantry"
+        }
+      },
+      { "terrain": 2 },
+      { "terrain": 27 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 2 }
+    ],
+    [
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 29 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 32 },
+      { "terrain": 3 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 21 },
+      { "terrain": 19 },
+      { "terrain": 2 },
+      { "terrain": 2 },
+      { "terrain": 2 },
+      { "terrain": 1 },
+      { "terrain": 1 },
+      { "terrain": 2 },
+      { "terrain": 2 }
+    ],
+    [
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 28 },
+      { "terrain": 29 },
+      { "terrain": 29 },
+      { "terrain": 1 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 36
+      },
+      { "terrain": 1 },
+      { "terrain": 21 },
+      { "terrain": 15 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "blue-moon"
+        },
+        "terrain": 44
+      },
+      { "terrain": 2 },
+      {
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        },
+        "terrain": 34
+      },
+      { "terrain": 2 },
+      { "terrain": 2 },
+      { "terrain": 2 }
+    ]
+  ],
+  "players": [
+    {
+      "armyType": "orange-star",
+      "co": "Andy",
+      "funds": 3000,
+      "luck-policy": 0,
+      "power-meter": {
+        "charge": 0,
+        "cop-stars": 3,
+        "scop-stars": 3,
+        "star-value": 9000
+      },
+      "power-status": 0
+    },
+    {
+      "armyType": "blue-moon",
+      "co": "Adder",
+      "funds": 0,
+      "luck-policy": 0,
+      "power-meter": {
+        "charge": 0,
+        "cop-stars": 2,
+        "scop-stars": 3,
+        "star-value": 9000
+      },
+      "power-status": 0
+    }
+  ],
+  "turn-count": 1,
+  "unit-cap": 50,
+  "winner": -1
+}

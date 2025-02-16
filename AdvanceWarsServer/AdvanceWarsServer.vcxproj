@@ -210,6 +210,7 @@
     <None Include="test\json\captures\infantry-stops-capture.json" />
     <None Include="test\json\captures\infantry100FlipNeutralComTower.json" />
     <None Include="test\json\captures\infantry100FlipNeutralLab.json" />
+    <None Include="test\json\combat\infantry\forest\city\infantry-infantry.json" />
     <None Include="test\json\combat\infantry\infantryCity0-infantryCity0.json" />
     <None Include="test\json\combat\infantry\infantryMountain0-infantryMountain0.json" />
     <None Include="test\json\combat\infantry\road\city\infantryRoad0-infantryCity0.json" />

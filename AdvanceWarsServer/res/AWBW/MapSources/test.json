@@ -1,5 +1,5 @@
 {
-  "activePlayer": 0,
+  "activePlayer": 1,
   "cap-limit": 21,
   "game-over": false,
   "gameId": "88f46e8d-412e-4540-8721-e5ed3b2fa07e",
@@ -30,7 +30,7 @@
           "fuel": 99,
           "health": 100,
           "hidden": false,
-          "moved": false,
+          "moved": true,
           "owner": "orange-star",
           "type": "infantry"
         }
@@ -49,22 +49,24 @@
     [
       { "terrain": 3 },
       { "terrain": 3 },
-      { "terrain": 3 },
+      {
+        "terrain": 3,
+        "unit": {
+          "ammo": 0,
+          "fuel": 99,
+          "health": 83,
+          "hidden": false,
+          "moved": true,
+          "owner": "orange-star",
+          "type": "infantry"
+        }
+      },
       {
         "property": {
           "capture-points": 20,
           "owner": "blue-moon"
         },
-        "terrain": 44,
-        "unit": {
-          "ammo": 0,
-          "fuel": 99,
-          "health": 100,
-          "hidden": false,
-          "moved": false,
-          "owner": "blue-moon",
-          "type": "infantry"
-        }
+        "terrain": 44
       },
       { "terrain": 1 }
     ],
@@ -73,18 +75,38 @@
       {
         "property": {
           "capture-points": 20,
-          "owner": "neutral"
+          "owner": "blue-moon"
         },
-        "terrain": 34
+        "terrain": 43
       },
-      { "terrain": 2 },
+      {
+        "terrain": 2,
+        "unit": {
+          "ammo": 3,
+          "fuel": 70,
+          "health": 100,
+          "hidden": false,
+          "moved": true,
+          "owner": "blue-moon",
+          "type": "mech"
+        }
+      },
       { "terrain": 1 },
       {
         "property": {
           "capture-points": 20,
           "owner": "blue-moon"
         },
-        "terrain": 47
+        "terrain": 47,
+        "unit": {
+          "ammo": 0,
+          "fuel": 99,
+          "health": 37,
+          "hidden": false,
+          "moved": true,
+          "owner": "blue-moon",
+          "type": "infantry"
+        }
       }
     ]
   ],
@@ -93,9 +115,9 @@
       "armyType": "orange-star",
       "co": "Andy",
       "funds": 2000,
-      "luck-policy": 1,
+      "luck-policy": 0,
       "power-meter": {
-        "charge": 0,
+        "charge": 1400,
         "cop-stars": 3,
         "scop-stars": 3,
         "star-value": 9000
@@ -105,10 +127,10 @@
     {
       "armyType": "blue-moon",
       "co": "Adder",
-      "funds": 0,
-      "luck-policy": 2,
+      "funds": 3000,
+      "luck-policy": 0,
       "power-meter": {
-        "charge": 0,
+        "charge": 1150,
         "cop-stars": 2,
         "scop-stars": 3,
         "star-value": 9000
@@ -116,7 +138,7 @@
       "power-status": 0
     }
   ],
-  "turn-count": 1,
+  "turn-count": 2,
   "unit-cap": 50,
   "winner": -1
 }

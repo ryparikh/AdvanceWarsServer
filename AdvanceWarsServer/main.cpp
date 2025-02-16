@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) noexcept {
 
 			std::atomic<int> simulationMoves = 0;
 			auto runGameSimulation = [&]() {
-				std::fstream filestream("./res/AWBW/MapSources/MCTS.json", std::ios::in);
+				std::fstream filestream("./res/AWBW/MapSources/test.json", std::ios::in);
 				if (filestream.fail() || filestream.eof())
 				{
 					return;
@@ -73,8 +73,9 @@ int main(int argc, char* argv[]) noexcept {
 						std::cout << "Processed Actions: " << totalActions << ", Processed Time (ms): " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << std::endl;
 					}
 
-					if (totalActions == 300000) {
-						break;
+					if (totalActions % 500000 == 0) {
+						GameState::to_json(jsonState, rootState);
+						std::cout << "GameState: " << std::endl << jsonState.dump() << std::endl;
 					}
 				}
 				simulationMoves += totalActions;
@@ -141,7 +142,10 @@ int main(int argc, char* argv[]) noexcept {
 			while (!rootState.isTerminal()) {
 				int player = rootState.IsFirstPlayerTurn() ? 0 : 1;
 				MCTS<GameState, Action> mcts;
-				auto bestNode = mcts.run(root, 10000);
+				time_point startTimeTotalSim = std::chrono::steady_clock::now();
+				auto bestNode = mcts.run(root, 50000);
+				time_point endTimeTotalSim = std::chrono::steady_clock::now();
+				std::cout << "\n\n\n\nTook to simulate: " << std::chrono::duration<double, std::milli>(endTimeTotalSim - startTimeTotalSim).count() << std::endl;
 				json jaction;
 				to_json(jaction, bestNode->action);
 				outFile << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
@@ -173,6 +177,19 @@ int main(int argc, char* argv[]) noexcept {
 
 			time_point endTime = std::chrono::steady_clock::now();
 			std::cout << "Tests took to simulate: " << std::chrono::duration<double>(endTime - startTime).count() << "s" << std::endl;
+		}
+		else if (argument == "-converter") {
+
+			Player player1(CommandingOfficier::Type::Andy, Player::ArmyType::OrangeStar);
+			Player player2(CommandingOfficier::Type::Adder, Player::ArmyType::BlueMoon);
+			std::array<Player, 2> arrPlayers{ std::move(player1), std::move(player2) };
+			GameState gameState("game", std::move(arrPlayers));
+			gameState.InitializeGame();
+			std::ofstream outFile("./res/AWBW/MapSources/Lefty.json");
+			json j;
+			GameState::to_json(j, gameState);
+			outFile << j.dump();
+			outFile.close();
 		}
 	}
 	catch (...) {

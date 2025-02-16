@@ -308,6 +308,6 @@
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-copower.json" />
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-enemycopower.json" />
     <None Include="test\json\misc\begin-turn-no-repair-enemy-property.json" />
-    <None Include="test\json\misc\begin-turn-repair-not-enough-funds.json" />
+    <None Include="test\json\combat\infantry\forest\city\infantry-infantry.json" />
   </ItemGroup>
 </Project>

@@ -157,6 +157,10 @@ struct Action {
 	std::optional<int> m_optUnloadIndex;
 };
 
+
+void to_json(json& j, const Action& action);
+void from_json(json& j, Action& action);
+
 class MoveNode {
 public:
 	MoveNode(bool visited) : m_visited(visited) {}
@@ -172,6 +176,7 @@ public:
 	bool m_visited = false;
 };
 
+#include <iostream>
 class GameState {
 public:
 	GameState() noexcept;
@@ -191,7 +196,13 @@ public:
 
 	GameState applyAction(const Action& action) {
 		GameState actedGameState{Clone()};
-		actedGameState.DoAction(action);
+		if (Result::Failed == actedGameState.DoAction(action)) 			{
+			json jaction;
+			::to_json(jaction, action);
+			json jstate;
+			to_json(jstate, *this);
+			std::cout << "Chose an invalid action:" << jaction.dump() << "\n" << jstate.dump() << std::endl;
+		}
 		//actedGameState.CheckPlayerResigns();
 		return actedGameState;
 	}
@@ -299,5 +310,3 @@ private:
 	int m_winningPlayer = -1;
 };
 
-void to_json(json& j, const Action& action);
-void from_json(json& j, Action& action);

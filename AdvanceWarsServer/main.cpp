@@ -7,11 +7,10 @@
 #include "MonteCarloTreeSearch.h"
 #include "SubsystemTest.h"
 #include "Platform.h"
+#include <torch/torch.h>
 
 int main(int argc, char* argv[]) noexcept {
 	try {
-
-
 		if (argc < 2) { // Check if the user provided exactly one argument
 			std::cerr << "Usage: " << argv[0] << " <option>\n";
 			std::cerr << "Options:\n";
@@ -22,8 +21,74 @@ int main(int argc, char* argv[]) noexcept {
 		}
 
 		std::string argument = argv[1];
+		if (argument == "-torchlib") {
 
-		if (argument == "-sim-random-move-game") {
+			std::cout << "CUDA support: " << (torch::cuda::is_available() ? "true" : "false") << std::endl;
+			std::cout << "CUDA devices: " << (torch::cuda::device_count()) << std::endl;
+
+			torch::Tensor tensor = torch::rand({ 2, 3 });
+			std::cout << tensor << std::endl;
+
+			struct Net : torch::nn::Module {
+				Net()
+					: conv1(torch::nn::Conv2dOptions(1, 32, 5)),
+					conv2(torch::nn::Conv2dOptions(32, 64, 5)),
+					fc1(1024, 128),
+					fc2(128, 10) {
+					register_module("conv1", conv1);
+					register_module("conv2", conv2);
+					register_module("fc1", fc1);
+					register_module("fc2", fc2);
+				}
+
+				torch::Tensor forward(torch::Tensor x) {
+					x = torch::relu(conv1->forward(x));
+					x = torch::max_pool2d(x, 2);
+					x = torch::relu(conv2->forward(x));
+					x = torch::max_pool2d(x, 2);
+					x = x.view({ x.size(0), -1 });
+					x = torch::relu(fc1->forward(x));
+					x = fc2->forward(x);
+					return torch::log_softmax(x, 1);
+				}
+
+				torch::nn::Conv2d conv1, conv2;
+				torch::nn::Linear fc1, fc2;
+			};
+			torch::Device device(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
+			std::cout << "Using device: " << (device.is_cuda() ? "CUDA" : "CPU") << "\n";
+
+			// Load MNIST dataset
+			auto train_dataset = torch::data::datasets::MNIST("D:/MNIST/MNIST/raw").map(
+				torch::data::transforms::Stack<>());
+			auto train_loader = torch::data::make_data_loader(std::move(train_dataset),
+				torch::data::DataLoaderOptions().batch_size(64));
+
+			// Initialize model, optimizer, and loss function
+			Net model;
+			model.to(device);
+			torch::optim::SGD optimizer(model.parameters(), torch::optim::SGDOptions(0.01).momentum(0.9));
+
+			// Training loop
+			for (size_t epoch = 1; epoch <= 5; ++epoch) {
+				size_t batch_idx = 0;
+				for (auto& batch : *train_loader) {
+					model.train();
+					auto data = batch.data.to(device), targets = batch.target.to(device);
+					optimizer.zero_grad();
+					auto output = model.forward(data);
+					auto loss = torch::nll_loss(output, targets);
+					loss.backward();
+					optimizer.step();
+
+					if (batch_idx++ % 100 == 0) {
+						std::cout << "Train Epoch: " << epoch << " [" << batch_idx * 64
+							<< "/60000] Loss: " << loss.item<float>() << "\n";
+					}
+				}
+			}
+		}
+		else if (argument == "-sim-random-move-game") {
 			// Determine the number of available CPU cores.
 			unsigned int maxConcurrentGames = std::thread::hardware_concurrency();
 			if (maxConcurrentGames == 0) {
@@ -35,7 +100,7 @@ int main(int argc, char* argv[]) noexcept {
 
 			std::atomic<int> simulationMoves = 0;
 			auto runGameSimulation = [&]() {
-				std::fstream filestream("./res/AWBW/MapSources/test.json", std::ios::in);
+				std::fstream filestream("./res/AWBW/MapSources/lefty.json", std::ios::in);
 				if (filestream.fail() || filestream.eof())
 				{
 					return;
@@ -66,6 +131,7 @@ int main(int argc, char* argv[]) noexcept {
 					++totalActions;
 					outFile << "Action: " << jaction.dump() << std::endl;
 					rootState.DoAction(vecActions[action]);
+					rootState.CheckPlayerResigns();
 					//GameState::to_json(jsonState, rootState);
 					//outFile << "GameState: " << std::endl << jsonState.dump() << std::endl;
 					if (totalActions % 1000 == 0) {
@@ -85,7 +151,7 @@ int main(int argc, char* argv[]) noexcept {
 				time_point endTime = std::chrono::steady_clock::now();
 				std::clog << "Game took to simulate: " << std::chrono::duration<double, std::milli>(endTime - startTime).count() << "\n";
 				std::cout << "TotalActions: " << totalActions << std::endl;
-			};
+				};
 
 			// This vector will hold the futures for the running games.
 			std::vector<std::future<void>> futures;
@@ -113,16 +179,16 @@ int main(int argc, char* argv[]) noexcept {
 			}
 
 			// Wait for any remaining games to finish.
-			for (auto &fut : futures) {
+			for (auto& fut : futures) {
 				fut.wait();
-			}			
+			}
 
 			time_point endTimeTotalSim = std::chrono::steady_clock::now();
 			std::clog << "\n\n\n\nTook to simulate: " << std::chrono::duration<double, std::milli>(endTimeTotalSim - startTimeTotalSim).count() << std::endl;
 			std::cout << "TotalActions: " << simulationMoves << std::endl;
 		}
 		else if (argument == "-sim-mcts-game") {
-			std::fstream filestream("./res/AWBW/MapSources/MCTS.json", std::ios::in);
+			std::fstream filestream("./res/AWBW/MapSources/Lefty.json", std::ios::in);
 			if (filestream.fail() || filestream.eof())
 			{
 				return -1;

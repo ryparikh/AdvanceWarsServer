@@ -85,6 +85,16 @@ Result GameState::BeginTurn() noexcept {
 					ResupplyApcUnits(x, y);
 				}
 
+				if ((pUnit->m_properties.m_type == UnitProperties::Type::Carrier ||
+					pUnit->m_properties.m_type == UnitProperties::Type::Crusier) &&
+					pUnit->m_owner == &GetCurrentPlayer()) {
+					for (int i = 0; i < pUnit->CLoadedUnits(); ++i) {
+						Unit* pLoadedUnit = pUnit->GetLoadedUnit(i);
+						pLoadedUnit->m_properties.m_fuel = GetUnitInfo(pLoadedUnit->m_properties.m_type).m_fuel;
+						pLoadedUnit->m_properties.m_ammo = GetUnitInfo(pLoadedUnit->m_properties.m_type).m_ammo;
+					}
+				}
+
 				if (MapTile::IsProperty(terrain.m_type) && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player] && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab && pUnit->m_owner == &m_arrPlayers[player]) {
 					Unit* pUnit = pTile->TryGetUnit();
 					pUnit->m_properties.m_fuel = GetUnitInfo(pUnit->m_properties.m_type).m_fuel;
@@ -481,20 +491,12 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 					if (pUnloadDestination->m_spUnit == nullptr && pUnloadDestination->GetTerrain().m_movementCostMap.find(pUnloadUnit->m_properties.m_movementType)->second > 0) {
 						vecActions.emplace_back(Action::Type::Unload, x, y, Action::Direction::North, i);
 					}
-
-					if (pUnit->m_properties.m_type == UnitProperties::Type::BlackBoat && pUnloadDestination->m_spUnit != nullptr && pUnloadDestination->m_spUnit->m_owner == &GetCurrentPlayer()) {
-						vecActions.emplace_back(Action::Type::Repair, x, y, Action::Direction::North);
-					}
 				}
 				// east
 				result = m_spmap->TryGetTile(x + 1, y, &pUnloadDestination);
 				if (result == Result::Succeeded) {
 					if (pUnloadDestination->m_spUnit == nullptr && pUnloadDestination->GetTerrain().m_movementCostMap.find(pUnloadUnit->m_properties.m_movementType)->second > 0) {
 						vecActions.emplace_back(Action::Type::Unload, x, y, Action::Direction::East, i);
-					}
-
-					if (pUnit->m_properties.m_type == UnitProperties::Type::BlackBoat && pUnloadDestination->m_spUnit != nullptr && pUnloadDestination->m_spUnit->m_owner == &GetCurrentPlayer()) {
-						vecActions.emplace_back(Action::Type::Repair, x, y, Action::Direction::East);
 					}
 				}
 				// south 
@@ -503,10 +505,6 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 					if (pUnloadDestination->m_spUnit == nullptr && pUnloadDestination->GetTerrain().m_movementCostMap.find(pUnloadUnit->m_properties.m_movementType)->second > 0) {
 						vecActions.emplace_back(Action::Type::Unload, x, y, Action::Direction::South, i);
 					}
-
-					if (pUnit->m_properties.m_type == UnitProperties::Type::BlackBoat && pUnloadDestination->m_spUnit != nullptr && pUnloadDestination->m_spUnit->m_owner == &GetCurrentPlayer()) {
-						vecActions.emplace_back(Action::Type::Repair, x, y, Action::Direction::South);
-					}
 				}
 				// west 
 				result = m_spmap->TryGetTile(x - 1, y, &pUnloadDestination);
@@ -514,12 +512,24 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 					if (pUnloadDestination->m_spUnit == nullptr && pUnloadDestination->GetTerrain().m_movementCostMap.find(pUnloadUnit->m_properties.m_movementType)->second > 0) {
 						vecActions.emplace_back(Action::Type::Unload, x, y, Action::Direction::West, i);
 					}
-
-					if (pUnit->m_properties.m_type == UnitProperties::Type::BlackBoat && pUnloadDestination->m_spUnit != nullptr && pUnloadDestination->m_spUnit->m_owner == &GetCurrentPlayer()) {
-						vecActions.emplace_back(Action::Type::Repair, x, y, Action::Direction::West);
-					}
 				}
 			}
+		}
+
+		if (pUnit->m_properties.m_type == UnitProperties::Type::BlackBoat && !pUnit->m_moved) {
+			auto addRepairAction = [&](int xRepair, int yRepair, Action::Direction direction) {
+				const MapTile* pRepairDestination = nullptr;
+				if (m_spmap->TryGetTile(xRepair, yRepair, &pRepairDestination) == Result::Succeeded &&
+					pRepairDestination->m_spUnit != nullptr &&
+					pRepairDestination->m_spUnit->m_owner == &GetCurrentPlayer()) {
+					vecActions.emplace_back(Action::Type::Repair, x, y, direction);
+				}
+			};
+
+			addRepairAction(x, y - 1, Action::Direction::North);
+			addRepairAction(x + 1, y, Action::Direction::East);
+			addRepairAction(x, y + 1, Action::Direction::South);
+			addRepairAction(x - 1, y, Action::Direction::West);
 		}
 
 		if (pUnit->m_moved) {
@@ -770,10 +780,65 @@ Result GameState::DoAction(const Action& action) noexcept {
 	case Action::Type::MoveWait:
 		return DoMoveAction(x, y, action);
 	case Action::Type::Repair:
-		return Result::Failed;
+		return DoRepairAction(x, y, action);
 	case Action::Type::Unload:
 		return DoUnloadAction(x, y, action);
 	}
+	return Result::Succeeded;
+}
+
+Result GameState::DoRepairAction(int x, int y, const Action& action) {
+	if (!action.m_optDirection.has_value()) {
+		return Result::Failed;
+	}
+
+	MapTile* pSourceTile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pSourceTile));
+
+	Unit* pBlackBoat = pSourceTile->TryGetUnit();
+	if (pBlackBoat == nullptr ||
+		pBlackBoat->m_owner != &GetCurrentPlayer() ||
+		pBlackBoat->m_properties.m_type != UnitProperties::Type::BlackBoat ||
+		pBlackBoat->m_moved) {
+		return Result::Failed;
+	}
+
+	MapTile* pTargetTile = nullptr;
+	switch (action.m_optDirection.value()) {
+	case Action::Direction::North:
+		IfFailedReturn(m_spmap->TryGetTile(x, y - 1, &pTargetTile));
+		break;
+	case Action::Direction::East:
+		IfFailedReturn(m_spmap->TryGetTile(x + 1, y, &pTargetTile));
+		break;
+	case Action::Direction::South:
+		IfFailedReturn(m_spmap->TryGetTile(x, y + 1, &pTargetTile));
+		break;
+	case Action::Direction::West:
+		IfFailedReturn(m_spmap->TryGetTile(x - 1, y, &pTargetTile));
+		break;
+	default:
+		return Result::Failed;
+	}
+
+	Unit* pTargetUnit = pTargetTile->TryGetUnit();
+	if (pTargetUnit == nullptr || pTargetUnit->m_owner != &GetCurrentPlayer()) {
+		return Result::Failed;
+	}
+
+	pTargetUnit->m_properties.m_fuel = GetUnitInfo(pTargetUnit->m_properties.m_type).m_fuel;
+	pTargetUnit->m_properties.m_ammo = GetUnitInfo(pTargetUnit->m_properties.m_type).m_ammo;
+
+	if (pTargetUnit->health < 100) {
+		int repairAmount = std::min(100 - pTargetUnit->health, 10);
+		int unitRepairFunds = Unit::GetUnitCost(pTargetUnit->m_properties.m_type) * (repairAmount / 10);
+		if (unitRepairFunds <= GetCurrentPlayer().m_funds) {
+			GetCurrentPlayer().m_funds -= unitRepairFunds;
+			pTargetUnit->health += repairAmount;
+		}
+	}
+
+	pBlackBoat->m_moved = true;
 	return Result::Succeeded;
 }
 
@@ -803,7 +868,16 @@ Result GameState::DoUnloadAction(int x, int y, const Action& action) {
 	MapTile* ptile = nullptr;
 	IfFailedReturn(m_spmap->TryGetTile(x, y, &ptile));
 	Unit* punitTransport = ptile->TryGetUnit();
-	Unit* pUnit = punitTransport->Unload(*action.m_optUnloadIndex);
+	if (punitTransport == nullptr) {
+		return Result::Failed;
+	}
+
+	int unloadIndex = action.m_optUnloadIndex.value_or(0);
+	if (unloadIndex < 0 || unloadIndex >= punitTransport->CLoadedUnits()) {
+		return Result::Failed;
+	}
+
+	Unit* pUnit = punitTransport->Unload(unloadIndex);
 	pmaptileDest->TryAddUnit(pUnit);
 	pUnit->m_moved = true;
 	return Result::Succeeded;
@@ -1478,26 +1552,29 @@ bool GameState::CheckPlayerResigns() noexcept {
 		return false;
 	}
 
-	if (m_nTurnCount < 14) {
+	if (m_nTurnCount < 5) {
 		return false;
-	}
-
-	if (m_nTurnCount > 100) {
-		m_fGameOver = true;
-		m_winningPlayer = 2;
-		std::cout << "Turn count exceeded" << std::endl;
-		std::cout << "Winning player: " << m_winningPlayer << std::endl;
-		return true;
 	}
 
 	int nCurrentPlayerArmyValue = 0;
 	int nCurrentPlayerUnits = 0;
 	int nEnemyPlayerArmyValue = 0;
 	int nEnemyPlayerUnits = 0;
+	int nCurrentIncome = 0;
+	int nEnemyIncome = 0;
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
 			const MapTile* pTile = nullptr;
 			m_spmap->TryGetTile(x, y, &pTile);
+			const Terrain& terrain = pTile->GetTerrain();
+			if (MapTile::IsProperty(terrain.m_type) && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab) {
+				if (pTile->m_spPropertyInfo->m_owner == &GetCurrentPlayer()) {
+					++nCurrentIncome;
+				}
+				else if (pTile->m_spPropertyInfo->m_owner == &GetEnemyPlayer()) {
+					++nEnemyIncome;
+				}
+			}
 			const Unit* punit = pTile->TryGetUnit();
 			if (punit != nullptr) {
 				if (punit->m_owner == &GetCurrentPlayer()) {
@@ -1512,17 +1589,17 @@ bool GameState::CheckPlayerResigns() noexcept {
 		}
 	}
 
-	// if army value is less than half opponent value
-	// if army units is less than half opponent units
+	// if army value is significantly less than opponent value
+	// if army units is significantly less than opponent units
 	// forfeit
-	if ((nCurrentPlayerArmyValue < (nEnemyPlayerArmyValue / 3)) && (nCurrentPlayerUnits < (nEnemyPlayerUnits / 3))) {
-		std::cout << "CAM: " << nCurrentPlayerArmyValue << std::endl;
-		std::cout << "EAM: " << nEnemyPlayerArmyValue << std::endl;
-		std::cout << "CU: " << nCurrentPlayerUnits << std::endl;
-		std::cout << "EU: " << nEnemyPlayerUnits << std::endl;
+	if ((nCurrentPlayerArmyValue < (nEnemyPlayerArmyValue / 2)) && (nCurrentPlayerUnits < (nEnemyPlayerUnits / 2)) && nCurrentIncome < nEnemyIncome) {
+		//std::cout << "CAM: " << nCurrentPlayerArmyValue << std::endl;
+		//std::cout << "EAM: " << nEnemyPlayerArmyValue << std::endl;
+		//std::cout << "CU: " << nCurrentPlayerUnits << std::endl;
+		//std::cout << "EU: " << nEnemyPlayerUnits << std::endl;
 		m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
-		std::cout << "Forfeit by player" << (m_isFirstPlayerTurn ? 0 : 1) << std::endl;
-		std::cout << "Winning player" << m_winningPlayer << std::endl;
+		//std::cout << "Forfeit by player" << (m_isFirstPlayerTurn ? 0 : 1) << std::endl;
+		//std::cout << "Winning player" << m_winningPlayer << std::endl;
 		m_fGameOver = true;
 	}
 
@@ -1699,6 +1776,7 @@ void from_json(json& j, Action& action) {
 	if (j.contains("unloadIndex")) {
 		int unloadIndex = -1;
 		j.at("unloadIndex").get_to(unloadIndex);
+		action.m_optUnloadIndex = unloadIndex;
 	}
 }
 

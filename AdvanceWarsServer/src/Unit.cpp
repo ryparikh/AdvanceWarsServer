@@ -213,7 +213,11 @@ bool Unit::CanLoad(UnitProperties::Type type) const noexcept {
 		unitTypeIsOk = (type == UnitProperties::Type::Infantry || type == UnitProperties::Type::Mech);
 	}
 
-	if (m_properties.m_type == UnitProperties::Type::Crusier || m_properties.m_type == UnitProperties::Type::Carrier) {
+	if (m_properties.m_type == UnitProperties::Type::Crusier) {
+		unitTypeIsOk = type == UnitProperties::Type::BCopter || type == UnitProperties::Type::TCopter;
+	}
+
+	if (m_properties.m_type == UnitProperties::Type::Carrier) {
 		unitTypeIsOk = UnitProperties::IsAirUnit(type);
 	}
 

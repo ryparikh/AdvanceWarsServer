@@ -59,7 +59,7 @@ public:
 	std::shared_ptr<MCTSNode<StateType, ActionType>> run(std::shared_ptr<MCTSNode<StateType, ActionType>> root, int iterations) {
 		expand(root);
 		for (int i = 0; i < iterations; ++i) {
-			if ((i + 1) % 500 == 0) {
+			if ((i + 1) % 50 == 0) {
 				std::cout << "simmed iterations: " << i << std::endl;
 			}
 

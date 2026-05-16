@@ -1,0 +1,186 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "carrier-unload-hidden-stealth",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 42
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 47
+        }
+      ],
+      [
+        {
+          "terrain": 28
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "loaded-units": [
+              {
+                "ammo": 6,
+                "fuel": 60,
+                "health": 100,
+                "hidden": true,
+                "moved": true,
+                "owner": "orange-star",
+                "type": "stealth"
+              }
+            ],
+            "moved": false,
+            "owner": "orange-star",
+            "type": "carrier"
+          }
+        },
+        {
+          "terrain": 28
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 2000,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "unload",
+      "source": [ 1, 1 ],
+      "direction": "north",
+      "unloadIndex": 0
+    }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "carrier-unload-hidden-stealth",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 42
+        },
+        {
+          "terrain": 3,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": true,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "stealth"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 47
+        }
+      ],
+      [
+        {
+          "terrain": 28
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "carrier"
+          }
+        },
+        {
+          "terrain": 28
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 2000,
+        "luck-policy": 1,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "luck-policy": 2,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

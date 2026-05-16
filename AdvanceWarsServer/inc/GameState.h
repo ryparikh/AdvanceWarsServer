@@ -203,7 +203,7 @@ public:
 			to_json(jstate, *this);
 			std::cout << "Chose an invalid action:" << jaction.dump() << "\n" << jstate.dump() << std::endl;
 		}
-		//actedGameState.CheckPlayerResigns();
+		actedGameState.CheckPlayerResigns();
 		return actedGameState;
 	}
 
@@ -223,9 +223,13 @@ public:
 		return m_winningPlayer;
 	}
 
+	int evaluateCurrentPlayer() const {
+		return 0;
+	}
+
 	int getEvaluationForCurrentPlayer() const {
 		if (!m_fGameOver || m_winningPlayer == 2) {
-			return 0;
+			return evaluateCurrentPlayer();
 		}
 
 		int player = m_isFirstPlayerTurn ? 0 : 1;
@@ -285,6 +289,7 @@ private:
 	Result DoMoveLoadAction(int x, int y, const Action& action);
 	Result DoCaptureAction(int x, int y, const Action& action);
 	Result DoUnloadAction(int x, int y, const Action& action);
+	Result DoRepairAction(int x, int y, const Action& action);
 	Result DoCOPowerAction();
 	Result DoSCOPowerAction();
 	Result ResupplyPlayersUnits(const Player* player);

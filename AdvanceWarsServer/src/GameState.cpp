@@ -19,6 +19,16 @@ GameState::GameState() noexcept
 {
 }
 
+void GameState::SetCombatRngSeed(std::uint32_t seed) {
+	m_combatRngSeed = seed;
+	m_combatRng.emplace(seed);
+}
+
+void GameState::ClearCombatRngSeed() noexcept {
+	m_combatRngSeed.reset();
+	m_combatRng.reset();
+}
+
 Result GameState::InitializeGame() noexcept {
 	MapParser parser;
 	time_point fileStartTime = std::chrono::steady_clock::now();
@@ -1244,10 +1254,7 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 		return -1;
 	}
 
-	std::random_device rd;
-	std::mt19937 luckGen(rd());
 	std::uniform_int_distribution<int> goodLuckDistribution(0, GetMaxGoodLuck(*pattackingplayer));
-	// Generate a random number
 	int goodLuckRoll = 0;
 	if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysLowestValue) {
 		goodLuckRoll = goodLuckDistribution.min();
@@ -1256,11 +1263,11 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 		goodLuckRoll = goodLuckDistribution.max();
 	}
 	else {
-		goodLuckRoll = goodLuckDistribution(luckGen);
+		goodLuckRoll = RollCombatLuck(goodLuckDistribution.min(), goodLuckDistribution.max());
 	}
 
 	std::uniform_int_distribution<int> badLuckDistribution(0, GetMaxBadLuck(*pattackingplayer));
-	int badLuckRoll = badLuckDistribution(luckGen);
+	int badLuckRoll = 0;
 	if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysLowestValue) {
 		badLuckRoll = badLuckDistribution.max();
 	}
@@ -1268,7 +1275,7 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 		badLuckRoll = badLuckDistribution.min();
 	}
 	else {
-		badLuckRoll = badLuckDistribution(luckGen);
+		badLuckRoll = RollCombatLuck(badLuckDistribution.min(), badLuckDistribution.max());
 	}
 
 	int nComTowers = 0;
@@ -1350,6 +1357,16 @@ int GameState::GetCOTerrainModifier(const Player& player, const CommandingOffici
 		break;
 	}
 	return 0;
+}
+
+int GameState::RollCombatLuck(int min, int max) {
+	std::uniform_int_distribution<int> distribution(min, max);
+	if (m_combatRng.has_value()) {
+		return distribution(*m_combatRng);
+	}
+
+	static thread_local std::mt19937 unseededCombatRng{ std::random_device{}() };
+	return distribution(unseededCombatRng);
 }
 
 int GameState::GetMaxGoodLuck(const Player& player) noexcept {
@@ -1617,6 +1634,8 @@ GameState::GameState(const GameState& other) noexcept :
 	m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
 	m_fGameOver = other.m_fGameOver;
 	m_winningPlayer = other.m_winningPlayer;
+	m_combatRngSeed = other.m_combatRngSeed;
+	m_combatRng = other.m_combatRng;
 }
 
 GameState GameState::Clone() {
@@ -1638,6 +1657,8 @@ GameState& GameState::operator=(const GameState& other) noexcept {
 		m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
 		m_fGameOver = other.m_fGameOver;
 		m_winningPlayer = other.m_winningPlayer;
+		m_combatRngSeed = other.m_combatRngSeed;
+		m_combatRng = other.m_combatRng;
 	}
 	return *this;
 }
@@ -1654,6 +1675,10 @@ void GameState::to_json(json& j, const GameState& gameState) {
 		  { "game-over", gameState.m_fGameOver },
 		  { "winner", gameState.m_winningPlayer },
 	};
+
+	if (gameState.m_combatRngSeed.has_value()) {
+		j["combat-rng-seed"] = gameState.m_combatRngSeed.value();
+	}
 }
 
 void to_json(json& j, const Action& action) {
@@ -1803,4 +1828,13 @@ void GameState::from_json(json& j, GameState& gameState) {
 	int activePlayer;
 	j.at("activePlayer").get_to(activePlayer);
 	gameState.m_isFirstPlayerTurn = activePlayer == 0;
+
+	if (j.contains("combat-rng-seed")) {
+		std::uint32_t combatRngSeed;
+		j.at("combat-rng-seed").get_to(combatRngSeed);
+		gameState.SetCombatRngSeed(combatRngSeed);
+	}
+	else {
+		gameState.ClearCombatRngSeed();
+	}
 }

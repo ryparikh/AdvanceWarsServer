@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cstdint>
 #include <random>
 #include <thread>
 #include <future>
@@ -14,7 +15,7 @@ int main(int argc, char* argv[]) noexcept {
 		if (argc < 2) { // Check if the user provided exactly one argument
 			std::cerr << "Usage: " << argv[0] << " <option>\n";
 			std::cerr << "Options:\n";
-			std::cerr << "  -sim-random-move-game : Simulate a random move game.\n";
+			std::cerr << "  -sim-random-move-game [seed] : Simulate a random move game.\n";
 			std::cerr << "  -sim-mcts-game        : Simulate an MCTS game.\n";
 			std::cerr << "  -server               : Act as game server.\n";
 			return 1; // Return an error code
@@ -89,6 +90,12 @@ int main(int argc, char* argv[]) noexcept {
 			}
 		}
 		else if (argument == "-sim-random-move-game") {
+			std::uint32_t randomMoveSeed = std::random_device{}();
+			if (argc >= 3) {
+				randomMoveSeed = static_cast<std::uint32_t>(std::stoul(argv[2]));
+			}
+			std::cout << "Random move game seed: " << randomMoveSeed << std::endl;
+
 			// Determine the number of available CPU cores.
 			unsigned int maxConcurrentGames = std::thread::hardware_concurrency();
 			if (maxConcurrentGames == 0) {
@@ -110,14 +117,14 @@ int main(int argc, char* argv[]) noexcept {
 				filestream >> jsonState;
 				GameState rootState;
 				GameState::from_json(jsonState, rootState);
+				rootState.SetCombatRngSeed(randomMoveSeed);
 
 				std::ofstream outFile("D:/awai/random-move-game/" + Platform::createUuid() + ".awai");
 
 				time_point startTime = std::chrono::steady_clock::now();
 				std::cout << "GameState: " << std::endl << jsonState.dump() << std::endl;
 				outFile << "GameState: " << std::endl << jsonState.dump() << std::endl;
-				std::random_device rd;
-				std::mt19937 luckGen(rd());
+				std::mt19937 luckGen(randomMoveSeed);
 				int totalActions = 0;
 				while (!rootState.isTerminal()) {
 					std::vector<Action> vecActions;

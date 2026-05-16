@@ -290,6 +290,11 @@
     <None Include="test\json\captures\infantry100FlipNeutralComTower.json" />
     <None Include="test\json\captures\infantry100FlipNeutralLab.json" />
     <None Include="test\json\captures\airport-port-capture-progress-and-transfer.json" />
+    <None Include="test\json\com-tower\attack-bonus-control.json" />
+    <None Include="test\json\com-tower\attack-bonus-one-owned-tower.json" />
+    <None Include="test\json\com-tower\attack-bonus-two-owned-towers.json" />
+    <None Include="test\json\com-tower\begin-turn-no-income.json" />
+    <None Include="test\json\com-tower\capture-progress-and-transfer.json" />
     <None Include="test\json\joining\full-health-join-hurt.json" />
     <None Include="test\json\joining\hurt-join-full-health-fail.json" />
     <None Include="test\json\joining\basic-supply.json" />

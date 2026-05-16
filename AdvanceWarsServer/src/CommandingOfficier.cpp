@@ -1,4 +1,6 @@
 #include "CommandingOfficier.h"
+
+#include <stdexcept>
 										/*Anti-air*/	/*Apc*/		/*Artillery*/	/*BCopter*/	/*Battleship*/	/*Blackboat*/	/*Blackbomb*/	/*Bomber*/	/*Carrier*/	/*Crusier*/	/*Fighter*/	/*Infantry*/	/*Lander*/	/*Medium Tank*/	/*Mech*/	/*Mega tank*/	/*Missile*/	/*Neotank*/	/*Piperunner*/	/*Recon*/	/*Rocket*/	/*Stealth*/	/*Sub*/		/*TCopter*/	/*Tank*/
 constexpr DamageChart c_adderNormal	{{	{100, 100},		{0, 100},	{100, 100},		{100, 100},	{100, 100},		{0, 100},		{0, 100},		{100, 100},	{100, 100},	{100, 100},	{100, 100},	{100, 100},		{0, 100},	{100, 100},		{100, 100},	{100, 100},		{100, 100},	{100, 100},	{100, 100},		{100, 100},	{100, 100},	{100, 100},	{100, 100},	{0, 100},	{100, 100}	}};
 constexpr DamageChart c_adderCOP	{{	{110, 110},		{0, 110},	{110, 110},		{110, 110},	{110, 110},		{0, 110},		{0, 110},		{110, 110},	{110, 110},	{110, 110},	{110, 110},	{110, 110},		{0, 110},	{110, 110},		{110, 110},	{110, 110},		{110, 110},	{110, 110},	{110, 110},		{110, 110},	{110, 110},	{110, 110},	{110, 110},	{0, 110},	{110, 110}	}};
@@ -148,67 +150,59 @@ constexpr DamageCharts c_vonbolt{ c_vonboltNormal, c_vonboltCOP, c_vonboltSCOP }
 	c_vonbolt
 };
 
-std::string CommandingOfficier::to_string() const {
-	switch (m_type) {
-	case Type::Adder:
-		return "Adder";
-	case Type::Andy:
-		return "Andy";
-	case Type::Colin:
-		return "Colin";
-	case Type::Drake:
-		return "Drake";
-	case Type::Eagle:
-		return "Eagle";
-	case Type::Flak:
-		return "Flak";
-	case Type::Grimm:
-		return "Grimm";
-	case Type::Grit:
-		return "Grit";
-	case Type::Hachi:
-		return "Hachi";
-	case Type::Hawke:
-		return "Hawke";
-	case Type::Jake:
-		return "Jake";
-	case Type::Javier:
-		return "Javier";
-	case Type::Jess:
-		return "Jess";
-	case Type::Jugger:
-		return "Jugger";
-	case Type::Kanbei:
-		return "Kanbei";
-	case Type::Kindle:
-		return "Kindle";
-	case Type::Koal:
-		return "Koal";
-	case Type::Lash:
-		return "Lash";
-	case Type::Max:
-		return "Max";
-	case Type::Nell:
-		return "Nell";
-	case Type::Olaf:
-		return "Olaf";
-	case Type::Rachel:
-		return "Rachel";
-	case Type::Sami:
-		return "Sami";
-	case Type::Sasha:
-		return "Sasha";
-	case Type::Sensei:
-		return "Sensei";
-	case Type::Sonja:
-		return "Sonja";
-	case Type::Sturm:
-		return "Sturm";
-	case Type::VonBolt:
-		return "VonBolt";
-	default:
-		return "";
+namespace {
+using COType = CommandingOfficier::Type;
+
+constexpr std::array<std::pair<const char*, COType>, static_cast<int>(COType::Size)> c_commandingOfficiers{ {
+	{ "Adder", COType::Adder },
+	{ "Andy", COType::Andy },
+	{ "Colin", COType::Colin },
+	{ "Drake", COType::Drake },
+	{ "Eagle", COType::Eagle },
+	{ "Flak", COType::Flak },
+	{ "Grimm", COType::Grimm },
+	{ "Grit", COType::Grit },
+	{ "Hachi", COType::Hachi },
+	{ "Hawke", COType::Hawke },
+	{ "Jake", COType::Jake },
+	{ "Javier", COType::Javier },
+	{ "Jess", COType::Jess },
+	{ "Jugger", COType::Jugger },
+	{ "Kanbei", COType::Kanbei },
+	{ "Kindle", COType::Kindle },
+	{ "Koal", COType::Koal },
+	{ "Lash", COType::Lash },
+	{ "Max", COType::Max },
+	{ "Nell", COType::Nell },
+	{ "Olaf", COType::Olaf },
+	{ "Rachel", COType::Rachel },
+	{ "Sami", COType::Sami },
+	{ "Sasha", COType::Sasha },
+	{ "Sensei", COType::Sensei },
+	{ "Sonja", COType::Sonja },
+	{ "Sturm", COType::Sturm },
+	{ "VonBolt", COType::VonBolt },
+} };
+
+COType CommandingOfficierTypeFromString(const std::string& coName) {
+	for (const auto& [name, type] : c_commandingOfficiers) {
+		if (coName == name) {
+			return type;
+		}
 	}
+
+	throw std::invalid_argument("Unknown commanding officer: " + coName);
+}
+}
+
+std::string CommandingOfficier::to_string() const {
+	for (const auto& [name, type] : c_commandingOfficiers) {
+		if (m_type == type) {
+			return name;
+		}
+	}
+
+	return "";
 }
 
 void to_json(json& j, const CommandingOfficier& co) {
@@ -216,11 +210,7 @@ void to_json(json& j, const CommandingOfficier& co) {
 }
 
 void from_json(json& j, CommandingOfficier& co) {
-	if (j == "Adder") {
-		co = { CommandingOfficier::Type::Adder };
-	}
-
-	if (j == "Andy") {
-		co = { CommandingOfficier::Type::Andy};
-	}
+	std::string coName;
+	j.get_to(coName);
+	co = { CommandingOfficierTypeFromString(coName) };
 }

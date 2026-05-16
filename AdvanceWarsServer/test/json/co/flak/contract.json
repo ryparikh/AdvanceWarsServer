@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "Flak",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 3
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      }
+    ]
+  }
+}

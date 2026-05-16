@@ -2,10 +2,99 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include "GameState.h"
 
 namespace {
+void SetMismatch(std::string& expected, std::string& actual, const std::string& message, const std::string& expectedValue, const std::string& actualValue) {
+	expected = message + ": " + expectedValue;
+	actual = actualValue;
+}
+
+std::string StatToString(const std::pair<int, int>& stat) {
+	std::ostringstream oss;
+	oss << stat.first << "/" << stat.second;
+	return oss.str();
+}
+
+Result RunCommandingOfficierContract(json& jContract, std::string& expected, std::string& actual) {
+	std::string coName;
+	jContract.at("name").get_to(coName);
+
+	json coJson = coName;
+	CommandingOfficier co;
+	from_json(coJson, co);
+	if (co.m_type == CommandingOfficier::Type::Invalid) {
+		SetMismatch(expected, actual, "CO parser should recognize", coName, "Invalid");
+		return Result::Failed;
+	}
+
+	json roundTrip;
+	to_json(roundTrip, co);
+	if (roundTrip != coName) {
+		SetMismatch(expected, actual, "CO should round trip", coName, roundTrip.dump());
+		return Result::Failed;
+	}
+
+	PowerMeter powerMeter(co.m_type);
+	json actualPowerMeter;
+	PowerMeter::to_json(actualPowerMeter, powerMeter);
+	const json& expectedPowerMeter = jContract.at("power-meter");
+	if (actualPowerMeter["cop-stars"] != expectedPowerMeter.at("cop-stars") ||
+		actualPowerMeter["scop-stars"] != expectedPowerMeter.at("scop-stars")) {
+		expected = expectedPowerMeter.dump();
+		actual = actualPowerMeter.dump();
+		return Result::Failed;
+	}
+
+	const DamageCharts& charts = rgCharts[static_cast<int>(co.m_type)];
+	for (auto& statContract : jContract.at("stats")) {
+		std::string unitName;
+		statContract.at("unit").get_to(unitName);
+		UnitProperties::Type unitType = UnitProperties::unitTypeFromString(unitName);
+		if (unitType == UnitProperties::Type::Invalid) {
+			SetMismatch(expected, actual, "Unit parser should recognize", unitName, "Invalid");
+			return Result::Failed;
+		}
+
+		const std::array<std::pair<const char*, int>, 3> powerStatuses{ {
+			{ "normal", 0 },
+			{ "cop", 1 },
+			{ "scop", 2 },
+		} };
+		for (const auto& [statusName, statusIndex] : powerStatuses) {
+			std::pair<int, int> expectedStat;
+			statContract.at(statusName).at(0).get_to(expectedStat.first);
+			statContract.at(statusName).at(1).get_to(expectedStat.second);
+			std::pair<int, int> actualStat = charts[statusIndex][static_cast<int>(unitType)];
+			if (actualStat != expectedStat) {
+				SetMismatch(expected, actual, coName + " " + unitName + " " + statusName, StatToString(expectedStat), StatToString(actualStat));
+				return Result::Failed;
+			}
+		}
+	}
+
+	return Result::Succeeded;
+}
+
+Result RunInvalidCommandingOfficierContract(json& jInvalidCo, std::string& expected, std::string& actual) {
+	std::string coName;
+	jInvalidCo.get_to(coName);
+
+	json coJson = coName;
+	CommandingOfficier co;
+	try {
+		from_json(coJson, co);
+	}
+	catch (const std::exception&) {
+		return Result::Succeeded;
+	}
+
+	SetMismatch(expected, actual, "Unknown CO should throw", coName, co.to_string());
+	return Result::Failed;
+}
+
 Result BuildActionTrace(GameState gameState, const std::vector<Action>& actions, std::string& traceDump) {
 	json trace = json::array();
 	json initialState;
@@ -72,6 +161,15 @@ Result JsonTestRunner::run() {
 
 	json j;
 	filestream >> j;
+
+	if (j.contains("co-contract")) {
+		return RunCommandingOfficierContract(j.at("co-contract"), m_strExpected, m_strActual);
+	}
+
+	if (j.contains("invalid-co")) {
+		return RunInvalidCommandingOfficierContract(j.at("invalid-co"), m_strExpected, m_strActual);
+	}
+
 	JsonSubsystemTest test;
 	from_json(j, test);
 

@@ -1,0 +1,56 @@
+{
+  "co-contract": {
+    "name": "Eagle",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 6
+    },
+    "stats": [
+      {
+        "unit": "bcopter",
+        "normal": [
+          115,
+          110
+        ],
+        "cop": [
+          130,
+          130
+        ],
+        "scop": [
+          130,
+          130
+        ]
+      },
+      {
+        "unit": "battleship",
+        "normal": [
+          70,
+          100
+        ],
+        "cop": [
+          80,
+          110
+        ],
+        "scop": [
+          80,
+          110
+        ]
+      },
+      {
+        "unit": "infantry",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "co-contract": {
+    "name": "Drake",
+    "power-meter": {
+      "cop-stars": 4,
+      "scop-stars": 3
+    },
+    "stats": [
+      {
+        "unit": "bcopter",
+        "normal": [
+          70,
+          100
+        ],
+        "cop": [
+          80,
+          110
+        ],
+        "scop": [
+          80,
+          110
+        ]
+      },
+      {
+        "unit": "battleship",
+        "normal": [
+          100,
+          110
+        ],
+        "cop": [
+          110,
+          120
+        ],
+        "scop": [
+          110,
+          120
+        ]
+      },
+      {
+        "unit": "infantry",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      }
+    ]
+  }
+}

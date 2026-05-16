@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "Hawke",
+    "power-meter": {
+      "cop-stars": 5,
+      "scop-stars": 4
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "Sturm",
+    "power-meter": {
+      "cop-stars": 5,
+      "scop-stars": 5
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          80,
+          120
+        ],
+        "cop": [
+          90,
+          130
+        ],
+        "scop": [
+          90,
+          130
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          80,
+          120
+        ],
+        "cop": [
+          90,
+          130
+        ],
+        "scop": [
+          90,
+          130
+        ]
+      }
+    ]
+  }
+}

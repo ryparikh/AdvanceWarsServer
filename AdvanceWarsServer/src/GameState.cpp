@@ -1499,9 +1499,14 @@ void GameState::HealUnits(int health) {
 }
 
 Result GameState::DoCOPowerAction() {
-	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
-	GetCurrentPlayer().SetPowerStatus(1);
-	GetCurrentPlayer().m_powerMeter.UseCop();
+	Player& currentPlayer = GetCurrentPlayer();
+	if (!currentPlayer.m_powerMeter.FCopCharged()) {
+		return Result::Failed;
+	}
+
+	CommandingOfficier::Type type = currentPlayer.m_co.m_type;
+	currentPlayer.SetPowerStatus(1);
+	currentPlayer.m_powerMeter.UseCop();
 	switch (type) {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(2);
@@ -1534,9 +1539,14 @@ Result GameState::ResupplyPlayersUnits(const Player* player) {
 }
 
 Result GameState::DoSCOPowerAction() {
-	CommandingOfficier::Type type = GetCurrentPlayer().m_co.m_type;
-	GetCurrentPlayer().SetPowerStatus(2);
-	GetCurrentPlayer().m_powerMeter.UseScop();
+	Player& currentPlayer = GetCurrentPlayer();
+	if (!currentPlayer.m_powerMeter.FScopCharged()) {
+		return Result::Failed;
+	}
+
+	CommandingOfficier::Type type = currentPlayer.m_co.m_type;
+	currentPlayer.SetPowerStatus(2);
+	currentPlayer.m_powerMeter.UseScop();
 	switch (type) {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(5);

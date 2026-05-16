@@ -787,7 +787,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 		case Terrain::Type::Airport:
 			for (auto unit : vrgUnits) {
 				int funds = GetCurrentPlayer().m_funds;
-				if (unit.m_type != UnitProperties::Type::BlackBomb && unit.m_movementType == MovementTypes::Air && Unit::GetUnitCost(unit.m_type) * 10 <= funds) {
+				if (unit.m_movementType == MovementTypes::Air && Unit::GetUnitCost(unit.m_type) * 10 <= funds) {
 					vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
 				}
 			}

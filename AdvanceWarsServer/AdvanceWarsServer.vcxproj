@@ -326,6 +326,7 @@
     <None Include="test\json\captures\infantry100FlipNeutralBase.json" />
     <None Include="test\json\captures\infantry100FlipNeutralCity.json" />
     <None Include="test\json\captures\infantry100FlipNeutralPort.json" />
+    <None Include="test\json\captures\airport-port-capture-progress-and-transfer.json" />
     <None Include="test\json\captures\infantry44CaptureNeutralCity20.json" />
     <None Include="test\json\captures\infantry91CaptureNeutralCity15.json" />
     <None Include="test\json\joining\basic-supply.json" />
@@ -346,6 +347,8 @@
     <None Include="test\json\misc\end-game-rout-direct-attack.json" />
     <None Include="test\json\misc\end-game-rout-indirect-attack.json" />
     <None Include="test\json\misc\end-game-rout-no-gas-unit.json" />
+    <None Include="test\json\production\airport-port-buy-actions.json" />
+    <None Include="test\json\production\airport-port-valid-actions.json" />
     <None Include="test\json\transport\apc\load-infantry.json" />
     <None Include="test\json\transport\apc\load-mech.json" />
     <None Include="test\json\transport\apc\load-multiple-infantry-fails.json" />

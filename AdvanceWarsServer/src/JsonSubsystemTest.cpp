@@ -138,6 +138,22 @@ void from_json(json& j, JsonSubsystemTest& test) {
 		}
 	}
 
+	if (j.contains("validActions")) {
+		for (auto& jValidActions : j.at("validActions")) {
+			std::pair<int, int> source;
+			jValidActions.at("source").get_to(source);
+
+			std::vector<Action> actions;
+			for (auto& jAction : jValidActions.at("expected")) {
+				Action action;
+				from_json(jAction, action);
+				actions.emplace_back(action);
+			}
+
+			test.vecValidActions.emplace_back(std::move(source), std::move(actions));
+		}
+	}
+
 	if (j.contains("deterministic-replay")) {
 		j.at("deterministic-replay").get_to(test.fDeterministicReplay);
 	}
@@ -210,6 +226,33 @@ Result JsonTestRunner::run() {
 	if (!test.vecFailedActions.empty()) {
 		for (const Action& action : test.vecFailedActions) {
 			if (test.initialGameState.DoAction(action) == Result::Succeeded) {
+				return Result::Failed;
+			}
+		}
+	}
+
+	if (!test.vecValidActions.empty()) {
+		for (const auto& validActions : test.vecValidActions) {
+			std::vector<Action> actualActions;
+			IfFailedReturn(test.initialGameState.GetValidActions(validActions.first.first, validActions.first.second, actualActions));
+
+			json expectedActions = json::array();
+			for (const Action& action : validActions.second) {
+				json jAction;
+				to_json(jAction, action);
+				expectedActions.push_back(std::move(jAction));
+			}
+
+			json actualActionsJson = json::array();
+			for (const Action& action : actualActions) {
+				json jAction;
+				to_json(jAction, action);
+				actualActionsJson.push_back(std::move(jAction));
+			}
+
+			m_strExpected = expectedActions.dump();
+			m_strActual = actualActionsJson.dump();
+			if (m_strActual != m_strExpected) {
 				return Result::Failed;
 			}
 		}

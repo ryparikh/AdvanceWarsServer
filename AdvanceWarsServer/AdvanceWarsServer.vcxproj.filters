@@ -289,6 +289,7 @@
     <None Include="test\json\captures\infantry100FlipNeutralPort.json" />
     <None Include="test\json\captures\infantry100FlipNeutralComTower.json" />
     <None Include="test\json\captures\infantry100FlipNeutralLab.json" />
+    <None Include="test\json\captures\airport-port-capture-progress-and-transfer.json" />
     <None Include="test\json\joining\full-health-join-hurt.json" />
     <None Include="test\json\joining\hurt-join-full-health-fail.json" />
     <None Include="test\json\joining\basic-supply.json" />
@@ -312,5 +313,7 @@
     <None Include="test\json\combat\infantry\road\road\infantryRoad0-infantryRoad0-enemycopower.json" />
     <None Include="test\json\misc\begin-turn-no-repair-enemy-property.json" />
     <None Include="test\json\combat\infantry\forest\city\infantry-infantry.json" />
+    <None Include="test\json\production\airport-port-buy-actions.json" />
+    <None Include="test\json\production\airport-port-valid-actions.json" />
   </ItemGroup>
 </Project>

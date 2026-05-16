@@ -5,11 +5,44 @@
 #include <iostream>
 #include <queue>
 #include <random>
+#include <stdexcept>
 
 #include "MapParser.h"
 const std::string mapChoiceFilePath = R"(.\res\AWBW\MapSources\Lefty.txt)";
 
 using time_point = std::chrono::time_point<std::chrono::steady_clock>;
+
+namespace {
+const char* WeatherTypeToString(GameState::WeatherType weather) {
+	switch (weather) {
+	case GameState::WeatherType::Clear:
+		return "clear";
+	case GameState::WeatherType::Rain:
+		return "rain";
+	case GameState::WeatherType::Snow:
+		return "snow";
+	default:
+		return "";
+	}
+}
+
+GameState::WeatherType WeatherTypeFromString(const std::string& weather) {
+	if (weather == "clear") {
+		return GameState::WeatherType::Clear;
+	}
+
+	if (weather == "rain") {
+		return GameState::WeatherType::Rain;
+	}
+
+	if (weather == "snow") {
+		return GameState::WeatherType::Snow;
+	}
+
+	throw std::invalid_argument("Unknown weather: " + weather);
+}
+}
+
 GameState::GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept :
 	m_guid(guid),
 	m_arrPlayers(std::move(arrPlayers)) {
@@ -63,6 +96,8 @@ Result GameState::BeginTurn() noexcept {
 	if (m_isFirstPlayerTurn) {
 		++m_nTurnCount;
 	}
+
+	TickTemporaryWeather();
 
 	GetCurrentPlayer().m_powerStatus = 0;
 
@@ -190,7 +225,7 @@ Result GameState::ResupplyApcUnits(int x, int y) noexcept {
 	return Result::Succeeded;
 }
 
-std::pair<int, int> GameState::movementRemainingAfterStep(int x, int y, MovementTypes movementType, int maxMovement, int maxFuel) const noexcept {
+std::pair<int, int> GameState::movementRemainingAfterStep(int x, int y, const Unit& unit, int maxMovement, int maxFuel) const noexcept {
 	const MapTile* pSearchTile = nullptr;
 	Result result = m_spmap->TryGetTile(x, y, &pSearchTile);
 	if (result == Result::Failed) {
@@ -201,7 +236,7 @@ std::pair<int, int> GameState::movementRemainingAfterStep(int x, int y, Movement
 		return { -1, -1 };
 	}
 
-	int terrainCost = pSearchTile->GetTerrain().m_movementCostMap.find(movementType)->second;
+	int terrainCost = GetWeatherMovementCost(pSearchTile->GetTerrain(), GetCurrentPlayer(), unit);
 	if (terrainCost < 1) {
 		return { -1, -1 };
 	}
@@ -365,6 +400,92 @@ int GameState::GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit
 	}
 }
 
+int GameState::GetWeatherMovementCost(const Terrain& terrain, const Player& player, const Unit& unit) const noexcept {
+	auto iterMovementCost = terrain.m_movementCostMap.find(unit.m_properties.m_movementType);
+	if (iterMovementCost == terrain.m_movementCostMap.end()) {
+		return -1;
+	}
+
+	int baseCost = iterMovementCost->second;
+	if (baseCost < 1 || m_weather == WeatherType::Clear) {
+		return baseCost;
+	}
+
+	WeatherType effectiveWeather = m_weather;
+	if (m_weather == WeatherType::Rain && player.m_co.m_type == CommandingOfficier::Type::Drake) {
+		return baseCost;
+	}
+	else if (m_weather == WeatherType::Rain && player.m_co.m_type == CommandingOfficier::Type::Olaf) {
+		effectiveWeather = WeatherType::Snow;
+	}
+	else if (m_weather == WeatherType::Snow && player.m_co.m_type == CommandingOfficier::Type::Olaf) {
+		return baseCost;
+	}
+
+	if (effectiveWeather == WeatherType::Rain) {
+		if ((unit.m_properties.m_movementType == MovementTypes::Treads ||
+			unit.m_properties.m_movementType == MovementTypes::Tires) &&
+			(terrain.m_type == Terrain::Type::Plain || terrain.m_type == Terrain::Type::Forest)) {
+			return baseCost + 1;
+		}
+
+		return baseCost;
+	}
+
+	if (effectiveWeather == WeatherType::Snow) {
+		if (unit.m_properties.m_type == UnitProperties::Type::Piperunner) {
+			return baseCost;
+		}
+
+		if (unit.m_properties.m_movementType == MovementTypes::Foot &&
+			(terrain.m_type == Terrain::Type::Plain ||
+				terrain.m_type == Terrain::Type::Mountain ||
+				terrain.m_type == Terrain::Type::Forest)) {
+			return baseCost * 2;
+		}
+
+		if (unit.m_properties.m_movementType == MovementTypes::Boots &&
+			terrain.m_type == Terrain::Type::Mountain) {
+			return baseCost * 2;
+		}
+
+		if ((unit.m_properties.m_movementType == MovementTypes::Treads ||
+			unit.m_properties.m_movementType == MovementTypes::Tires) &&
+			terrain.m_type == Terrain::Type::Plain) {
+			return baseCost + 1;
+		}
+
+		if (unit.m_properties.m_movementType == MovementTypes::Air) {
+			return baseCost * 2;
+		}
+
+		if ((unit.m_properties.m_movementType == MovementTypes::Sea ||
+			unit.m_properties.m_movementType == MovementTypes::Lander) &&
+			(terrain.m_type == Terrain::Type::Sea || terrain.m_type == Terrain::Type::Port)) {
+			return baseCost * 2;
+		}
+	}
+
+	return baseCost;
+}
+
+void GameState::SetTemporaryWeather(WeatherType weather) noexcept {
+	m_weather = weather;
+	m_weatherTurnsRemaining = 2;
+}
+
+void GameState::TickTemporaryWeather() noexcept {
+	if (!m_weatherTurnsRemaining.has_value()) {
+		return;
+	}
+
+	--(*m_weatherTurnsRemaining);
+	if (*m_weatherTurnsRemaining <= 0) {
+		m_weather = WeatherType::Clear;
+		m_weatherTurnsRemaining.reset();
+	}
+}
+
 Result GameState::GetValidActions(std::vector<Action>& vecActions) const noexcept {
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
@@ -408,7 +529,6 @@ int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
 	const MapTile* pmaptile;
 	m_spmap->TryGetTile(xSrc, ySrc, &pmaptile);
 	const Unit* pUnit = pmaptile->TryGetUnit();
-	MovementTypes movementType = pUnit->m_properties.m_movementType;
 	int maxMovement = pUnit->m_properties.m_movement + GetCOMovementBonus(GetCurrentPlayer().m_co.m_type, *pUnit);
 	std::vector<std::unique_ptr<MoveNode>> vecNodes;
 	vecNodes.emplace_back(new MoveNode(maxMovement, pUnit->m_properties.m_fuel, xSrc, ySrc));
@@ -437,7 +557,7 @@ int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
 		// TODO: Refactor
 		// Search north
 		if (pTop->m_pnorth == nullptr || pTop->m_pnorth->m_visited == false) {
-			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y - 1, movementType, pTop->m_movement, pTop->m_fuel);
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y - 1, *pUnit, pTop->m_movement, pTop->m_fuel);
 			if (movementRemaining >= 0 && fuelRemaining >= 0) {
 				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_pnorth, movementRemaining, fuelRemaining, pTop->m_x, pTop->m_y - 1));
 			}
@@ -445,21 +565,21 @@ int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
 
 		// Search east
 		if (pTop->m_peast == nullptr || pTop->m_peast->m_visited == false) {
-			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x + 1, pTop->m_y, movementType, pTop->m_movement, pTop->m_fuel);
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x + 1, pTop->m_y, *pUnit, pTop->m_movement, pTop->m_fuel);
 			if (movementRemaining >= 0 && fuelRemaining >= 0) {
 				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_peast, movementRemaining, fuelRemaining, pTop->m_x + 1, pTop->m_y));
 			}
 		}
 		// Search south 
 		if (pTop->m_psouth == nullptr || pTop->m_psouth->m_visited == false) {
-			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y + 1, movementType, pTop->m_movement, pTop->m_fuel);
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y + 1, *pUnit, pTop->m_movement, pTop->m_fuel);
 			if (movementRemaining >= 0 && fuelRemaining >= 0) {
 				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_psouth, movementRemaining, fuelRemaining, pTop->m_x, pTop->m_y + 1));
 			}
 		}
 		// Search west
 		if (pTop->m_pwest == nullptr || pTop->m_pwest->m_visited == false) {
-			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x - 1, pTop->m_y, movementType, pTop->m_movement, pTop->m_fuel);
+			auto[movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x - 1, pTop->m_y, *pUnit, pTop->m_movement, pTop->m_fuel);
 			if (movementRemaining >= 0 && fuelRemaining >= 0) {
 				queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_pwest, movementRemaining, fuelRemaining, pTop->m_x - 1, pTop->m_y));
 			}
@@ -546,7 +666,6 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 			return Result::Succeeded;
 		}
 
-		MovementTypes movementType = pUnit->m_properties.m_movementType;
 		std::vector<std::pair<int, int>> vecTargets;
 		std::vector<std::unique_ptr<MoveNode>> vecNodes;
 		int maxMovement = pUnit->m_properties.m_movement + GetCOMovementBonus(GetCurrentPlayer().m_co.m_type, *pUnit);
@@ -625,7 +744,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 			// TODO: Refactor
 			// Search north
 			if (pTop->m_pnorth == nullptr || pTop->m_pnorth->m_visited == false) {
-				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y - 1, movementType, pTop->m_movement, pTop->m_fuel);
+				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y - 1, *pUnit, pTop->m_movement, pTop->m_fuel);
 				if (movementRemaining >= 0 && fuelRemaining >= 0) {
 					queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_pnorth, movementRemaining, fuelRemaining, pTop->m_x, pTop->m_y - 1));
 				}
@@ -633,21 +752,21 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 
 			// Search east
 			if (pTop->m_peast == nullptr || pTop->m_peast->m_visited == false) {
-				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x + 1, pTop->m_y, movementType, pTop->m_movement, pTop->m_fuel);
+				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x + 1, pTop->m_y, *pUnit, pTop->m_movement, pTop->m_fuel);
 				if (movementRemaining >= 0 && fuelRemaining >= 0) {
 					queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_peast, movementRemaining, fuelRemaining, pTop->m_x + 1, pTop->m_y));
 				}
 			}
 			// Search south 
 			if (pTop->m_psouth == nullptr || pTop->m_psouth->m_visited == false) {
-				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y + 1, movementType, pTop->m_movement, pTop->m_fuel);
+				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x, pTop->m_y + 1, *pUnit, pTop->m_movement, pTop->m_fuel);
 				if (movementRemaining >= 0 && fuelRemaining >= 0) {
 					queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_psouth, movementRemaining, fuelRemaining, pTop->m_x, pTop->m_y + 1));
 				}
 			}
 			// Search west
 			if (pTop->m_pwest == nullptr || pTop->m_pwest->m_visited == false) {
-				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x - 1, pTop->m_y, movementType, pTop->m_movement, pTop->m_fuel);
+				auto [movementRemaining, fuelRemaining] = movementRemainingAfterStep(pTop->m_x - 1, pTop->m_y, *pUnit, pTop->m_movement, pTop->m_fuel);
 				if (movementRemaining >= 0 && fuelRemaining >= 0) {
 					queueMoveNodes.push(AddNewNodeToGraph(vecActions, vecNodes, &pTop->m_pwest, movementRemaining, fuelRemaining, pTop->m_x - 1, pTop->m_y));
 				}
@@ -1511,6 +1630,9 @@ Result GameState::DoCOPowerAction() {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(2);
 			return Result::Succeeded;
+		case CommandingOfficier::Type::Olaf:
+			SetTemporaryWeather(WeatherType::Snow);
+			return Result::Succeeded;
 	}
 	return Result::Succeeded;
 }
@@ -1551,8 +1673,14 @@ Result GameState::DoSCOPowerAction() {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(5);
 			return Result::Succeeded;
+		case CommandingOfficier::Type::Drake:
+			SetTemporaryWeather(WeatherType::Rain);
+			return Result::Succeeded;
 		case CommandingOfficier::Type::Jess:
 			IfFailedReturn(ResupplyPlayersUnits(&GetCurrentPlayer()));
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Olaf:
+			SetTemporaryWeather(WeatherType::Snow);
 			return Result::Succeeded;
 	}
 	return Result::Succeeded;
@@ -1646,6 +1774,8 @@ GameState::GameState(const GameState& other) noexcept :
 	m_winningPlayer = other.m_winningPlayer;
 	m_combatRngSeed = other.m_combatRngSeed;
 	m_combatRng = other.m_combatRng;
+	m_weather = other.m_weather;
+	m_weatherTurnsRemaining = other.m_weatherTurnsRemaining;
 }
 
 GameState GameState::Clone() {
@@ -1669,6 +1799,8 @@ GameState& GameState::operator=(const GameState& other) noexcept {
 		m_winningPlayer = other.m_winningPlayer;
 		m_combatRngSeed = other.m_combatRngSeed;
 		m_combatRng = other.m_combatRng;
+		m_weather = other.m_weather;
+		m_weatherTurnsRemaining = other.m_weatherTurnsRemaining;
 	}
 	return *this;
 }
@@ -1688,6 +1820,14 @@ void GameState::to_json(json& j, const GameState& gameState) {
 
 	if (gameState.m_combatRngSeed.has_value()) {
 		j["combat-rng-seed"] = gameState.m_combatRngSeed.value();
+	}
+
+	if (gameState.m_weather != WeatherType::Clear) {
+		j["weather"] = WeatherTypeToString(gameState.m_weather);
+	}
+
+	if (gameState.m_weatherTurnsRemaining.has_value()) {
+		j["weather-turns-remaining"] = gameState.m_weatherTurnsRemaining.value();
 	}
 }
 
@@ -1846,5 +1986,29 @@ void GameState::from_json(json& j, GameState& gameState) {
 	}
 	else {
 		gameState.ClearCombatRngSeed();
+	}
+
+	if (j.contains("weather")) {
+		std::string weather;
+		j.at("weather").get_to(weather);
+		gameState.m_weather = WeatherTypeFromString(weather);
+	}
+	else {
+		gameState.m_weather = WeatherType::Clear;
+	}
+
+	if (j.contains("weather-turns-remaining")) {
+		int weatherTurnsRemaining;
+		j.at("weather-turns-remaining").get_to(weatherTurnsRemaining);
+		if (weatherTurnsRemaining > 0) {
+			gameState.m_weatherTurnsRemaining = weatherTurnsRemaining;
+		}
+		else {
+			gameState.m_weatherTurnsRemaining.reset();
+			gameState.m_weather = WeatherType::Clear;
+		}
+	}
+	else {
+		gameState.m_weatherTurnsRemaining.reset();
 	}
 }

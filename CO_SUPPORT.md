@@ -11,14 +11,20 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - All checked-in normal/COP/SCOP attack and defense chart values.
 - Andy COP/SCOP healing.
 - Jess SCOP resupply.
+- Active weather JSON parsing/serialization, weather movement/fuel costs, and Drake/Olaf weather-changing powers.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
 - Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Jake COP/SCOP indirect range for vehicles, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
+
+## Weather Notes
+
+- Weather JSON uses `"weather": "rain"` or `"weather": "snow"`. CO-created weather also writes `"weather-turns-remaining"` and expires on a later `BeginTurn`.
+- Rain and snow movement costs follow the AWBW weather tables, including Drake rain immunity, Olaf snow immunity, and Olaf treating rain like snow.
+- Rain vision penalties are intentionally deferred because this simulator does not yet have fog-of-war or vision state; that broader subsystem is tracked by #25.
 
 ## Tracked Follow-Up Issues
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#20](https://github.com/ryparikh/AdvanceWarsServer/issues/20): weather mechanics and weather-changing CO powers.
 - [#21](https://github.com/ryparikh/AdvanceWarsServer/issues/21): mass damage, healing, and HP-drain CO power effects.
 - [#22](https://github.com/ryparikh/AdvanceWarsServer/issues/22): CO economy and unit-cost effects.
 - [#23](https://github.com/ryparikh/AdvanceWarsServer/issues/23): CO production effects.

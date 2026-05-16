@@ -180,6 +180,12 @@ public:
 #include <iostream>
 class GameState {
 public:
+	enum class WeatherType {
+		Clear,
+		Rain,
+		Snow,
+	};
+
 	GameState() noexcept;
 	GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept;
 	GameState(const GameState& other) noexcept;
@@ -275,7 +281,7 @@ private:
 	Player& GetEnemyPlayer() noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[1] : m_arrPlayers[0]; }
 	const Player& GetEnemyPlayer() const noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[1] : m_arrPlayers[0]; }
 	const Player& GetCurrentPlayer() const noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[0] : m_arrPlayers[1]; }
-	std::pair<int, int> movementRemainingAfterStep(int x, int y, MovementTypes movementType, int maxMovement, int maxFuel) const noexcept;
+	std::pair<int, int> movementRemainingAfterStep(int x, int y, const Unit& unit, int maxMovement, int maxFuel) const noexcept;
 	Result AddIndirectAttackActions(int x, int y, const Unit& attacker, int minAttackRange, int maxAttackRange, std::vector<Action>& vecActions) const noexcept;
 	bool CanUnitAttack(const Unit& attacker, const Unit& defender) const noexcept;
 	bool FAttackUsesAmmo(const Unit& attacker, const Unit& defender) const noexcept;
@@ -304,6 +310,9 @@ private:
 	int GetMaxBadLuck(const Player& player) noexcept;
 	int RollCombatLuck(int min, int max);
 	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
+	int GetWeatherMovementCost(const Terrain& terrain, const Player& player, const Unit& unit) const noexcept;
+	void SetTemporaryWeather(WeatherType weather) noexcept;
+	void TickTemporaryWeather() noexcept;
 	void HealUnits(int health);
 	bool FAtUnitCap() const noexcept;
 	bool FPlayerRouted(const Player& player) const noexcept;
@@ -319,5 +328,7 @@ private:
 	int m_winningPlayer = -1;
 	std::optional<std::uint32_t> m_combatRngSeed;
 	std::optional<std::mt19937> m_combatRng;
+	WeatherType m_weather{ WeatherType::Clear };
+	std::optional<int> m_weatherTurnsRemaining;
 };
 

@@ -1,0 +1,56 @@
+{
+  "co-contract": {
+    "name": "Jess",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 3
+    },
+    "stats": [
+      {
+        "unit": "tank",
+        "normal": [
+          110,
+          100
+        ],
+        "cop": [
+          130,
+          110
+        ],
+        "scop": [
+          150,
+          110
+        ]
+      },
+      {
+        "unit": "bcopter",
+        "normal": [
+          90,
+          100
+        ],
+        "cop": [
+          100,
+          110
+        ],
+        "scop": [
+          100,
+          110
+        ]
+      },
+      {
+        "unit": "infantry",
+        "normal": [
+          90,
+          100
+        ],
+        "cop": [
+          100,
+          110
+        ],
+        "scop": [
+          100,
+          110
+        ]
+      }
+    ]
+  }
+}

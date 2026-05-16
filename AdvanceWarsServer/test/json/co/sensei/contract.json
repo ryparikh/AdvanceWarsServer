@@ -1,0 +1,56 @@
+{
+  "co-contract": {
+    "name": "Sensei",
+    "power-meter": {
+      "cop-stars": 2,
+      "scop-stars": 4
+    },
+    "stats": [
+      {
+        "unit": "bcopter",
+        "normal": [
+          150,
+          100
+        ],
+        "cop": [
+          175,
+          110
+        ],
+        "scop": [
+          175,
+          110
+        ]
+      },
+      {
+        "unit": "infantry",
+        "normal": [
+          140,
+          100
+        ],
+        "cop": [
+          150,
+          110
+        ],
+        "scop": [
+          150,
+          110
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          90,
+          100
+        ],
+        "cop": [
+          100,
+          110
+        ],
+        "scop": [
+          100,
+          110
+        ]
+      }
+    ]
+  }
+}

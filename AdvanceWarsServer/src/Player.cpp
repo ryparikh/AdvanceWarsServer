@@ -1,6 +1,8 @@
 #include "Player.h"
 
-PowerMeter::PowerMeter(const CommandingOfficier::Type& type) noexcept {
+#include <stdexcept>
+
+PowerMeter::PowerMeter(const CommandingOfficier::Type& type) {
 	switch (type) {
 	case CommandingOfficier::Type::Adder:
 		m_nCopStars = 2;
@@ -10,8 +12,73 @@ PowerMeter::PowerMeter(const CommandingOfficier::Type& type) noexcept {
 		m_nCopStars = 3;
 		m_nScopStars = 3;
 		break;
+	case CommandingOfficier::Type::Colin:
+		m_nCopStars = 2;
+		m_nScopStars = 4;
+		break;
+	case CommandingOfficier::Type::Drake:
+		m_nCopStars = 4;
+		m_nScopStars = 3;
+		break;
+	case CommandingOfficier::Type::Eagle:
+		m_nCopStars = 3;
+		m_nScopStars = 6;
+		break;
+	case CommandingOfficier::Type::Flak:
+	case CommandingOfficier::Type::Grimm:
+	case CommandingOfficier::Type::Grit:
+	case CommandingOfficier::Type::Jake:
+	case CommandingOfficier::Type::Javier:
+	case CommandingOfficier::Type::Jess:
+	case CommandingOfficier::Type::Kindle:
+	case CommandingOfficier::Type::Max:
+	case CommandingOfficier::Type::Nell:
+	case CommandingOfficier::Type::Rachel:
+		m_nCopStars = 3;
+		m_nScopStars = 3;
+		break;
+	case CommandingOfficier::Type::Hachi:
+	case CommandingOfficier::Type::Koal:
+	case CommandingOfficier::Type::Sonja:
+		m_nCopStars = 3;
+		m_nScopStars = 2;
+		break;
+	case CommandingOfficier::Type::Hawke:
+		m_nCopStars = 5;
+		m_nScopStars = 4;
+		break;
+	case CommandingOfficier::Type::Jugger:
+	case CommandingOfficier::Type::Olaf:
+		m_nCopStars = 3;
+		m_nScopStars = 4;
+		break;
+	case CommandingOfficier::Type::Kanbei:
+		m_nCopStars = 4;
+		m_nScopStars = 3;
+		break;
+	case CommandingOfficier::Type::Lash:
+		m_nCopStars = 4;
+		m_nScopStars = 3;
+		break;
+	case CommandingOfficier::Type::Sami:
+		m_nCopStars = 3;
+		m_nScopStars = 5;
+		break;
+	case CommandingOfficier::Type::Sasha:
+	case CommandingOfficier::Type::Sensei:
+		m_nCopStars = 2;
+		m_nScopStars = 4;
+		break;
+	case CommandingOfficier::Type::Sturm:
+		m_nCopStars = 5;
+		m_nScopStars = 5;
+		break;
+	case CommandingOfficier::Type::VonBolt:
+		m_nCopStars = 0;
+		m_nScopStars = 10;
+		break;
 	default:
-		throw;
+		throw std::invalid_argument("Unknown commanding officer power meter");
 	}
 }
 
@@ -20,7 +87,7 @@ void PowerMeter::AddCharge(int charge) noexcept {
 }
 
 void PowerMeter::UseScop() noexcept {
-	m_nCharge -= m_nScopStars * m_nStarValue;
+	m_nCharge = 0;
 	IncreaseStarCost();
 }
 
@@ -30,7 +97,7 @@ void PowerMeter::UseCop() noexcept {
 }
 
 void PowerMeter::IncreaseStarCost() noexcept {
-	m_nStarValue = std::min(m_nStarValue * 1.2, 55720.0);
+	m_nStarValue = std::min(static_cast<int>(m_nStarValue * 1.2), 55720);
 }
 
 std::string Player::getArmyTypeJson() const {

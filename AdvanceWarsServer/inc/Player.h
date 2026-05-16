@@ -4,14 +4,14 @@
 class PowerMeter final {
 public:
 	PowerMeter() {}
-	PowerMeter(const CommandingOfficier::Type& type) noexcept;
+	PowerMeter(const CommandingOfficier::Type& type);
 	void AddCharge(int charge) noexcept;
 	bool FCopCharged() const noexcept {
-		return m_nCharge > m_nCopStars * m_nStarValue;
+		return m_nCopStars > 0 && m_nCharge >= m_nCopStars * m_nStarValue;
 	}
 
 	bool FScopCharged() const noexcept {
-		return m_nCharge == GetTotalCharge();
+		return m_nCharge >= GetTotalCharge();
 	}
 
 	void UseCop() noexcept;

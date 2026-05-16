@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "Grimm",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 3
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          130,
+          80
+        ],
+        "cop": [
+          160,
+          90
+        ],
+        "scop": [
+          190,
+          90
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          130,
+          80
+        ],
+        "cop": [
+          160,
+          90
+        ],
+        "scop": [
+          190,
+          90
+        ]
+      }
+    ]
+  }
+}

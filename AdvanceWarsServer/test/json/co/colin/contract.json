@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "Colin",
+    "power-meter": {
+      "cop-stars": 2,
+      "scop-stars": 4
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          90,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          90,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      }
+    ]
+  }
+}

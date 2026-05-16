@@ -1,0 +1,56 @@
+{
+  "co-contract": {
+    "name": "Grit",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 3
+    },
+    "stats": [
+      {
+        "unit": "artillery",
+        "normal": [
+          120,
+          100
+        ],
+        "cop": [
+          150,
+          110
+        ],
+        "scop": [
+          150,
+          110
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          80,
+          100
+        ],
+        "cop": [
+          90,
+          110
+        ],
+        "scop": [
+          90,
+          110
+        ]
+      },
+      {
+        "unit": "infantry",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      }
+    ]
+  }
+}

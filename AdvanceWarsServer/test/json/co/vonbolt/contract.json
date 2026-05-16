@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "VonBolt",
+    "power-meter": {
+      "cop-stars": 0,
+      "scop-stars": 10
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          110,
+          110
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          120,
+          120
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          110,
+          110
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          120,
+          120
+        ]
+      }
+    ]
+  }
+}

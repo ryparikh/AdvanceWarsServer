@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "Sami",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 5
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          130,
+          100
+        ],
+        "cop": [
+          160,
+          110
+        ],
+        "scop": [
+          180,
+          110
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          90,
+          100
+        ],
+        "cop": [
+          100,
+          110
+        ],
+        "scop": [
+          100,
+          110
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "co-contract": {
+    "name": "Kanbei",
+    "power-meter": {
+      "cop-stars": 4,
+      "scop-stars": 3
+    },
+    "stats": [
+      {
+        "unit": "infantry",
+        "normal": [
+          130,
+          130
+        ],
+        "cop": [
+          150,
+          140
+        ],
+        "scop": [
+          150,
+          160
+        ]
+      },
+      {
+        "unit": "tank",
+        "normal": [
+          130,
+          130
+        ],
+        "cop": [
+          150,
+          140
+        ],
+        "scop": [
+          150,
+          160
+        ]
+      }
+    ]
+  }
+}

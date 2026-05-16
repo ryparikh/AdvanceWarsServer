@@ -1,0 +1,56 @@
+{
+  "co-contract": {
+    "name": "Max",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 3
+    },
+    "stats": [
+      {
+        "unit": "tank",
+        "normal": [
+          120,
+          100
+        ],
+        "cop": [
+          140,
+          110
+        ],
+        "scop": [
+          160,
+          110
+        ]
+      },
+      {
+        "unit": "artillery",
+        "normal": [
+          90,
+          100
+        ],
+        "cop": [
+          100,
+          110
+        ],
+        "scop": [
+          100,
+          110
+        ]
+      },
+      {
+        "unit": "infantry",
+        "normal": [
+          100,
+          100
+        ],
+        "cop": [
+          110,
+          110
+        ],
+        "scop": [
+          110,
+          110
+        ]
+      }
+    ]
+  }
+}

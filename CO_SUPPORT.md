@@ -14,14 +14,15 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
 - Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Jake COP/SCOP indirect range for vehicles, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
-## Intentionally Unsupported
+## Tracked Follow-Up Issues
 
-These AWBW CO effects are not implemented yet. The simulator keeps their chart stat changes where present, but does not model the listed special effects.
+These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- Mass damage, healing, or draining beyond Andy/Jess: Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt.
-- Economy and unit-cost effects: Colin, Hachi, Kanbei, Kindle, and Sasha.
-- Production effects: Hachi city deployment and Sensei unit spawning.
-- Turn and action-state effects: Eagle's extra actions.
-- Fog, vision, hiding, and terrain-defense special effects: Javier, Lash, Sonja vision, and related fog-only behavior.
-- Indirect-range special effects outside the currently implemented Jake helper, including Grit.
-- Capture-specific power behavior beyond chart damage modifiers, including Sami's instant capture behavior.
+- [#20](https://github.com/ryparikh/AdvanceWarsServer/issues/20): weather mechanics and weather-changing CO powers.
+- [#21](https://github.com/ryparikh/AdvanceWarsServer/issues/21): mass damage, healing, and HP-drain CO power effects.
+- [#22](https://github.com/ryparikh/AdvanceWarsServer/issues/22): CO economy and unit-cost effects.
+- [#23](https://github.com/ryparikh/AdvanceWarsServer/issues/23): CO production effects.
+- [#24](https://github.com/ryparikh/AdvanceWarsServer/issues/24): Eagle extra-action CO power behavior.
+- [#25](https://github.com/ryparikh/AdvanceWarsServer/issues/25): fog, vision, hiding, and terrain-defense CO effects.
+- [#26](https://github.com/ryparikh/AdvanceWarsServer/issues/26): remaining indirect-range CO effects.
+- [#27](https://github.com/ryparikh/AdvanceWarsServer/issues/27): capture-specific CO power behavior.

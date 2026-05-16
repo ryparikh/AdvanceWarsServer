@@ -5,10 +5,32 @@
 
 #include "GameState.h"
 
+namespace {
+Result BuildActionTrace(GameState gameState, const std::vector<Action>& actions, std::string& traceDump) {
+	json trace = json::array();
+	json initialState;
+	GameState::to_json(initialState, gameState);
+	trace.push_back(std::move(initialState));
+
+	for (const Action& action : actions) {
+		IfFailedReturn(gameState.DoAction(action));
+		gameState.CheckPlayerResigns();
+
+		json actedGameState;
+		GameState::to_json(actedGameState, gameState);
+		trace.push_back(std::move(actedGameState));
+	}
+
+	traceDump = trace.dump();
+	return Result::Succeeded;
+}
+}
+
 void from_json(json& j, JsonSubsystemTest& test) {
 	GameState::from_json(j.at("initial-game-state"), test.initialGameState);
 	if (j.contains("final-game-state")) {
 		GameState::from_json(j.at("final-game-state"), test.finalGameState);
+		test.fHasFinalGameState = true;
 	}
 
 	if (j.contains("actions")) {
@@ -25,6 +47,10 @@ void from_json(json& j, JsonSubsystemTest& test) {
 			from_json(jAction, action);
 			test.vecFailedActions.emplace_back(action);
 		}
+	}
+
+	if (j.contains("deterministic-replay")) {
+		j.at("deterministic-replay").get_to(test.fDeterministicReplay);
 	}
 }
 
@@ -49,7 +75,7 @@ Result JsonTestRunner::run() {
 	JsonSubsystemTest test;
 	from_json(j, test);
 
-	if (!test.vecActions.empty()) {
+	if (!test.vecActions.empty() && test.fHasFinalGameState) {
 		for (const Action& action : test.vecActions) {
 			IfFailedReturn(test.initialGameState.DoAction(action));
 		}
@@ -62,6 +88,23 @@ Result JsonTestRunner::run() {
 		m_strExpected = expectedGameState.dump();
 
 		if (m_strActual != m_strExpected) {
+			return Result::Failed;
+		}
+	}
+
+	if (test.fDeterministicReplay) {
+		if (test.vecActions.empty()) {
+			return Result::Failed;
+		}
+
+		std::string firstTrace;
+		std::string secondTrace;
+		IfFailedReturn(BuildActionTrace(test.initialGameState, test.vecActions, firstTrace));
+		IfFailedReturn(BuildActionTrace(test.initialGameState, test.vecActions, secondTrace));
+
+		m_strExpected = firstTrace;
+		m_strActual = secondTrace;
+		if (firstTrace != secondTrace) {
 			return Result::Failed;
 		}
 	}

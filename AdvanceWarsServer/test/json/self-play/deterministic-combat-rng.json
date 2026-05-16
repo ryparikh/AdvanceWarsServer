@@ -1,0 +1,287 @@
+{
+  "deterministic-replay": true,
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "combat-rng-seed": 8675309,
+    "game-over": false,
+    "gameId": "seeded-combat-rng-replay",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "move-attack",
+      "source": [0, 0],
+      "direction": "east",
+      "target": [0, 0]
+    },
+    {
+      "type": "move-attack",
+      "source": [2, 0],
+      "direction": "east",
+      "target": [2, 0]
+    },
+    {
+      "type": "move-attack",
+      "source": [4, 0],
+      "direction": "east",
+      "target": [4, 0]
+    },
+    {
+      "type": "move-attack",
+      "source": [6, 0],
+      "direction": "east",
+      "target": [6, 0]
+    },
+    {
+      "type": "move-attack",
+      "source": [8, 0],
+      "direction": "east",
+      "target": [8, 0]
+    },
+    {
+      "type": "move-attack",
+      "source": [10, 0],
+      "direction": "east",
+      "target": [10, 0]
+    },
+    {
+      "type": "move-attack",
+      "source": [12, 0],
+      "direction": "east",
+      "target": [12, 0]
+    },
+    {
+      "type": "move-attack",
+      "source": [14, 0],
+      "direction": "east",
+      "target": [14, 0]
+    }
+  ]
+}

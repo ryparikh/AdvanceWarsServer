@@ -1,7 +1,10 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <memory>
+#include <optional>
+#include <random>
 
 #include "Map.h"
 #include "Player.h"
@@ -9,8 +12,6 @@
 #include "Reward.h"
 
 class Map;
-
-#include <optional>
 
 struct Action {
 	enum class Type {
@@ -263,6 +264,8 @@ public:
 	}
 
 	bool FEnemyHasLabs() const noexcept;
+	void SetCombatRngSeed(std::uint32_t seed);
+	void ClearCombatRngSeed() noexcept;
 	static void to_json(json& j, const GameState& gameState);
 	static void from_json(json& j, GameState& gameState);
 private:
@@ -299,6 +302,7 @@ private:
 
 	int GetMaxGoodLuck(const Player& player) noexcept;
 	int GetMaxBadLuck(const Player& player) noexcept;
+	int RollCombatLuck(int min, int max);
 	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 	void HealUnits(int health);
 	bool FAtUnitCap() const noexcept;
@@ -313,5 +317,7 @@ private:
 	bool m_isFirstPlayerTurn{ true };
 	bool m_fGameOver = false;
 	int m_winningPlayer = -1;
+	std::optional<std::uint32_t> m_combatRngSeed;
+	std::optional<std::mt19937> m_combatRng;
 };
 

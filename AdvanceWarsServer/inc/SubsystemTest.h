@@ -9,6 +9,7 @@ struct JsonSubsystemTest {
 	GameState finalGameState;
 	std::vector<Action> vecActions;
 	std::vector<Action> vecFailedActions;
+	std::vector<std::pair<std::pair<int, int>, std::vector<Action>>> vecValidActions;
 	bool fHasFinalGameState{ false };
 	bool fDeterministicReplay{ false };
 };

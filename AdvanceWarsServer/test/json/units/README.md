@@ -17,14 +17,14 @@ Coverage key:
 | AntiAir | `anti-air` | `units/anti-air/` | partial | partial | Present as infantry combat target/opponent and production option. Needs anti-air owned attack tests. |
 | Apc | `apc` | `units/apc/` | yes | yes | `transport/apc/` covers load, unload, resupply, movement, and capacity boundaries. |
 | Artillery | `artillery` | `units/artillery/` | yes | yes | `units/artillery/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |
-| BCopter | `bcopter` | `units/bcopter/` | partial | partial | Present as infantry combat target/opponent and cruiser cargo. Needs B-copter owned movement/combat tests. |
+| BCopter | `bcopter` | `units/bcopter/` | yes | yes | `units/bcopter/` covers air movement over mixed terrain, begin-turn fuel drain, ammo consumption, and invalid plane targets. Existing fixtures also cover infantry combat target/opponent and cruiser cargo. |
 | Battleship | `battleship` | `units/battleship/` | yes | yes | `units/battleship/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |
 | BlackBoat | `blackboat` | `units/blackboat/` | yes | yes | `transport/blackboat/` covers load, unload, repair, resupply, funds, and sea unload boundaries. |
-| BlackBomb | `blackbomb` | `units/blackbomb/` | partial | none | Present in production fixtures. Explosion behavior is still uncovered. |
-| Bomber | `bomber` | `units/bomber/` | partial | partial | Present as production option and infantry combat target/opponent. Needs bomber owned air attack tests. |
+| BlackBomb | `blackbomb` | `units/blackbomb/` | yes | yes | `units/blackbomb/` covers air movement over mixed terrain, begin-turn fuel drain, fuel-out crash, and no-weapon attack rejection. Explode-command behavior is not implemented yet. |
+| Bomber | `bomber` | `units/bomber/` | yes | yes | `units/bomber/` covers air movement over mixed terrain, begin-turn fuel drain, ammo consumption against ground targets, and invalid air targets. |
 | Carrier | `carrier` | `units/carrier/` | yes | yes | `transport/carrier/` covers loading/resupply; `units/carrier/` covers indirect anti-air range, ammo, invalid ground target, and move-fire rejection. |
 | Crusier | `crusier` | `units/crusier/` | yes | yes | Enum and JSON spelling are `crusier`; `transport/crusier/` covers copter loading and loaded resupply. |
-| Fighter | `fighter` | `units/fighter/` | partial | partial | Present in production and as carrier cargo/invalid transport cargo. Needs fighter owned air combat tests. |
+| Fighter | `fighter` | `units/fighter/` | yes | yes | `units/fighter/` covers air movement over mixed terrain, begin-turn fuel drain, ammo consumption against air targets, and invalid land/sea targets. |
 | Infantry | `infantry` | `units/infantry/` | yes | yes | Broad coverage exists in `combat/infantry/`, `captures/`, `joining/`, and transport cargo tests. |
 | Lander | `lander` | `units/lander/` | yes | yes | `transport/lander/` covers multi-load, unload, and no-unload-at-sea boundary. |
 | MediumTank | `medium-tank` | `units/medium-tank/` | partial | partial | Present as production option and infantry combat target/opponent. Needs medium tank owned combat tests. |
@@ -35,7 +35,7 @@ Coverage key:
 | Piperunner | `piperunner` | `units/piperunner/` | partial | partial | `units/piperunner/` covers indirect min/max range, ammo consumption, no ammo, empty target, and move-fire rejection. Pipe movement still needs dedicated fixtures. |
 | Recon | `recon` | `units/recon/` | partial | partial | Present as production option and infantry combat target/opponent. Needs recon owned movement/vision tests. |
 | Rocket | `rocket` | `units/rocket/` | yes | yes | `units/rocket/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |
-| Stealth | `stealth` | `units/stealth/` | partial | partial | Present in production and carrier hidden-cargo fixtures. Hide/unhide and fuel drain behavior are uncovered. |
+| Stealth | `stealth` | `units/stealth/` | partial | partial | `units/stealth/` covers air movement over mixed terrain, visible-unit ammo consumption, no-ammo rejection, and hidden begin-turn fuel drain. Hide/unhide actions, fog visibility, hidden targeting, and detection remain tracked by #16. |
 | Sub | `sub` | `units/sub/` | partial | none | Present in production fixtures. Dive/hide/fuel/combat behavior is uncovered. |
-| TCopter | `tcopter` | `units/tcopter/` | yes | yes | `transport/tcopter/` covers load, unload, movement unload, and capacity boundaries. |
+| TCopter | `tcopter` | `units/tcopter/` | yes | yes | `units/tcopter/` covers air movement over mixed terrain, begin-turn fuel drain, and no-weapon attack rejection. `transport/tcopter/` covers load, unload, movement unload, and capacity boundaries. |
 | Tank | `tank` | `units/tank/` | yes | yes | `combat/tank/` and broader combat/production fixtures cover basic tank behavior and no-ammo combat. |

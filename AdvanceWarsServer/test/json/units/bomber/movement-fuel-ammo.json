@@ -1,0 +1,54 @@
+{
+  "initial-game-state": {
+    "activePlayer": 1,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "bomber-movement-fuel-ammo",
+    "map": [
+      [
+        { "terrain": 1, "unit": { "ammo": 9, "fuel": 20, "health": 100, "hidden": false, "moved": true, "owner": "orange-star", "type": "bomber" } },
+        { "terrain": 2 },
+        { "terrain": 3 },
+        { "terrain": 28 },
+        { "terrain": 33 },
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 70, "health": 1, "hidden": false, "moved": false, "owner": "blue-moon", "type": "tank" } },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "infantry" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    { "type": "end-turn" },
+    { "type": "move-attack", "source": [0, 0], "target": [4, 0], "direction": "east" }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "bomber-movement-fuel-ammo",
+    "map": [
+      [
+        { "terrain": 1 },
+        { "terrain": 2 },
+        { "terrain": 3 },
+        { "terrain": 28 },
+        { "terrain": 33, "unit": { "ammo": 8, "fuel": 11, "health": 100, "hidden": false, "moved": true, "owner": "orange-star", "type": "bomber" } },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "infantry" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 350, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 700, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 2,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

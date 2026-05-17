@@ -1151,7 +1151,7 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 	}
 
 	int& cp = ptile->m_spPropertyInfo->m_capturePoints;
-	cp -= ((pUnit->health + 9)/ 10);
+	cp -= GetCOCaptureProgress(GetCurrentPlayer(), *pUnit);
 	if (cp <= 0) {
 		bool fHqCapture = ptile->m_pterrain->m_type == Terrain::Type::Headquarters;
 		ptile->Capture(&GetCurrentPlayer());
@@ -1190,6 +1190,19 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 	}
 
 	return Result::Succeeded;
+}
+
+int GameState::GetCOCaptureProgress(const Player& player, const Unit& unit) const noexcept {
+	int displayedHp = (unit.health + 9) / 10;
+	if (player.m_co.m_type == CommandingOfficier::Type::Sami && unit.IsFootsoldier()) {
+		if (player.PowerStatus() == 2) {
+			return 20;
+		}
+
+		return displayedHp * 3 / 2;
+	}
+
+	return displayedHp;
 }
 
 bool GameState::FEnemyHasLabs() const noexcept {

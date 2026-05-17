@@ -316,6 +316,7 @@ private:
 	int GetCOBuildCost(const Player& player, UnitProperties::Type unitType) const noexcept;
 	int GetCOIncomeForProperty(const Player& player, Terrain::Type terrainType) const noexcept;
 	int GetCOFundsAttackModifier(const Player& player, const CommandingOfficier::Type& co) const noexcept;
+	int GetCOCaptureProgress(const Player& player, const Unit& unit) const noexcept;
 	int CountOwnedProperties(const Player& player) const noexcept;
 
 	int GetMaxGoodLuck(const Player& player) noexcept;

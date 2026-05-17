@@ -17,7 +17,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
-- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Jake COP/SCOP indirect range for vehicles, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
+- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
 ## Weather Notes
 
@@ -31,6 +31,10 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Drake's Tsunami and Typhoon halve enemy fuel with integer truncation, then apply their HP damage. Typhoon also keeps the existing rain side effect.
 - Rachel, Sturm, and Von Bolt missile-style powers use a 2-range diamond area. Target scoring follows the AWBW wiki criteria using the simulator's two-player friendly/enemy model, unit HP, unit cost, and property capture state. Loaded units are excluded because they are not represented as map occupants.
 - Rachel's three Covering Fire target centers are selected before damage is applied, then each missile applies damage. Von Bolt's stun is represented internally until the affected player's next `BeginTurn`, where stunned units remain `"moved": true` for that turn.
+
+## Range Notes
+
+- Indirect range modifiers adjust maximum range only; minimum range is unchanged. Grit applies to all indirect units, Jake applies to vehicle indirects during COP/SCOP, and Max applies his -1 maximum-range penalty to indirect units without changing adjacent direct attacks.
 
 ## Economy Notes
 
@@ -57,4 +61,3 @@ These AWBW mechanics are not implemented yet. They are tracked as GitHub issues 
 
 - [#23](https://github.com/ryparikh/AdvanceWarsServer/issues/23): CO production effects.
 - [#25](https://github.com/ryparikh/AdvanceWarsServer/issues/25): fog, vision, hiding, and terrain-defense CO effects.
-- [#26](https://github.com/ryparikh/AdvanceWarsServer/issues/26): remaining indirect-range CO effects.

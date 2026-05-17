@@ -275,6 +275,14 @@ public:
 	static void to_json(json& j, const GameState& gameState);
 	static void from_json(json& j, GameState& gameState);
 private:
+	enum class MissileTargetingMode {
+		RachelInfantry,
+		RachelCost,
+		RachelHp,
+		Sturm,
+		VonBolt,
+	};
+
 	Result BeginTurn() noexcept;
 	Result ResupplyApcUnits(int x, int y) noexcept;
 	Player& GetCurrentPlayer() noexcept { return m_isFirstPlayerTurn ? m_arrPlayers[0] : m_arrPlayers[1]; }
@@ -313,7 +321,14 @@ private:
 	int GetWeatherMovementCost(const Terrain& terrain, const Player& player, const Unit& unit) const noexcept;
 	void SetTemporaryWeather(WeatherType weather) noexcept;
 	void TickTemporaryWeather() noexcept;
-	void HealUnits(int health);
+	void HealUnits(const Player& player, int health);
+	void DamageUnits(const Player& player, int health, bool halveFuel = false);
+	void DamageUnitsOnUrbanTerrain(const Player& player, int health);
+	std::optional<std::pair<int, int>> FindMissileTarget(MissileTargetingMode mode) const noexcept;
+	void ApplyAreaDamage(const Player& player, int centerX, int centerY, int health, bool stun);
+	void ApplyRachelCoveringFire();
+	void ApplySturmMeteor(int health);
+	void ApplyVonBoltExMachina();
 	bool FAtUnitCap() const noexcept;
 	bool FPlayerRouted(const Player& player) const noexcept;
 private:

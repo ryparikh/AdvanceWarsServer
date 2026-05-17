@@ -108,6 +108,7 @@ public:
 	int health = 100;
 	bool m_moved = false;
 	bool m_hidden = false;
+	bool m_stunned = false;
 	std::vector<Unit*> m_vecLanderUnits;
 };
 

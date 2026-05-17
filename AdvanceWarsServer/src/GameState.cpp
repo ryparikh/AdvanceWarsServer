@@ -2,7 +2,9 @@
 #include "UnitInfo.h"
 
 #include <chrono>
+#include <algorithm>
 #include <iostream>
+#include <limits>
 #include <queue>
 #include <random>
 #include <stdexcept>
@@ -40,6 +42,30 @@ GameState::WeatherType WeatherTypeFromString(const std::string& weather) {
 	}
 
 	throw std::invalid_argument("Unknown weather: " + weather);
+}
+
+int ManhattanDistance(int x1, int y1, int x2, int y2) noexcept {
+	return std::abs(x1 - x2) + std::abs(y1 - y2);
+}
+
+bool TopLeftComesFirst(int x, int y, int otherX, int otherY) noexcept {
+	return y < otherY || (y == otherY && x < otherX);
+}
+
+int DamageValueForRachelMissile(const Unit& unit) noexcept {
+	if (unit.health < 10) {
+		return 1;
+	}
+
+	return std::min(unit.health, 30);
+}
+
+int DamageValueForVonBoltMissile(const Unit& unit) noexcept {
+	if (unit.health > 30) {
+		return 30;
+	}
+
+	return std::max(0, ((unit.health + 9) / 10 - 1) * 10);
 }
 }
 
@@ -189,7 +215,13 @@ Result GameState::BeginTurn() noexcept {
 			Unit* pUnit = pTile->m_spUnit.get();
 			if (pUnit != nullptr &&
 				pUnit->m_owner == &GetCurrentPlayer()) {
-				pUnit->m_moved = false;
+				if (pUnit->m_stunned) {
+					pUnit->m_moved = true;
+					pUnit->m_stunned = false;
+				}
+				else {
+					pUnit->m_moved = false;
+				}
 			}
 		}
 	}
@@ -1604,16 +1636,208 @@ Result GameState::DoMoveAction(int& x, int& y, const Action& action) {
 	return Result::Succeeded;
 }
 
-void GameState::HealUnits(int health) {
+void GameState::HealUnits(const Player& player, int health) {
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
 			MapTile* pTile = nullptr;
 			m_spmap->TryGetTile(x, y, &pTile);
 			Unit* punit = pTile->TryGetUnit();
-			if (punit != nullptr && punit->m_owner == &GetCurrentPlayer()) {
+			if (punit != nullptr && punit->m_owner == &player) {
 				punit->health = std::min(punit->health + health * 10, 100);
 			}
 		}
+	}
+}
+
+void GameState::DamageUnits(const Player& player, int health, bool halveFuel) {
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			Unit* punit = pTile->TryGetUnit();
+			if (punit != nullptr && punit->m_owner == &player) {
+				punit->health = std::max(punit->health - health * 10, 1);
+				if (halveFuel) {
+					punit->m_properties.m_fuel /= 2;
+				}
+			}
+		}
+	}
+}
+
+void GameState::DamageUnitsOnUrbanTerrain(const Player& player, int health) {
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			Unit* punit = pTile->TryGetUnit();
+			if (punit != nullptr && punit->m_owner == &player && MapTile::IsProperty(pTile->GetTerrain().m_type)) {
+				punit->health = std::max(punit->health - health * 10, 1);
+			}
+		}
+	}
+}
+
+std::optional<std::pair<int, int>> GameState::FindMissileTarget(MissileTargetingMode mode) const noexcept {
+	struct Candidate {
+		bool found = false;
+		int x = 0;
+		int y = 0;
+		int value = std::numeric_limits<int>::min();
+		int tieValue = std::numeric_limits<int>::min();
+	};
+
+	Candidate best;
+	const Player& currentPlayer = GetCurrentPlayer();
+	const Player& enemyPlayer = GetEnemyPlayer();
+
+	auto unitValue = [&](const Unit& unit, const MapTile& tile) -> int {
+		switch (mode) {
+		case MissileTargetingMode::RachelInfantry: {
+			int value = DamageValueForRachelMissile(unit);
+			if (unit.IsFootsoldier() && unit.health > 10) {
+				value *= 4;
+				if (tile.m_spPropertyInfo != nullptr && tile.m_spPropertyInfo->m_capturePoints < 20) {
+					value *= 2;
+				}
+			}
+			return value;
+		}
+		case MissileTargetingMode::RachelCost:
+			if (unit.health < 10) {
+				return 2;
+			}
+			return DamageValueForRachelMissile(unit) * Unit::GetUnitCost(unit.m_properties.m_type);
+		case MissileTargetingMode::RachelHp:
+			return DamageValueForRachelMissile(unit);
+		case MissileTargetingMode::Sturm:
+			return unit.health * Unit::GetUnitCost(unit.m_properties.m_type);
+		case MissileTargetingMode::VonBolt:
+			return DamageValueForVonBoltMissile(unit) * Unit::GetUnitCost(unit.m_properties.m_type);
+		default:
+			return 0;
+		}
+	};
+
+	auto tieValue = [&](const Unit& unit) -> int {
+		switch (mode) {
+		case MissileTargetingMode::RachelHp:
+			return unit.health;
+		case MissileTargetingMode::RachelCost:
+		case MissileTargetingMode::VonBolt:
+			return unit.health * Unit::GetUnitCost(unit.m_properties.m_type);
+		default:
+			return 0;
+		}
+	};
+
+	for (int centerX = 0; centerX < m_spmap->GetCols(); ++centerX) {
+		for (int centerY = 0; centerY < m_spmap->GetRows(); ++centerY) {
+			if (mode == MissileTargetingMode::Sturm) {
+				const MapTile* pCenterTile = nullptr;
+				m_spmap->TryGetTile(centerX, centerY, &pCenterTile);
+				const Unit* pCenterUnit = pCenterTile->TryGetUnit();
+				if (pCenterUnit == nullptr || pCenterUnit->m_owner != &enemyPlayer) {
+					continue;
+				}
+			}
+
+			bool hitsEnemy = false;
+			int totalValue = 0;
+			int totalTieValue = 0;
+			for (int x = 0; x < m_spmap->GetCols(); ++x) {
+				for (int y = 0; y < m_spmap->GetRows(); ++y) {
+					if (ManhattanDistance(centerX, centerY, x, y) > 2) {
+						continue;
+					}
+
+					const MapTile* pTile = nullptr;
+					m_spmap->TryGetTile(x, y, &pTile);
+					const Unit* pUnit = pTile->TryGetUnit();
+					if (pUnit == nullptr) {
+						continue;
+					}
+
+					const bool friendly = pUnit->m_owner == &currentPlayer;
+					int value = unitValue(*pUnit, *pTile);
+					totalValue += friendly ? -value : value;
+					if (pUnit->m_owner == &enemyPlayer) {
+						hitsEnemy = true;
+						totalTieValue += tieValue(*pUnit);
+					}
+				}
+			}
+
+			if (!hitsEnemy) {
+				continue;
+			}
+
+			if (!best.found ||
+				totalValue > best.value ||
+				(totalValue == best.value && totalTieValue > best.tieValue) ||
+				(totalValue == best.value && totalTieValue == best.tieValue && TopLeftComesFirst(centerX, centerY, best.x, best.y))) {
+				best = { true, centerX, centerY, totalValue, totalTieValue };
+			}
+		}
+	}
+
+	if (!best.found) {
+		return std::nullopt;
+	}
+
+	return std::make_pair(best.x, best.y);
+}
+
+void GameState::ApplyAreaDamage(const Player& player, int centerX, int centerY, int health, bool stun) {
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			if (ManhattanDistance(centerX, centerY, x, y) > 2) {
+				continue;
+			}
+
+			MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			Unit* punit = pTile->TryGetUnit();
+			if (punit != nullptr && punit->m_owner == &player) {
+				punit->health = std::max(punit->health - health * 10, 1);
+				if (stun) {
+					punit->m_stunned = true;
+				}
+			}
+		}
+	}
+}
+
+void GameState::ApplyRachelCoveringFire() {
+	const std::array<MissileTargetingMode, 3> modes = {
+		MissileTargetingMode::RachelInfantry,
+		MissileTargetingMode::RachelCost,
+		MissileTargetingMode::RachelHp,
+	};
+
+	std::array<std::optional<std::pair<int, int>>, 3> targets;
+	for (std::size_t i = 0; i < modes.size(); ++i) {
+		targets[i] = FindMissileTarget(modes[i]);
+	}
+
+	for (const auto& target : targets) {
+		if (target.has_value()) {
+			ApplyAreaDamage(GetEnemyPlayer(), target->first, target->second, 3, false);
+		}
+	}
+}
+
+void GameState::ApplySturmMeteor(int health) {
+	const auto target = FindMissileTarget(MissileTargetingMode::Sturm);
+	if (target.has_value()) {
+		ApplyAreaDamage(GetEnemyPlayer(), target->first, target->second, health, false);
+	}
+}
+
+void GameState::ApplyVonBoltExMachina() {
+	const auto target = FindMissileTarget(MissileTargetingMode::VonBolt);
+	if (target.has_value()) {
+		ApplyAreaDamage(GetEnemyPlayer(), target->first, target->second, 3, true);
 	}
 }
 
@@ -1628,10 +1852,23 @@ Result GameState::DoCOPowerAction() {
 	currentPlayer.m_powerMeter.UseCop();
 	switch (type) {
 		case CommandingOfficier::Type::Andy:
-			HealUnits(2);
+			HealUnits(currentPlayer, 2);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Drake:
+			DamageUnits(GetEnemyPlayer(), 1, true);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Hawke:
+			HealUnits(currentPlayer, 1);
+			DamageUnits(GetEnemyPlayer(), 1);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Kindle:
+			DamageUnitsOnUrbanTerrain(GetEnemyPlayer(), 3);
 			return Result::Succeeded;
 		case CommandingOfficier::Type::Olaf:
 			SetTemporaryWeather(WeatherType::Snow);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Sturm:
+			ApplySturmMeteor(4);
 			return Result::Succeeded;
 	}
 	return Result::Succeeded;
@@ -1671,16 +1908,31 @@ Result GameState::DoSCOPowerAction() {
 	currentPlayer.m_powerMeter.UseScop();
 	switch (type) {
 		case CommandingOfficier::Type::Andy:
-			HealUnits(5);
+			HealUnits(currentPlayer, 5);
 			return Result::Succeeded;
 		case CommandingOfficier::Type::Drake:
+			DamageUnits(GetEnemyPlayer(), 2, true);
 			SetTemporaryWeather(WeatherType::Rain);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Hawke:
+			HealUnits(currentPlayer, 2);
+			DamageUnits(GetEnemyPlayer(), 2);
 			return Result::Succeeded;
 		case CommandingOfficier::Type::Jess:
 			IfFailedReturn(ResupplyPlayersUnits(&GetCurrentPlayer()));
 			return Result::Succeeded;
 		case CommandingOfficier::Type::Olaf:
+			DamageUnits(GetEnemyPlayer(), 2);
 			SetTemporaryWeather(WeatherType::Snow);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Rachel:
+			ApplyRachelCoveringFire();
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Sturm:
+			ApplySturmMeteor(8);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::VonBolt:
+			ApplyVonBoltExMachina();
 			return Result::Succeeded;
 	}
 	return Result::Succeeded;

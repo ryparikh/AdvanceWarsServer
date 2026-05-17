@@ -69,6 +69,7 @@ Unit* Unit::Clone(const Player* pNewOwner) const {
 	spClone->health = health;
 	spClone->m_moved = m_moved;
 	spClone->m_hidden = m_hidden;
+	spClone->m_stunned = m_stunned;
 	for (const Unit* pLoadedUnit : m_vecLanderUnits) {
 		spClone->m_vecLanderUnits.emplace_back(pLoadedUnit->Clone(pNewOwner));
 	}
@@ -411,6 +412,9 @@ void to_json(json& j, const Unit& unit) {
 	j["health"] = unit.health;
 	j["moved"] = unit.m_moved;
 	j["hidden"] = unit.m_hidden;
+	if (unit.m_stunned) {
+		j["stunned"] = unit.m_stunned;
+	}
 	if (unit.m_vecLanderUnits.size() == 1) {
 		json loadedUnit;
 		to_json(loadedUnit, *unit.m_vecLanderUnits[0]);
@@ -440,6 +444,9 @@ void from_json(const std::array<Player, 2>& arrPlayers, json& j, Unit& unit) {
 
 	j.at("moved").get_to(unit.m_moved);
 	j.at("hidden").get_to(unit.m_hidden);
+	if (j.contains("stunned")) {
+		j.at("stunned").get_to(unit.m_stunned);
+	}
 
 	if (j.contains("loaded-units")) {
 		for (auto& jUnit : j.at("loaded-units")) {

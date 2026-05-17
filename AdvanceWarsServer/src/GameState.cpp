@@ -1469,15 +1469,23 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 
 
 int GameState::GetCOIndirectRangeModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& unit) const noexcept {
+	if (!UnitProperties::IsIndirectAttack(unit.m_properties.m_type)) {
+		return 0;
+	}
+
 	switch (co) {
 	default:
 		break;
+	case CommandingOfficier::Type::Grit:
+		return 1 + player.PowerStatus();
 	case CommandingOfficier::Type::Jake:
 		if (player.PowerStatus() != 0 && unit.IsVehicle()) {
 			return 1;
 		}
 
 		break;
+	case CommandingOfficier::Type::Max:
+		return -1;
 	}
 
 	return 0;

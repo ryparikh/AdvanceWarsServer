@@ -272,6 +272,10 @@ void JsonTestSuite::run() {
 		if (!dir_entry.is_regular_file()) {
 			continue;
 		}
+		if (dir_entry.path().extension() != ".json") {
+			continue;
+		}
+
 		JsonTestRunner runner(dir_entry);
 		Result result = runner.run();
 		if (result == Result::Failed) {

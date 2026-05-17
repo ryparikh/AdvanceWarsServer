@@ -16,13 +16,13 @@ Coverage key:
 | --- | --- | --- | --- | --- | --- |
 | AntiAir | `anti-air` | `units/anti-air/` | partial | partial | Present as infantry combat target/opponent and production option. Needs anti-air owned attack tests. |
 | Apc | `apc` | `units/apc/` | yes | yes | `transport/apc/` covers load, unload, resupply, movement, and capacity boundaries. |
-| Artillery | `artillery` | `units/artillery/` | partial | partial | Present as infantry combat target/opponent and indirect rout fixture. Needs artillery owned range/ammo tests. |
+| Artillery | `artillery` | `units/artillery/` | yes | yes | `units/artillery/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |
 | BCopter | `bcopter` | `units/bcopter/` | partial | partial | Present as infantry combat target/opponent and cruiser cargo. Needs B-copter owned movement/combat tests. |
-| Battleship | `battleship` | `units/battleship/` | partial | none | Present in production and combat mentions. Needs battleship owned indirect/naval tests. |
+| Battleship | `battleship` | `units/battleship/` | yes | yes | `units/battleship/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |
 | BlackBoat | `blackboat` | `units/blackboat/` | yes | yes | `transport/blackboat/` covers load, unload, repair, resupply, funds, and sea unload boundaries. |
 | BlackBomb | `blackbomb` | `units/blackbomb/` | partial | none | Present in production fixtures. Explosion behavior is still uncovered. |
 | Bomber | `bomber` | `units/bomber/` | partial | partial | Present as production option and infantry combat target/opponent. Needs bomber owned air attack tests. |
-| Carrier | `carrier` | `units/carrier/` | yes | yes | `transport/carrier/` covers loading air units, hidden stealth unload, and loaded air resupply. |
+| Carrier | `carrier` | `units/carrier/` | yes | yes | `transport/carrier/` covers loading/resupply; `units/carrier/` covers indirect anti-air range, ammo, invalid ground target, and move-fire rejection. |
 | Crusier | `crusier` | `units/crusier/` | yes | yes | Enum and JSON spelling are `crusier`; `transport/crusier/` covers copter loading and loaded resupply. |
 | Fighter | `fighter` | `units/fighter/` | partial | partial | Present in production and as carrier cargo/invalid transport cargo. Needs fighter owned air combat tests. |
 | Infantry | `infantry` | `units/infantry/` | yes | yes | Broad coverage exists in `combat/infantry/`, `captures/`, `joining/`, and transport cargo tests. |
@@ -30,11 +30,11 @@ Coverage key:
 | MediumTank | `medium-tank` | `units/medium-tank/` | partial | partial | Present as production option and infantry combat target/opponent. Needs medium tank owned combat tests. |
 | Mech | `mech` | `units/mech/` | yes | yes | Covered through capture, combat, joining, and transport cargo scenarios. Needs dedicated mech-owned folder tests later. |
 | MegaTank | `megatank` | `units/megatank/` | partial | partial | Present as production option and infantry combat target/opponent. Needs mega tank owned combat tests. |
-| Missile | `missile` | `units/missile/` | partial | partial | Present as production option and infantry combat target/opponent. Needs missile owned range/no-target tests. |
+| Missile | `missile` | `units/missile/` | yes | yes | `units/missile/` covers indirect anti-air min/max range, ammo consumption, no ammo, invalid ground target, and move-fire rejection. |
 | Neotank | `neotank` | `units/neotank/` | partial | partial | Present as production option and infantry combat target/opponent. Needs neotank owned combat tests. |
-| Piperunner | `piperunner` | `units/piperunner/` | partial | partial | Present as production option and infantry combat target/opponent. Needs pipe movement and attack tests. |
+| Piperunner | `piperunner` | `units/piperunner/` | partial | partial | `units/piperunner/` covers indirect min/max range, ammo consumption, no ammo, empty target, and move-fire rejection. Pipe movement still needs dedicated fixtures. |
 | Recon | `recon` | `units/recon/` | partial | partial | Present as production option and infantry combat target/opponent. Needs recon owned movement/vision tests. |
-| Rocket | `rocket` | `units/rocket/` | partial | partial | Present as production option and infantry combat target/opponent. Needs rocket owned indirect/no-ammo tests. |
+| Rocket | `rocket` | `units/rocket/` | yes | yes | `units/rocket/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |
 | Stealth | `stealth` | `units/stealth/` | partial | partial | Present in production and carrier hidden-cargo fixtures. Hide/unhide and fuel drain behavior are uncovered. |
 | Sub | `sub` | `units/sub/` | partial | none | Present in production fixtures. Dive/hide/fuel/combat behavior is uncovered. |
 | TCopter | `tcopter` | `units/tcopter/` | yes | yes | `transport/tcopter/` covers load, unload, movement unload, and capacity boundaries. |

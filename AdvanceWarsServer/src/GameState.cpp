@@ -1230,6 +1230,10 @@ Result GameState::DoBuyAction(int x, int y, const Action& action) {
 		return Result::Failed;
 	}
 
+	if (FAtUnitCap()) {
+		return Result::Failed;
+	}
+
 	int cost = GetCOBuildCost(*currentPlayer, unitType);
 	if (currentPlayer->m_funds >= cost) {
 		currentPlayer->m_funds -= cost;

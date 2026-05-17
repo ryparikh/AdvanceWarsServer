@@ -1,0 +1,566 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "direct-ground-happy-paths-road",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 80,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "recon"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "medium-tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "neotank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "medium-tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 3,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 3,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "anti-air"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 80,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "recon"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 3,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        0,
+        0
+      ]
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        2,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        2,
+        0
+      ]
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        4,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        4,
+        0
+      ]
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        6,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        6,
+        0
+      ]
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        8,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        8,
+        0
+      ]
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        10,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        10,
+        0
+      ]
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        12,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        12,
+        0
+      ]
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        14,
+        0
+      ],
+      "direction": "east",
+      "target": [
+        14,
+        0
+      ]
+    }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "direct-ground-happy-paths-road",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 80,
+            "health": 94,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "recon"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 30,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 70,
+            "health": 68,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 70,
+            "health": 45,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 7,
+            "fuel": 50,
+            "health": 96,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "medium-tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 70,
+            "health": 15,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 99,
+            "health": 84,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "neotank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 7,
+            "fuel": 50,
+            "health": 25,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "medium-tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 2,
+            "fuel": 50,
+            "health": 71,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 2,
+            "fuel": 50,
+            "health": 35,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 60,
+            "health": 41,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "anti-air"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 8,
+            "fuel": 70,
+            "health": 75,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 29,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 80,
+            "health": 88,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "recon"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 2,
+            "fuel": 70,
+            "health": 61,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 70,
+            "health": 45,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 0,
+        "power-meter": {
+          "charge": 37050,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 45000,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

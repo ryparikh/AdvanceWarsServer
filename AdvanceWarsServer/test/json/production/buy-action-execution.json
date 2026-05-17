@@ -1,0 +1,758 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "buy-action-execution",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 500000,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "buy",
+      "source": [ 0, 0 ],
+      "unit": "anti-air"
+    },
+    {
+      "type": "buy",
+      "source": [ 1, 0 ],
+      "unit": "apc"
+    },
+    {
+      "type": "buy",
+      "source": [ 2, 0 ],
+      "unit": "artillery"
+    },
+    {
+      "type": "buy",
+      "source": [ 3, 0 ],
+      "unit": "infantry"
+    },
+    {
+      "type": "buy",
+      "source": [ 4, 0 ],
+      "unit": "medium-tank"
+    },
+    {
+      "type": "buy",
+      "source": [ 5, 0 ],
+      "unit": "mech"
+    },
+    {
+      "type": "buy",
+      "source": [ 6, 0 ],
+      "unit": "megatank"
+    },
+    {
+      "type": "buy",
+      "source": [ 7, 0 ],
+      "unit": "missile"
+    },
+    {
+      "type": "buy",
+      "source": [ 8, 0 ],
+      "unit": "neotank"
+    },
+    {
+      "type": "buy",
+      "source": [ 9, 0 ],
+      "unit": "recon"
+    },
+    {
+      "type": "buy",
+      "source": [ 10, 0 ],
+      "unit": "rocket"
+    },
+    {
+      "type": "buy",
+      "source": [ 11, 0 ],
+      "unit": "tank"
+    },
+    {
+      "type": "buy",
+      "source": [ 12, 0 ],
+      "unit": "bcopter"
+    },
+    {
+      "type": "buy",
+      "source": [ 13, 0 ],
+      "unit": "blackbomb"
+    },
+    {
+      "type": "buy",
+      "source": [ 14, 0 ],
+      "unit": "bomber"
+    },
+    {
+      "type": "buy",
+      "source": [ 15, 0 ],
+      "unit": "fighter"
+    },
+    {
+      "type": "buy",
+      "source": [ 16, 0 ],
+      "unit": "stealth"
+    },
+    {
+      "type": "buy",
+      "source": [ 17, 0 ],
+      "unit": "tcopter"
+    },
+    {
+      "type": "buy",
+      "source": [ 18, 0 ],
+      "unit": "battleship"
+    },
+    {
+      "type": "buy",
+      "source": [ 19, 0 ],
+      "unit": "blackboat"
+    },
+    {
+      "type": "buy",
+      "source": [ 20, 0 ],
+      "unit": "carrier"
+    },
+    {
+      "type": "buy",
+      "source": [ 21, 0 ],
+      "unit": "crusier"
+    },
+    {
+      "type": "buy",
+      "source": [ 22, 0 ],
+      "unit": "lander"
+    },
+    {
+      "type": "buy",
+      "source": [ 23, 0 ],
+      "unit": "sub"
+    }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "buy-action-execution",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 9,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "anti-air"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 0,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "apc"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 9,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "artillery"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 8,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "medium-tank"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 3,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 3,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "megatank"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 6,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "missile"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "neotank"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 0,
+            "fuel": 80,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "recon"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 6,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "rocket"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 35,
+          "unit": {
+            "ammo": 9,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "tank"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36,
+          "unit": {
+            "ammo": 6,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "bcopter"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "blackbomb"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "bomber"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "fighter"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "stealth"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "tcopter"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "battleship"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37,
+          "unit": {
+            "ammo": 0,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "blackboat"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "carrier"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "crusier"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "lander"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 37,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "sub"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 152500,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

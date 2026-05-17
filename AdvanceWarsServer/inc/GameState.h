@@ -335,6 +335,7 @@ private:
 	void ApplyVonBoltExMachina();
 	void ApplySashaMarketCrash(Player& currentPlayer) noexcept;
 	void AddSashaWarBondsFunds(Player& attackingPlayer, int damageValue) noexcept;
+	void RefreshEagleLightningStrikeUnits(const Player& player) noexcept;
 	bool FAtUnitCap() const noexcept;
 	bool FPlayerRouted(const Player& player) const noexcept;
 private:

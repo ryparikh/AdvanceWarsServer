@@ -1978,6 +1978,21 @@ void GameState::AddSashaWarBondsFunds(Player& attackingPlayer, int damageValue) 
 	}
 }
 
+void GameState::RefreshEagleLightningStrikeUnits(const Player& player) noexcept {
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			Unit* pUnit = pTile->TryGetUnit();
+			if (pUnit != nullptr &&
+				pUnit->m_owner == &player &&
+				!pUnit->IsFootsoldier()) {
+				pUnit->m_moved = false;
+			}
+		}
+	}
+}
+
 Result GameState::ResupplyPlayersUnits(const Player* player) {
 	auto tryResupplyUnit = [&](int xResupply, int yResupply) -> Result {
 		MapTile* pTile = nullptr;
@@ -2017,6 +2032,9 @@ Result GameState::DoSCOPowerAction() {
 		case CommandingOfficier::Type::Drake:
 			DamageUnits(GetEnemyPlayer(), 2, true);
 			SetTemporaryWeather(WeatherType::Rain);
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Eagle:
+			RefreshEagleLightningStrikeUnits(currentPlayer);
 			return Result::Succeeded;
 		case CommandingOfficier::Type::Hawke:
 			HealUnits(currentPlayer, 2);

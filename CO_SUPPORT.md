@@ -15,6 +15,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt COP/SCOP HP effects, including Drake fuel drain and Von Bolt next-turn stun.
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
+- Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
 - Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Jake COP/SCOP indirect range for vehicles, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
 ## Weather Notes
@@ -35,12 +36,19 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Colin, Hachi, and Kanbei cost modifiers currently apply to unit construction. Hachi's Merchant Union city deployment remains part of the broader production-effects follow-up.
 - Sasha's Market Crash applies to the single opposing player in this simulator's two-player model.
 
+## Action-State Notes
+
+- Eagle's Lightning Drive COP only activates the COP stat chart; it does not clear moved flags.
+- Eagle's Lightning Strike SCOP clears `"moved"` for the current player's map-present non-footsoldier units, including vehicles, air units, sea units, transports, Black Boats, and newly built non-footsoldier units.
+- Infantry and Mechs are footsoldiers, so their capture progress and spent action state are preserved through Lightning Strike.
+- Loaded units are not refreshed while they are cargo because they are not map occupants. If a transport unloads after Lightning Strike, the unloaded unit still becomes `"moved": true` under the simulator's existing unload rule.
+- Lightning Strike is not a `BeginTurn`: it does not grant income, property repairs, property resupply, APC resupply, fuel-day processing, or capture-point changes. Black Boat repair is a normal action, so a Black Boat that repaired before Lightning Strike can repair again after being refreshed.
+
 ## Tracked Follow-Up Issues
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
 - [#23](https://github.com/ryparikh/AdvanceWarsServer/issues/23): CO production effects.
-- [#24](https://github.com/ryparikh/AdvanceWarsServer/issues/24): Eagle extra-action CO power behavior.
 - [#25](https://github.com/ryparikh/AdvanceWarsServer/issues/25): fog, vision, hiding, and terrain-defense CO effects.
 - [#26](https://github.com/ryparikh/AdvanceWarsServer/issues/26): remaining indirect-range CO effects.
 - [#27](https://github.com/ryparikh/AdvanceWarsServer/issues/27): capture-specific CO power behavior.

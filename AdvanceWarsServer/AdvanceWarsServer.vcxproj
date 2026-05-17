@@ -218,6 +218,12 @@
     <None Include="test\json\com-tower\attack-bonus-two-owned-towers.json" />
     <None Include="test\json\com-tower\begin-turn-no-income.json" />
     <None Include="test\json\com-tower\capture-progress-and-transfer.json" />
+    <None Include="test\json\lab\begin-turn-no-income.json" />
+    <None Include="test\json\lab\capture-interrupted-resets.json" />
+    <None Include="test\json\lab\capture-progress-and-transfer.json" />
+    <None Include="test\json\lab\multiple-enemy-labs-capturing-all-wins.json" />
+    <None Include="test\json\lab\multiple-enemy-labs-capturing-one-does-not-win.json" />
+    <None Include="test\json\lab\victory-player1.json" />
     <None Include="test\json\combat\infantry\forest\city\infantry-infantry.json" />
     <None Include="test\json\combat\infantry\infantryCity0-infantryCity0.json" />
     <None Include="test\json\combat\infantry\infantryMountain0-infantryMountain0.json" />

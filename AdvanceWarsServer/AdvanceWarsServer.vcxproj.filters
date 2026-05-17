@@ -295,6 +295,12 @@
     <None Include="test\json\com-tower\attack-bonus-two-owned-towers.json" />
     <None Include="test\json\com-tower\begin-turn-no-income.json" />
     <None Include="test\json\com-tower\capture-progress-and-transfer.json" />
+    <None Include="test\json\lab\begin-turn-no-income.json" />
+    <None Include="test\json\lab\capture-interrupted-resets.json" />
+    <None Include="test\json\lab\capture-progress-and-transfer.json" />
+    <None Include="test\json\lab\multiple-enemy-labs-capturing-all-wins.json" />
+    <None Include="test\json\lab\multiple-enemy-labs-capturing-one-does-not-win.json" />
+    <None Include="test\json\lab\victory-player1.json" />
     <None Include="test\json\joining\full-health-join-hurt.json" />
     <None Include="test\json\joining\hurt-join-full-health-fail.json" />
     <None Include="test\json\joining\basic-supply.json" />

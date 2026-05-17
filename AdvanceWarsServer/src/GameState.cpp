@@ -44,6 +44,16 @@ GameState::WeatherType WeatherTypeFromString(const std::string& weather) {
 	throw std::invalid_argument("Unknown weather: " + weather);
 }
 
+bool FProducesIncome(Terrain::Type terrainType) noexcept {
+	return MapTile::IsProperty(terrainType) &&
+		terrainType != Terrain::Type::ComTower &&
+		terrainType != Terrain::Type::Lab;
+}
+
+bool FKindleUrbanTerrain(Terrain::Type terrainType) noexcept {
+	return MapTile::IsProperty(terrainType);
+}
+
 int ManhattanDistance(int x1, int y1, int x2, int y2) noexcept {
 	return std::abs(x1 - x2) + std::abs(y1 - y2);
 }
@@ -135,8 +145,8 @@ Result GameState::BeginTurn() noexcept {
 			const MapTile* pTile = nullptr;
 			m_spmap->TryGetTile(x, y, &pTile);
 			const Terrain& terrain = pTile->GetTerrain();
-			if (MapTile::IsProperty(terrain.m_type) && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player]) {
-				newFunds += 1000;
+			if (FProducesIncome(terrain.m_type) && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player]) {
+				newFunds += GetCOIncomeForProperty(m_arrPlayers[player], terrain.m_type);
 			}
 		}
 	}
@@ -819,7 +829,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 		case Terrain::Type::Airport:
 			for (auto unit : vrgUnits) {
 				int funds = GetCurrentPlayer().m_funds;
-				if (unit.m_movementType == MovementTypes::Air && Unit::GetUnitCost(unit.m_type) * 10 <= funds) {
+				if (unit.m_movementType == MovementTypes::Air && GetCOBuildCost(GetCurrentPlayer(), unit.m_type) <= funds) {
 					vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
 				}
 			}
@@ -832,7 +842,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 					unit.m_movementType == MovementTypes::Pipe ||
 					unit.m_movementType == MovementTypes::Tires ||
 					unit.m_movementType == MovementTypes::Treads) &&
-					Unit::GetUnitCost(unit.m_type) * 10 <= funds) {
+					GetCOBuildCost(GetCurrentPlayer(), unit.m_type) <= funds) {
 					// TODO: How to win if players both build pipe runners
 					if (unit.m_type != UnitProperties::Type::Piperunner) {
 						vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
@@ -843,7 +853,7 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 		case Terrain::Type::Port:
 			for (auto unit : vrgUnits) {
 				int funds = GetCurrentPlayer().m_funds;
-				if ((unit.m_movementType == MovementTypes::Sea || unit.m_movementType == MovementTypes::Lander) && Unit::GetUnitCost(unit.m_type) * 10 <= funds) {
+				if ((unit.m_movementType == MovementTypes::Sea || unit.m_movementType == MovementTypes::Lander) && GetCOBuildCost(GetCurrentPlayer(), unit.m_type) <= funds) {
 					vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
 				}
 			}
@@ -1220,15 +1230,16 @@ Result GameState::DoBuyAction(int x, int y, const Action& action) {
 		return Result::Failed;
 	}
 
-	int cost = Unit::GetUnitCost(unitType) * 10;
+	int cost = GetCOBuildCost(*currentPlayer, unitType);
 	if (currentPlayer->m_funds >= cost) {
 		currentPlayer->m_funds -= cost;
 		IfFailedReturn(ptile->TryAddUnit(unitType, currentPlayer));
 		Unit* punit = ptile->TryGetUnit();
 		punit->m_moved = true;
+		return Result::Succeeded;
 	}
 
-	return Result::Succeeded;
+	return Result::Failed;
 }
 
 Result GameState::DoAttackAction(int x, int y, const Action& action) {
@@ -1297,6 +1308,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		if (pattackingplayer->PowerStatus() == 0) {
 			pattackingplayer->m_powerMeter.AddCharge(0.5 * defenderUnitCost);
 		}
+		AddSashaWarBondsFunds(*pattackingplayer, defenderUnitCost);
 
 		if (pdefendingplayer->PowerStatus() == 0) {
 			pdefendingplayer->m_powerMeter.AddCharge(defenderUnitCost);
@@ -1333,6 +1345,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		if (pdefendingplayer->PowerStatus() == 0) {
 			pdefendingplayer->m_powerMeter.AddCharge(0.5 * attackerUnitCost);
 		}
+		AddSashaWarBondsFunds(*pdefendingplayer, attackerUnitCost);
 		if (pattackingplayer->PowerStatus() == 0) {
 			pattackingplayer->m_powerMeter.AddCharge(attackerUnitCost);
 		}
@@ -1444,6 +1457,7 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 	int attackValue = rgCharts[static_cast<int>(attackerCO)][pattackingplayer->PowerStatus()][static_cast<int>(attacker.m_properties.m_type)].first + 10 * nComTowers;
 	int defenceValue = rgCharts[static_cast<int>(defenderCO)][pdefendingplayer->PowerStatus()][static_cast<int>(defender.m_properties.m_type)].second;
 
+	attackValue += GetCOFundsAttackModifier(*pattackingplayer, attackerCO);
 	attackValue += GetCOTerrainModifier(*pattackingplayer, attackerCO, attackerTerrain.m_type);
 	if (defender.IsAirUnit()) {
 		defenderTerrainStars = 0;
@@ -1504,10 +1518,82 @@ int GameState::GetCOTerrainModifier(const Player& player, const CommandingOffici
 		}
 		
 		return 10;
+	case CommandingOfficier::Type::Kindle:
+		if (!FKindleUrbanTerrain(terrainType)) {
+			break;
+		}
+
+		if (player.m_powerStatus == 1) {
+			return 80;
+		}
+		else if (player.m_powerStatus == 2) {
+			return 130;
+		}
+
+		return 40;
 	default:
 		break;
 	}
 	return 0;
+}
+
+int GameState::GetCOBuildCost(const Player& player, UnitProperties::Type unitType) const noexcept {
+	int cost = Unit::GetUnitCost(unitType) * 10;
+	switch (player.m_co.m_type) {
+	case CommandingOfficier::Type::Colin:
+		return cost * 80 / 100;
+	case CommandingOfficier::Type::Hachi:
+		if (player.PowerStatus() != 0) {
+			return cost * 50 / 100;
+		}
+		return cost * 90 / 100;
+	case CommandingOfficier::Type::Kanbei:
+		return cost * 120 / 100;
+	default:
+		return cost;
+	}
+}
+
+int GameState::GetCOIncomeForProperty(const Player& player, Terrain::Type) const noexcept {
+	if (player.m_co.m_type == CommandingOfficier::Type::Sasha) {
+		return 1100;
+	}
+
+	return 1000;
+}
+
+int GameState::GetCOFundsAttackModifier(const Player& player, const CommandingOfficier::Type& co) const noexcept {
+	switch (co) {
+	case CommandingOfficier::Type::Colin:
+		if (player.PowerStatus() == 2) {
+			return (player.m_funds / 1000) * 3;
+		}
+		break;
+	case CommandingOfficier::Type::Kindle:
+		if (player.PowerStatus() == 2) {
+			return CountOwnedProperties(player) * 3;
+		}
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+int GameState::CountOwnedProperties(const Player& player) const noexcept {
+	int properties = 0;
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			const MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			if (MapTile::IsProperty(pTile->GetTerrain().m_type) && pTile->m_spPropertyInfo->m_owner == &player) {
+				++properties;
+			}
+		}
+	}
+
+	return properties;
 }
 
 int GameState::RollCombatLuck(int min, int max) {
@@ -1854,6 +1940,9 @@ Result GameState::DoCOPowerAction() {
 		case CommandingOfficier::Type::Andy:
 			HealUnits(currentPlayer, 2);
 			return Result::Succeeded;
+		case CommandingOfficier::Type::Colin:
+			currentPlayer.m_funds += currentPlayer.m_funds / 2;
+			return Result::Succeeded;
 		case CommandingOfficier::Type::Drake:
 			DamageUnits(GetEnemyPlayer(), 1, true);
 			return Result::Succeeded;
@@ -1867,11 +1956,26 @@ Result GameState::DoCOPowerAction() {
 		case CommandingOfficier::Type::Olaf:
 			SetTemporaryWeather(WeatherType::Snow);
 			return Result::Succeeded;
+		case CommandingOfficier::Type::Sasha:
+			ApplySashaMarketCrash(currentPlayer);
+			return Result::Succeeded;
 		case CommandingOfficier::Type::Sturm:
 			ApplySturmMeteor(4);
 			return Result::Succeeded;
 	}
 	return Result::Succeeded;
+}
+
+void GameState::ApplySashaMarketCrash(Player& currentPlayer) noexcept {
+	Player& enemyPlayer = GetEnemyPlayer();
+	const int reduction = enemyPlayer.m_powerMeter.GetTotalCharge() * currentPlayer.m_funds / 50000;
+	enemyPlayer.m_powerMeter.ReduceCharge(reduction);
+}
+
+void GameState::AddSashaWarBondsFunds(Player& attackingPlayer, int damageValue) noexcept {
+	if (attackingPlayer.m_co.m_type == CommandingOfficier::Type::Sasha && attackingPlayer.PowerStatus() == 2) {
+		attackingPlayer.m_funds += damageValue / 2;
+	}
 }
 
 Result GameState::ResupplyPlayersUnits(const Player* player) {

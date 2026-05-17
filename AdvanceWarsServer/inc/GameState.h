@@ -318,6 +318,7 @@ private:
 	int GetCOFundsAttackModifier(const Player& player, const CommandingOfficier::Type& co) const noexcept;
 	int GetCOCaptureProgress(const Player& player, const Unit& unit) const noexcept;
 	int CountOwnedProperties(const Player& player) const noexcept;
+	bool FCanProduceUnitFromTerrain(const Player& player, Terrain::Type terrainType, UnitProperties::Type unitType) const noexcept;
 
 	int GetMaxGoodLuck(const Player& player) noexcept;
 	int GetMaxBadLuck(const Player& player) noexcept;
@@ -337,6 +338,7 @@ private:
 	void ApplySashaMarketCrash(Player& currentPlayer) noexcept;
 	void AddSashaWarBondsFunds(Player& attackingPlayer, int damageValue) noexcept;
 	void RefreshEagleLightningStrikeUnits(const Player& player) noexcept;
+	void SpawnSenseiCityUnits(const Player& player, UnitProperties::Type unitType) noexcept;
 	bool FAtUnitCap() const noexcept;
 	bool FPlayerRouted(const Player& player) const noexcept;
 private:

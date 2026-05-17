@@ -14,6 +14,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Active weather JSON parsing/serialization, weather movement/fuel costs, and Drake/Olaf weather-changing powers.
 - Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt COP/SCOP HP effects, including Drake fuel drain and Von Bolt next-turn stun.
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
+- Implemented production effects: Hachi's Merchant Union allows standard ground-unit deployment from owned empty cities, and Sensei's Copter Command/Airborne Assault spawn 9 HP unwaited Infantry/Mechs on owned empty cities in top-row, left-to-right order until the unit cap is reached.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
@@ -34,7 +35,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 ## Economy Notes
 
-- Colin, Hachi, and Kanbei cost modifiers currently apply to unit construction. Hachi's Merchant Union city deployment remains part of the broader production-effects follow-up.
+- Colin, Hachi, and Kanbei cost modifiers apply to unit construction. Hachi's Merchant Union uses the simulator's existing standard ground-production list for city deployment, so Piperunners remain excluded just as they are from base production.
 - Sasha's Market Crash applies to the single opposing player in this simulator's two-player model.
 
 ## Action-State Notes
@@ -55,6 +56,5 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#23](https://github.com/ryparikh/AdvanceWarsServer/issues/23): CO production effects.
 - [#25](https://github.com/ryparikh/AdvanceWarsServer/issues/25): fog, vision, hiding, and terrain-defense CO effects.
 - [#26](https://github.com/ryparikh/AdvanceWarsServer/issues/26): remaining indirect-range CO effects.

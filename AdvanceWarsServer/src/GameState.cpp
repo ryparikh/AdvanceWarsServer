@@ -62,6 +62,11 @@ bool TopLeftComesFirst(int x, int y, int otherX, int otherY) noexcept {
 	return y < otherY || (y == otherY && x < otherX);
 }
 
+bool FStandardGroundProductionUnit(UnitProperties::Type unitType) noexcept {
+	return UnitProperties::IsGroundUnit(unitType) &&
+		unitType != UnitProperties::Type::Piperunner;
+}
+
 int DamageValueForRachelMissile(const Unit& unit) noexcept {
 	if (unit.health < 10) {
 		return 1;
@@ -825,39 +830,12 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 			return Result::Succeeded;
 		}
 
-		switch (terrain.m_type) {
-		case Terrain::Type::Airport:
-			for (auto unit : vrgUnits) {
-				int funds = GetCurrentPlayer().m_funds;
-				if (unit.m_movementType == MovementTypes::Air && GetCOBuildCost(GetCurrentPlayer(), unit.m_type) <= funds) {
-					vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
-				}
+		for (auto unit : vrgUnits) {
+			int funds = GetCurrentPlayer().m_funds;
+			if (FCanProduceUnitFromTerrain(GetCurrentPlayer(), terrain.m_type, unit.m_type) &&
+				GetCOBuildCost(GetCurrentPlayer(), unit.m_type) <= funds) {
+				vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
 			}
-			break;
-		case Terrain::Type::Base:
-			for (auto unit : vrgUnits) {
-				int funds = GetCurrentPlayer().m_funds;
-				if ((unit.m_movementType == MovementTypes::Boots ||
-					unit.m_movementType == MovementTypes::Foot ||
-					unit.m_movementType == MovementTypes::Pipe ||
-					unit.m_movementType == MovementTypes::Tires ||
-					unit.m_movementType == MovementTypes::Treads) &&
-					GetCOBuildCost(GetCurrentPlayer(), unit.m_type) <= funds) {
-					// TODO: How to win if players both build pipe runners
-					if (unit.m_type != UnitProperties::Type::Piperunner) {
-						vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
-					}
-				}
-			}
-			break;
-		case Terrain::Type::Port:
-			for (auto unit : vrgUnits) {
-				int funds = GetCurrentPlayer().m_funds;
-				if ((unit.m_movementType == MovementTypes::Sea || unit.m_movementType == MovementTypes::Lander) && GetCOBuildCost(GetCurrentPlayer(), unit.m_type) <= funds) {
-					vecActions.emplace_back(Action::Type::Buy, x, y, unit.m_type);
-				}
-			}
-			break;
 		}
 	}
 
@@ -1237,9 +1215,7 @@ Result GameState::DoBuyAction(int x, int y, const Action& action) {
 
 	UnitProperties::Type unitType = action.m_optUnitType.value();
 
-	if ((ptile->GetTerrain().m_type == Terrain::Type::Airport && !UnitProperties::IsAirUnit(unitType)) ||
-		(ptile->GetTerrain().m_type == Terrain::Type::Base && !UnitProperties::IsGroundUnit(unitType)) ||
-		(ptile->GetTerrain().m_type == Terrain::Type::Port && !UnitProperties::IsSeaUnit(unitType))) {
+	if (!FCanProduceUnitFromTerrain(*currentPlayer, ptile->GetTerrain().m_type, unitType)) {
 		return Result::Failed;
 	}
 
@@ -1568,6 +1544,23 @@ int GameState::GetCOBuildCost(const Player& player, UnitProperties::Type unitTyp
 		return cost * 120 / 100;
 	default:
 		return cost;
+	}
+}
+
+bool GameState::FCanProduceUnitFromTerrain(const Player& player, Terrain::Type terrainType, UnitProperties::Type unitType) const noexcept {
+	switch (terrainType) {
+	case Terrain::Type::Airport:
+		return UnitProperties::IsAirUnit(unitType);
+	case Terrain::Type::Base:
+		return FStandardGroundProductionUnit(unitType);
+	case Terrain::Type::City:
+		return player.m_co.m_type == CommandingOfficier::Type::Hachi &&
+			player.PowerStatus() == 2 &&
+			FStandardGroundProductionUnit(unitType);
+	case Terrain::Type::Port:
+		return UnitProperties::IsSeaUnit(unitType);
+	default:
+		return false;
 	}
 }
 
@@ -1976,6 +1969,9 @@ Result GameState::DoCOPowerAction() {
 		case CommandingOfficier::Type::Sasha:
 			ApplySashaMarketCrash(currentPlayer);
 			return Result::Succeeded;
+		case CommandingOfficier::Type::Sensei:
+			SpawnSenseiCityUnits(currentPlayer, UnitProperties::Type::Infantry);
+			return Result::Succeeded;
 		case CommandingOfficier::Type::Sturm:
 			ApplySturmMeteor(4);
 			return Result::Succeeded;
@@ -2004,6 +2000,31 @@ void GameState::RefreshEagleLightningStrikeUnits(const Player& player) noexcept 
 			if (pUnit != nullptr &&
 				pUnit->m_owner == &player &&
 				!pUnit->IsFootsoldier()) {
+				pUnit->m_moved = false;
+			}
+		}
+	}
+}
+
+void GameState::SpawnSenseiCityUnits(const Player& player, UnitProperties::Type unitType) noexcept {
+	for (int y = 0; y < m_spmap->GetRows(); ++y) {
+		for (int x = 0; x < m_spmap->GetCols(); ++x) {
+			if (FAtUnitCap()) {
+				return;
+			}
+
+			MapTile* pTile = nullptr;
+			if (m_spmap->TryGetTile(x, y, &pTile) != Result::Succeeded ||
+				pTile->GetTerrain().m_type != Terrain::Type::City ||
+				pTile->m_spPropertyInfo == nullptr ||
+				pTile->m_spPropertyInfo->m_owner != &player ||
+				pTile->TryGetUnit() != nullptr) {
+				continue;
+			}
+
+			if (pTile->TryAddUnit(unitType, &player) == Result::Succeeded) {
+				Unit* pUnit = pTile->TryGetUnit();
+				pUnit->health = 90;
 				pUnit->m_moved = false;
 			}
 		}
@@ -2066,6 +2087,9 @@ Result GameState::DoSCOPowerAction() {
 			return Result::Succeeded;
 		case CommandingOfficier::Type::Rachel:
 			ApplyRachelCoveringFire();
+			return Result::Succeeded;
+		case CommandingOfficier::Type::Sensei:
+			SpawnSenseiCityUnits(currentPlayer, UnitProperties::Type::Mech);
 			return Result::Succeeded;
 		case CommandingOfficier::Type::Sturm:
 			ApplySturmMeteor(8);

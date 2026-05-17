@@ -1,0 +1,75 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "hachi-merchant-union-city-deployment-unit-cap",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 34
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Hachi",
+        "funds": 10000,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 2,
+          "star-value": 10800
+        },
+        "power-status": 2,
+        "luck-policy": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 1,
+    "winner": -1
+  },
+  "failedActions": [
+    {
+      "type": "buy",
+      "source": [ 0, 0 ],
+      "unit": "tank"
+    }
+  ],
+  "validActions": [
+    {
+      "source": [ 0, 0 ],
+      "expected": []
+    }
+  ]
+}

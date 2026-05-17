@@ -16,6 +16,7 @@ public:
 
 	void UseCop() noexcept;
 	void UseScop() noexcept;
+	void ReduceCharge(int charge) noexcept;
 	inline int GetCharge() const noexcept {
 		return m_nCharge;
 	}

@@ -1,5 +1,6 @@
 #include "Player.h"
 
+#include <algorithm>
 #include <stdexcept>
 
 PowerMeter::PowerMeter(const CommandingOfficier::Type& type) {
@@ -84,6 +85,10 @@ PowerMeter::PowerMeter(const CommandingOfficier::Type& type) {
 
 void PowerMeter::AddCharge(int charge) noexcept {
 	m_nCharge = std::min(charge + m_nCharge, GetTotalCharge());
+}
+
+void PowerMeter::ReduceCharge(int charge) noexcept {
+	m_nCharge = std::max(m_nCharge - charge, 0);
 }
 
 void PowerMeter::UseScop() noexcept {

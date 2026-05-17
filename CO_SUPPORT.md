@@ -13,6 +13,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Jess SCOP resupply.
 - Active weather JSON parsing/serialization, weather movement/fuel costs, and Drake/Olaf weather-changing powers.
 - Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt COP/SCOP HP effects, including Drake fuel drain and Von Bolt next-turn stun.
+- Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
 - Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Jake COP/SCOP indirect range for vehicles, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
@@ -29,11 +30,15 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Rachel, Sturm, and Von Bolt missile-style powers use a 2-range diamond area. Target scoring follows the AWBW wiki criteria using the simulator's two-player friendly/enemy model, unit HP, unit cost, and property capture state. Loaded units are excluded because they are not represented as map occupants.
 - Rachel's three Covering Fire target centers are selected before damage is applied, then each missile applies damage. Von Bolt's stun is represented internally until the affected player's next `BeginTurn`, where stunned units remain `"moved": true` for that turn.
 
+## Economy Notes
+
+- Colin, Hachi, and Kanbei cost modifiers currently apply to unit construction. Hachi's Merchant Union city deployment remains part of the broader production-effects follow-up.
+- Sasha's Market Crash applies to the single opposing player in this simulator's two-player model.
+
 ## Tracked Follow-Up Issues
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#22](https://github.com/ryparikh/AdvanceWarsServer/issues/22): CO economy and unit-cost effects.
 - [#23](https://github.com/ryparikh/AdvanceWarsServer/issues/23): CO production effects.
 - [#24](https://github.com/ryparikh/AdvanceWarsServer/issues/24): Eagle extra-action CO power behavior.
 - [#25](https://github.com/ryparikh/AdvanceWarsServer/issues/25): fog, vision, hiding, and terrain-defense CO effects.

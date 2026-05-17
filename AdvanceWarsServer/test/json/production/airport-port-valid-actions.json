@@ -11,6 +11,13 @@
             "capture-points": 20,
             "owner": "orange-star"
           },
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
           "terrain": 36
         },
         {
@@ -121,32 +128,62 @@
         {
           "type": "buy",
           "source": [ 0, 0 ],
-          "unit": "bcopter"
+          "unit": "anti-air"
         },
         {
           "type": "buy",
           "source": [ 0, 0 ],
-          "unit": "blackbomb"
+          "unit": "apc"
         },
         {
           "type": "buy",
           "source": [ 0, 0 ],
-          "unit": "bomber"
+          "unit": "artillery"
         },
         {
           "type": "buy",
           "source": [ 0, 0 ],
-          "unit": "fighter"
+          "unit": "infantry"
         },
         {
           "type": "buy",
           "source": [ 0, 0 ],
-          "unit": "stealth"
+          "unit": "medium-tank"
         },
         {
           "type": "buy",
           "source": [ 0, 0 ],
-          "unit": "tcopter"
+          "unit": "mech"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "megatank"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "missile"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "neotank"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "recon"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "rocket"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "tank"
         }
       ]
     },
@@ -156,38 +193,69 @@
         {
           "type": "buy",
           "source": [ 1, 0 ],
-          "unit": "battleship"
+          "unit": "bcopter"
         },
         {
           "type": "buy",
           "source": [ 1, 0 ],
-          "unit": "blackboat"
+          "unit": "blackbomb"
         },
         {
           "type": "buy",
           "source": [ 1, 0 ],
-          "unit": "carrier"
+          "unit": "bomber"
         },
         {
           "type": "buy",
           "source": [ 1, 0 ],
-          "unit": "crusier"
+          "unit": "fighter"
         },
         {
           "type": "buy",
           "source": [ 1, 0 ],
-          "unit": "lander"
+          "unit": "stealth"
         },
         {
           "type": "buy",
           "source": [ 1, 0 ],
-          "unit": "sub"
+          "unit": "tcopter"
         }
       ]
     },
     {
       "source": [ 2, 0 ],
-      "expected": []
+      "expected": [
+        {
+          "type": "buy",
+          "source": [ 2, 0 ],
+          "unit": "battleship"
+        },
+        {
+          "type": "buy",
+          "source": [ 2, 0 ],
+          "unit": "blackboat"
+        },
+        {
+          "type": "buy",
+          "source": [ 2, 0 ],
+          "unit": "carrier"
+        },
+        {
+          "type": "buy",
+          "source": [ 2, 0 ],
+          "unit": "crusier"
+        },
+        {
+          "type": "buy",
+          "source": [ 2, 0 ],
+          "unit": "lander"
+        },
+        {
+          "type": "buy",
+          "source": [ 2, 0 ],
+          "unit": "sub"
+        }
+      ]
     },
     {
       "source": [ 3, 0 ],
@@ -207,17 +275,16 @@
     },
     {
       "source": [ 7, 0 ],
+      "expected": []
+    },
+    {
+      "source": [ 8, 0 ],
       "expected": []
     }
   ],
   "failedActions": [
     {
       "type": "buy",
-      "source": [ 2, 0 ],
-      "unit": "bcopter"
-    },
-    {
-      "type": "buy",
       "source": [ 3, 0 ],
       "unit": "bcopter"
     },
@@ -229,7 +296,7 @@
     {
       "type": "buy",
       "source": [ 5, 0 ],
-      "unit": "battleship"
+      "unit": "bcopter"
     },
     {
       "type": "buy",
@@ -243,12 +310,17 @@
     },
     {
       "type": "buy",
-      "source": [ 0, 0 ],
-      "unit": "lander"
+      "source": [ 8, 0 ],
+      "unit": "battleship"
     },
     {
       "type": "buy",
       "source": [ 1, 0 ],
+      "unit": "lander"
+    },
+    {
+      "type": "buy",
+      "source": [ 2, 0 ],
       "unit": "bcopter"
     }
   ]

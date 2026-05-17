@@ -1,0 +1,39 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "lander-boundaries",
+    "map": [
+      [
+        { "terrain": 28 },
+        { "terrain": 28, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "loaded-units": [{ "ammo": 9, "fuel": 70, "health": 100, "hidden": false, "moved": true, "owner": "orange-star", "type": "tank" }], "moved": false, "owner": "orange-star", "type": "lander" } }
+      ],
+      [
+        { "terrain": 28, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "lander" } },
+        { "terrain": 15 }
+      ],
+      [
+        { "terrain": 28, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "lander" } },
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 70, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "tank" } }
+      ],
+      [
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 70, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "tank" } },
+        { "terrain": 29, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "loaded-units": [{ "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": true, "owner": "orange-star", "type": "infantry" }, { "ammo": 3, "fuel": 70, "health": 100, "hidden": false, "moved": true, "owner": "orange-star", "type": "mech" }], "moved": false, "owner": "orange-star", "type": "lander" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "failedActions": [
+    { "type": "unload", "source": [1, 0], "direction": "west" },
+    { "type": "move-wait", "source": [0, 1], "target": [1, 1] },
+    { "type": "move-attack", "source": [0, 2], "target": [0, 2], "direction": "east" },
+    { "type": "move-load", "source": [0, 3], "target": [1, 3] }
+  ]
+}

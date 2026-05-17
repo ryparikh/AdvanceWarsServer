@@ -1,0 +1,173 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "sturm-cop-meteor-targeting-penalizes-friendly-units-in-area",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 3,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15
+        },
+        {
+          "terrain": 15
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 6,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Sturm",
+        "funds": 0,
+        "power-meter": {
+          "charge": 45000,
+          "cop-stars": 5,
+          "scop-stars": 5,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "co-power"
+    }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "sturm-cop-meteor-targeting-penalizes-friendly-units-in-area",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 3,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15
+        },
+        {
+          "terrain": 15
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 6,
+            "fuel": 70,
+            "health": 60,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "tank"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Sturm",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 5,
+          "scop-stars": 5,
+          "star-value": 10800
+        },
+        "power-status": 1,
+        "luck-policy": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

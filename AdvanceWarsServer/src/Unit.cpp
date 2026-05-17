@@ -435,11 +435,15 @@ void from_json(const std::array<Player, 2>& arrPlayers, json& j, Unit& unit) {
 
 	std::string armyType;
 	j.at("owner").get_to(armyType);
+	unit.m_owner = nullptr;
 	if (arrPlayers[0].m_armyType == Player::armyTypefromString(armyType)) {
 		unit.m_owner = &arrPlayers[0];
 	}
 	else if (arrPlayers[1].m_armyType == Player::armyTypefromString(armyType)) {
 		unit.m_owner = &arrPlayers[1];
+	}
+	if (unit.m_owner != nullptr) {
+		++unit.m_owner->m_unitsCached;
 	}
 
 	j.at("moved").get_to(unit.m_moved);

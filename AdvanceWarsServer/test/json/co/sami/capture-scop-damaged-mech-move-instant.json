@@ -1,0 +1,129 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "sami-capture-scop-damaged-mech-move-instant",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 40,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 34
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Sami",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 5,
+          "star-value": 10800
+        },
+        "power-status": 2,
+        "luck-policy": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "move-capture",
+      "source": [ 0, 0 ],
+      "target": [ 1, 0 ]
+    }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "sami-capture-scop-damaged-mech-move-instant",
+    "map": [
+      [
+        {
+          "terrain": 15
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 34,
+          "unit": {
+            "ammo": 0,
+            "fuel": 69,
+            "health": 40,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Sami",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 5,
+          "star-value": 10800
+        },
+        "power-status": 2,
+        "luck-policy": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 0
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

@@ -15,6 +15,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt COP/SCOP HP effects, including Drake fuel drain and Von Bolt next-turn stun.
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
+- Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
 - Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Jake COP/SCOP indirect range for vehicles, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
@@ -44,6 +45,12 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Loaded units are not refreshed while they are cargo because they are not map occupants. If a transport unloads after Lightning Strike, the unloaded unit still becomes `"moved": true` under the simulator's existing unload rule.
 - Lightning Strike is not a `BeginTurn`: it does not grant income, property repairs, property resupply, APC resupply, fuel-day processing, or capture-point changes. Black Boat repair is a normal action, so a Black Boat that repaired before Lightning Strike can repair again after being refreshed.
 
+## Capture Notes
+
+- Capture progress uses the simulator's displayed-HP calculation, where partial true-health values round up to the current displayed HP before applying capture modifiers.
+- Sami's Double Time keeps the same 150% rounded-down capture bonus as her day-to-day ability. Victory March completes captures immediately for Infantry and Mechs, including damaged footsoldiers.
+- Interrupted captures still reset to 20 capture points when the capturing unit leaves the property, and blocked captures remain unavailable while an enemy unit occupies the property.
+
 ## Tracked Follow-Up Issues
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
@@ -51,4 +58,3 @@ These AWBW mechanics are not implemented yet. They are tracked as GitHub issues 
 - [#23](https://github.com/ryparikh/AdvanceWarsServer/issues/23): CO production effects.
 - [#25](https://github.com/ryparikh/AdvanceWarsServer/issues/25): fog, vision, hiding, and terrain-defense CO effects.
 - [#26](https://github.com/ryparikh/AdvanceWarsServer/issues/26): remaining indirect-range CO effects.
-- [#27](https://github.com/ryparikh/AdvanceWarsServer/issues/27): capture-specific CO power behavior.

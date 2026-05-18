@@ -325,6 +325,7 @@ private:
 	int RollCombatLuck(int min, int max);
 	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 	int GetWeatherMovementCost(const Terrain& terrain, const Player& player, const Unit& unit) const noexcept;
+	int GetFuelCostPerDay(const Player& player, const Unit& unit) const noexcept;
 	void SetTemporaryWeather(WeatherType weather) noexcept;
 	void TickTemporaryWeather() noexcept;
 	void HealUnits(const Player& player, int health);

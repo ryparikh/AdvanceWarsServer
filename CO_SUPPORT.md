@@ -14,6 +14,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Active weather JSON parsing/serialization, weather movement/fuel costs, and Drake/Olaf weather-changing powers.
 - Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt COP/SCOP HP effects, including Drake fuel drain and Von Bolt next-turn stun.
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
+- Implemented Rachel day-to-day property repair: compatible owned properties repair up to 3 displayed HP instead of the normal 2, with funds charged for displayed HP actually restored.
 - Implemented production effects: Hachi's Merchant Union allows standard ground-unit deployment, including Piperunners, from owned empty cities; Sensei's Copter Command/Airborne Assault spawn 9 HP unwaited Infantry/Mechs on owned empty cities in top-row, left-to-right order until the unit cap is reached.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
 - Implemented fuel-upkeep modifiers: Eagle air units consume 2 less fuel per day.
@@ -49,6 +50,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 - Colin, Hachi, and Kanbei cost modifiers apply to unit construction. Hachi's Merchant Union uses the simulator's standard ground-production list for city deployment, matching the AWBW wiki's Piperunner note that Piperunners can be built at Bases or spawned from Cities during Hachi's SCOP.
 - Sasha's Market Crash applies to the single opposing player in this simulator's two-player model.
+- Rachel's extra property repair composes with the normal owner and unit-class gates: land units repair only on owned Cities/Bases/HQs, air units on owned Airports, and sea units on owned Ports. If Rachel cannot afford the full 3 displayed HP restore, she restores the affordable displayed HP and pays only for that repair.
 
 ## Action-State Notes
 
@@ -74,7 +76,6 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#72](https://github.com/ryparikh/AdvanceWarsServer/issues/72): Rachel property repair bonus.
 - [#81](https://github.com/ryparikh/AdvanceWarsServer/issues/81): CO star costs and power-meter charge math audit.
 - [#83](https://github.com/ryparikh/AdvanceWarsServer/issues/83): Jess Turbo Charge COP resupply side effect.
 - [#85](https://github.com/ryparikh/AdvanceWarsServer/issues/85): Sturm all-terrain movement rules.

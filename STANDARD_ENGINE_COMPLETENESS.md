@@ -115,7 +115,7 @@ The unit fixture manifest lives at `AdvanceWarsServer/test/json/units/README.md`
 | Core terrain movement | JSON fixtures cover many terrain, weather, air, land, and sea movement cases. | AWBW movement tables. | Partial where Piperunner/Sturm/Teleport remain | #35, #85, #93 |
 | Properties and income | Cities/Bases/Airports/Ports/HQ income behavior exists; Labs/Com Towers no-income fixtures exist. | AWBW fund-producing properties only. | Complete for normal income, configurable settings partial | #65 |
 | Property repair/resupply | Begin-turn property service is gated by owner, property type, and unit class; Labs and Com Towers do not repair or resupply. | Land on City/Base/HQ, air on Airport, sea on Port; owner only. | Complete for normal property service | none |
-| Rachel property repair | Normal property repair is not Rachel-aware. | Rachel repairs +1 extra displayed HP on compatible properties. | Partial | #72 |
+| Rachel property repair | Rachel repairs +1 extra displayed HP on compatible owned properties, with affordable partial repair and no off-class service. | Rachel repairs +1 extra displayed HP on compatible properties. | Complete | none |
 | APC/Cruiser/Carrier resupply | Dedicated transport and loaded-resupply fixtures exist. | AWBW logistics order and compatible cargo. | Complete for current Standard coverage | none |
 | Labs | Lab capture/no-income/lab-victory fixtures exist. | Labs can act as no-HQ loss condition and do not produce income. | Complete for two-player Standard model | #76 for lab-unit production setting |
 | Com Towers | Capture/no-income/attack-bonus fixtures exist. | +10 attack per owned tower, no income. | Complete for standard tower attack bonus | #87 for Javier tower defense |
@@ -134,7 +134,7 @@ Detailed implementation notes live in `CO_SUPPORT.md`.
 | Power costs and meter state | Star costs and charge exist. | Audit | #81 |
 | Checked-in attack/defense charts | Normal/COP/SCOP charts exist. | Audit with combat data | #80, #81 |
 | Mass HP, weather, economy, production, range, movement, capture, and many power effects | See `CO_SUPPORT.md`. | Partial but broad support exists | focused gaps below |
-| Rachel property repair | Missing. | Partial | #72 |
+| Rachel property repair | Compatible owned property service repairs Rachel units up to 3 displayed HP and respects off-class restrictions. | Complete | none |
 | Jess COP resupply | SCOP resupply exists; COP resupply missing. | Partial | #83 |
 | Eagle air fuel upkeep | Missing. | Partial | #84 |
 | Sturm all-terrain movement | Missing/incomplete. | Partial | #85 |
@@ -208,7 +208,6 @@ Actions, units, and data:
 
 Properties, economy, and COs:
 
-- #72: Implement Rachel property repair bonus.
 - #81: Verify CO star costs and power-meter charge math against AWBW.
 - #83: Implement Jess Turbo Charge COP resupply side effect.
 - #84: Implement Eagle air-unit fuel upkeep modifier.

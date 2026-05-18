@@ -65,6 +65,29 @@ bool FPropertyServicesUnit(Terrain::Type terrainType, UnitProperties::Type unitT
 	}
 }
 
+int CMaxPropertyRepairHp(const Player& player) noexcept {
+	return player.m_co.m_type == CommandingOfficier::Type::Rachel ? 30 : 20;
+}
+
+int CPropertyRepairFunds(UnitProperties::Type unitType, int repairAmount) noexcept {
+	return Unit::GetUnitCost(unitType) * (repairAmount / 10);
+}
+
+int CAffordablePropertyRepairHp(const Player& player, const Unit& unit) noexcept {
+	const int requestedRepairAmount = std::min(100 - unit.health, CMaxPropertyRepairHp(player));
+	const int requestedRepairFunds = CPropertyRepairFunds(unit.m_properties.m_type, requestedRepairAmount);
+	if (requestedRepairFunds <= player.m_funds) {
+		return requestedRepairAmount;
+	}
+
+	if (player.m_co.m_type != CommandingOfficier::Type::Rachel) {
+		return 0;
+	}
+
+	const int unitRepairCost = Unit::GetUnitCost(unit.m_properties.m_type);
+	return std::min(requestedRepairAmount, (player.m_funds / unitRepairCost) * 10);
+}
+
 bool FKindleUrbanTerrain(Terrain::Type terrainType) noexcept {
 	return MapTile::IsProperty(terrainType);
 }
@@ -204,10 +227,9 @@ Result GameState::BeginTurn() noexcept {
 					pServiceUnit->m_properties.m_fuel = GetUnitInfo(pServiceUnit->m_properties.m_type).m_fuel;
 					pServiceUnit->m_properties.m_ammo = GetUnitInfo(pServiceUnit->m_properties.m_type).m_ammo;
 					if (pServiceUnit->health < 100) {
-						int repairAmount = std::min(100 - pServiceUnit->health, 20);
-						int unitRepairFunds = Unit::GetUnitCost(pServiceUnit->m_properties.m_type) * (repairAmount/10);
-						if (unitRepairFunds <= m_arrPlayers[player].m_funds) {
-							m_arrPlayers[player].m_funds -= unitRepairFunds;
+						int repairAmount = CAffordablePropertyRepairHp(m_arrPlayers[player], *pServiceUnit);
+						if (repairAmount > 0) {
+							m_arrPlayers[player].m_funds -= CPropertyRepairFunds(pServiceUnit->m_properties.m_type, repairAmount);
 							pServiceUnit->health += repairAmount;
 						}
 					}

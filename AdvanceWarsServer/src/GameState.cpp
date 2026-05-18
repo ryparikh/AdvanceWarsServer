@@ -209,8 +209,7 @@ Result GameState::BeginTurn() noexcept {
 			if (pUnit != nullptr &&
 				pUnit->m_owner == &GetCurrentPlayer() &&
 				(pUnit->IsAirUnit() || pUnit->IsSeaUnit())) {
-				bool isHidden = pUnit->IsHidden();
-				pUnit->m_properties.m_fuel -= isHidden ? pUnit->m_properties.m_fuelCostPerDay.second : pUnit->m_properties.m_fuelCostPerDay.first;
+				pUnit->m_properties.m_fuel -= GetFuelCostPerDay(GetCurrentPlayer(), *pUnit);
 				if (pUnit->m_properties.m_fuel <= 0) {
 					m_spmap->TryDestroyUnit(x, y);
 					if (FPlayerRouted(GetCurrentPlayer())) {
@@ -514,6 +513,15 @@ int GameState::GetWeatherMovementCost(const Terrain& terrain, const Player& play
 	}
 
 	return baseCost;
+}
+
+int GameState::GetFuelCostPerDay(const Player& player, const Unit& unit) const noexcept {
+	int fuelCost = unit.IsHidden() ? unit.m_properties.m_fuelCostPerDay.second : unit.m_properties.m_fuelCostPerDay.first;
+	if (player.m_co.m_type == CommandingOfficier::Type::Eagle && unit.IsAirUnit()) {
+		fuelCost += 2;
+	}
+
+	return fuelCost;
 }
 
 void GameState::SetTemporaryWeather(WeatherType weather) noexcept {

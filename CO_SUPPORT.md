@@ -16,7 +16,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
 - Implemented production effects: Hachi's Merchant Union allows standard ground-unit deployment from owned empty cities, and Sensei's Copter Command/Airborne Assault spawn 9 HP unwaited Infantry/Mechs on owned empty cities in top-row, left-to-right order until the unit cap is reached.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
-- Implemented fuel-upkeep modifiers: Eagle air units consume 2 additional fuel per day.
+- Implemented fuel-upkeep modifiers: Eagle air units consume 2 less fuel per day.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
 - Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
@@ -53,9 +53,9 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 ## Fuel Upkeep Notes
 
-- Eagle air units consume 2 additional fuel per day on top of their normal visible or hidden air-unit upkeep. This applies to B-Copters, Black Bombs, Bombers, Fighters, Stealths, and T-Copters.
+- Eagle air units reduce daily upkeep by 2 fuel, to a minimum of 0. This applies to B-Copters, Black Bombs, Bombers, Fighters, Stealths, and T-Copters, including hidden Stealth upkeep.
 - Non-air units keep their normal daily fuel upkeep under Eagle, including sea units with base upkeep and ground units with no daily upkeep.
-- Begin-turn temporary power and weather expiration still runs before daily fuel upkeep; Eagle's air upkeep modifier remains a day-to-day CO effect after those statuses expire.
+- Begin-turn temporary power and weather expiration still runs before daily fuel upkeep; Eagle's reduced air upkeep remains a day-to-day CO effect after those statuses expire.
 
 ## Capture Notes
 

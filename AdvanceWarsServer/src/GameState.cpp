@@ -1445,6 +1445,9 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 	else if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysHighestValue) {
 		goodLuckRoll = goodLuckDistribution.max();
 	}
+	else if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysMiddleValue) {
+		goodLuckRoll = (goodLuckDistribution.min() + goodLuckDistribution.max()) / 2;
+	}
 	else {
 		goodLuckRoll = RollCombatLuck(goodLuckDistribution.min(), goodLuckDistribution.max());
 	}
@@ -1456,6 +1459,9 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 	}
 	else if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysHighestValue) {
 		badLuckRoll = badLuckDistribution.min();
+	}
+	else if (pattackingplayer->m_luckPolicy == LuckPolicy::AlwaysMiddleValue) {
+		badLuckRoll = (badLuckDistribution.min() + badLuckDistribution.max()) / 2;
 	}
 	else {
 		badLuckRoll = RollCombatLuck(badLuckDistribution.min(), badLuckDistribution.max());

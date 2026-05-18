@@ -95,6 +95,17 @@ Use `deterministic-replay` when an action sequence should serialize to the same 
 
 The runner applies the same action sequence twice and compares the full serialized trace.
 
+### Deterministic Luck Fixtures
+
+Player JSON supports `"luck-policy"` for combat fixtures:
+
+- `0`: normal combat luck, using `"combat-rng-seed"` when present.
+- `1`: force the lowest total luck outcome.
+- `2`: force the highest total luck outcome.
+- `3`: force the middle value of each luck range.
+
+For COs with bad luck, "lowest" means minimum good luck and maximum bad luck. "Highest" means maximum good luck and minimum bad luck.
+
 ### CO Contract Fixture
 
 Use `co-contract` to check CO parser round-trip, power-meter stars, and checked-in chart values.

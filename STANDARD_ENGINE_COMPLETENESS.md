@@ -142,7 +142,8 @@ Detailed implementation notes live in `CO_SUPPORT.md`.
 | Javier indirect and Comm Tower defense | Missing/incomplete. | Partial | #87 |
 | Kanbei Samurai Spirit counterattack | Missing/incomplete. | Partial | #88 |
 | Sonja counterattack and hidden HP API view | Missing/incomplete. | Partial | #89 |
-| Luck CO deterministic fixtures | Luck bounds exist; exact deterministic fixtures split per CO. | Partial | #99, #100, #101, #102, #103 |
+| Sonja luck deterministic fixtures | D2D/COP/SCOP low, high, and middle combat fixtures cover luck separately from visibility and counterattack effects. | Complete | #103 |
+| Other luck CO deterministic fixtures | Luck bounds exist; exact deterministic fixtures split per CO. | Partial | #99, #100, #101, #102 |
 | Fog/vision-only CO effects | Not needed for Standard fog-off target. | Deferred | #90 |
 
 ## Weather And Fog
@@ -220,7 +221,6 @@ Properties, economy, and COs:
 - #100: Implement and test Rachel luck combat modifiers.
 - #101: Implement and test Flak luck combat modifiers.
 - #102: Implement and test Jugger luck combat modifiers.
-- #103: Implement and test Sonja luck combat modifiers.
 
 Deferred modes and map features:
 

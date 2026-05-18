@@ -21,6 +21,13 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
 - Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
+## Luck Notes
+
+- JSON combat fixtures can force deterministic luck with `"luck-policy"`: `0` uses normal RNG or `"combat-rng-seed"`, `1` forces the lowest total luck outcome, `2` forces the highest total luck outcome, and `3` forces the middle value of each luck range.
+- For bad-luck COs, the lowest total outcome uses minimum good luck and maximum bad luck; the highest total outcome uses maximum good luck and minimum bad luck.
+- Sonja's AWBW combat luck is covered separately from her information and counterattack effects: she keeps +0..+9 good luck and 0..9 bad luck in day-to-day, Enhanced Vision, and Counter Break, while COP/SCOP still use the universal AWBW +10 attack/+10 defense chart bonus.
+- Sonja's hidden HP, fog vision, day-to-day counterattack multiplier, and Counter Break first-strike edge cases remain tracked by [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89) and [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90), rather than by the combat-luck fixtures.
+
 ## Weather Notes
 
 - Weather JSON uses `"weather": "rain"` or `"weather": "snow"`. CO-created weather also writes `"weather-turns-remaining"` and expires on a later `BeginTurn`.
@@ -76,4 +83,4 @@ These AWBW mechanics are not implemented yet. They are tracked as GitHub issues 
 - [#88](https://github.com/ryparikh/AdvanceWarsServer/issues/88): Kanbei Samurai Spirit counterattack bonus.
 - [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89): Sonja counterattack bonus and hidden-HP API redaction.
 - [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90): fog, vision, hiding visibility, and fog-only CO effects.
-- [#99](https://github.com/ryparikh/AdvanceWarsServer/issues/99), [#100](https://github.com/ryparikh/AdvanceWarsServer/issues/100), [#101](https://github.com/ryparikh/AdvanceWarsServer/issues/101), [#102](https://github.com/ryparikh/AdvanceWarsServer/issues/102), and [#103](https://github.com/ryparikh/AdvanceWarsServer/issues/103): deterministic luck CO combat fixtures for Nell, Rachel, Flak, Jugger, and Sonja.
+- [#99](https://github.com/ryparikh/AdvanceWarsServer/issues/99), [#100](https://github.com/ryparikh/AdvanceWarsServer/issues/100), [#101](https://github.com/ryparikh/AdvanceWarsServer/issues/101), and [#102](https://github.com/ryparikh/AdvanceWarsServer/issues/102): deterministic luck CO combat fixtures for Nell, Rachel, Flak, and Jugger.

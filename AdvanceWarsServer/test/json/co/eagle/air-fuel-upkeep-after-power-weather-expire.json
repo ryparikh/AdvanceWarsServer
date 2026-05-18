@@ -82,7 +82,7 @@
           "terrain": 15,
           "unit": {
             "ammo": 9,
-            "fuel": 3,
+            "fuel": 7,
             "health": 100,
             "hidden": false,
             "moved": false,

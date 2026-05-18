@@ -128,7 +128,7 @@
           "terrain": 15,
           "unit": {
             "ammo": 6,
-            "fuel": 5,
+            "fuel": 9,
             "health": 100,
             "hidden": false,
             "moved": false,
@@ -140,7 +140,7 @@
           "terrain": 15,
           "unit": {
             "ammo": 9,
-            "fuel": 2,
+            "fuel": 6,
             "health": 100,
             "hidden": false,
             "moved": false,
@@ -152,7 +152,7 @@
           "terrain": 15,
           "unit": {
             "ammo": 6,
-            "fuel": 10,
+            "fuel": 14,
             "health": 100,
             "hidden": true,
             "moved": false,

@@ -9,13 +9,13 @@
         {
           "terrain": 15,
           "unit": {
-            "ammo": 6,
-            "fuel": 4,
+            "ammo": 9,
+            "fuel": 3,
             "health": 100,
             "hidden": false,
             "moved": true,
             "owner": "orange-star",
-            "type": "bcopter"
+            "type": "fighter"
           }
         },
         {

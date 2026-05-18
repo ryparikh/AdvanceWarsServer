@@ -80,7 +80,7 @@ Explicitly deferred modes and options:
 | Movement and wait | Covered broadly by JSON fixtures. | AWBW movement/fuel/path legality. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combat actions | Direct, indirect, counterattack, ammo, HP, terrain, and many CO/power cases are covered. | AWBW combat formula and data. | Audit | #80, #81 |
 | Capture | Capture progress, interruption, HQ capture, Labs, Com Towers, Airports, Ports, and Sami capture have fixtures. | AWBW capture points and capture-limit counting. | Partial | #73 |
-| Buy | Production fixtures cover common buy legality and unit cap. | Add setup bans, lab units, ghosted blockers, Piperunner production verification. | Partial | #75, #76, #78, #79 |
+| Buy | Production fixtures cover common buy legality, unit cap, and Piperunner production from Bases/Hachi Merchant Union cities. | Add setup bans, lab units, and ghosted blockers. | Partial | #75, #76, #78 |
 | Load and unload | APC, T-Copter, Lander, Black Boat, Cruiser, Carrier, loaded-unit destruction, and many boundaries are covered. | AWBW free unload behavior and legal terrain/occupancy. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combine/join | Joining/refund/capture-preservation fixtures exist. | AWBW join/refund behavior. | Complete for current Standard coverage | none |
 | Black Boat repair action | Dedicated repair/resupply fixtures exist. | AWBW Black Boat repair and resupply. | Complete for current Standard coverage | none |
@@ -104,7 +104,7 @@ The unit fixture manifest lives at `AdvanceWarsServer/test/json/units/README.md`
 | Mega Tank owner-side coverage | Mostly covered as target/opponent/production. | Partial | #107 |
 | Neotank owner-side coverage | Mostly covered as target/opponent/production. | Partial | #108 |
 | Piperunner pipe movement and attacks | Range/ammo fixtures exist; pipe-only movement still needs coverage. | Partial | #35 |
-| Piperunner production | Current standard ground production list excludes Piperunner. | Partial | #79 |
+| Piperunner production | Bases and Hachi Merchant Union cities include Piperunner; fixtures cover valid actions, direct buy, insufficient funds, and occupied production tiles. | Complete for current settings | none |
 | Black Bomb explosion | Movement/fuel/fuel-out/no-weapon fixtures exist; explosion absent. | Partial or deferred by Standard ban | #33, #75 |
 | Stealth and Sub hidden behavior | Visible combat and hidden fuel drain pieces exist. | Partial; full hide/unhide and visibility deferred from Standard fog-off mode | #34, #90 |
 
@@ -198,7 +198,6 @@ Actions, units, and data:
 - #35: Add piperunner pipe movement and attack coverage.
 - #42: Implement and test missile silo launch behavior.
 - #78: Implement ghosted production tile blockers.
-- #79: Allow Piperunner production from Bases and Hachi Merchant Union cities.
 - #80: Verify unit stats and damage lookup data against AWBW charts.
 - #104: Add Anti-Air owned combat coverage.
 - #105: Add Recon owned movement and combat coverage.

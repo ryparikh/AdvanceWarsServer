@@ -14,7 +14,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Active weather JSON parsing/serialization, weather movement/fuel costs, and Drake/Olaf weather-changing powers.
 - Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt COP/SCOP HP effects, including Drake fuel drain and Von Bolt next-turn stun.
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
-- Implemented production effects: Hachi's Merchant Union allows standard ground-unit deployment from owned empty cities, and Sensei's Copter Command/Airborne Assault spawn 9 HP unwaited Infantry/Mechs on owned empty cities in top-row, left-to-right order until the unit cap is reached.
+- Implemented production effects: Hachi's Merchant Union allows standard ground-unit deployment, including Piperunners, from owned empty cities; Sensei's Copter Command/Airborne Assault spawn 9 HP unwaited Infantry/Mechs on owned empty cities in top-row, left-to-right order until the unit cap is reached.
 - Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
 - Implemented fuel-upkeep modifiers: Eagle air units consume 2 additional fuel per day.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
@@ -40,7 +40,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 ## Economy Notes
 
-- Colin, Hachi, and Kanbei cost modifiers apply to unit construction. Hachi's Merchant Union uses the simulator's existing standard ground-production list for city deployment, so Piperunners remain excluded just as they are from base production.
+- Colin, Hachi, and Kanbei cost modifiers apply to unit construction. Hachi's Merchant Union uses the simulator's standard ground-production list for city deployment, matching the AWBW wiki's Piperunner note that Piperunners can be built at Bases or spawned from Cities during Hachi's SCOP.
 - Sasha's Market Crash applies to the single opposing player in this simulator's two-player model.
 
 ## Action-State Notes

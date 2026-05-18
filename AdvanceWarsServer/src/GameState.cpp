@@ -50,6 +50,21 @@ bool FProducesIncome(Terrain::Type terrainType) noexcept {
 		terrainType != Terrain::Type::Lab;
 }
 
+bool FPropertyServicesUnit(Terrain::Type terrainType, UnitProperties::Type unitType) noexcept {
+	switch (terrainType) {
+	case Terrain::Type::City:
+	case Terrain::Type::Base:
+	case Terrain::Type::Headquarters:
+		return UnitProperties::IsGroundUnit(unitType);
+	case Terrain::Type::Airport:
+		return UnitProperties::IsAirUnit(unitType);
+	case Terrain::Type::Port:
+		return UnitProperties::IsSeaUnit(unitType);
+	default:
+		return false;
+	}
+}
+
 bool FKindleUrbanTerrain(Terrain::Type terrainType) noexcept {
 	return MapTile::IsProperty(terrainType);
 }
@@ -181,16 +196,20 @@ Result GameState::BeginTurn() noexcept {
 					}
 				}
 
-				if (MapTile::IsProperty(terrain.m_type) && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player] && terrain.m_type != Terrain::Type::ComTower && terrain.m_type != Terrain::Type::Lab && pUnit->m_owner == &m_arrPlayers[player]) {
-					Unit* pUnit = pTile->TryGetUnit();
-					pUnit->m_properties.m_fuel = GetUnitInfo(pUnit->m_properties.m_type).m_fuel;
-					pUnit->m_properties.m_ammo = GetUnitInfo(pUnit->m_properties.m_type).m_ammo;
-					if (pUnit != nullptr && pUnit->health < 100) {
-						int repairAmount = std::min(100 - pUnit->health, 20);
-						int unitRepairFunds = Unit::GetUnitCost(pUnit->m_properties.m_type) * (repairAmount/10);
+				if (pTile->m_spPropertyInfo != nullptr && pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[player] && pUnit->m_owner == &m_arrPlayers[player] && FPropertyServicesUnit(terrain.m_type, pUnit->m_properties.m_type)) {
+					Unit* pServiceUnit = pTile->TryGetUnit();
+					if (pServiceUnit == nullptr) {
+						continue;
+					}
+
+					pServiceUnit->m_properties.m_fuel = GetUnitInfo(pServiceUnit->m_properties.m_type).m_fuel;
+					pServiceUnit->m_properties.m_ammo = GetUnitInfo(pServiceUnit->m_properties.m_type).m_ammo;
+					if (pServiceUnit->health < 100) {
+						int repairAmount = std::min(100 - pServiceUnit->health, 20);
+						int unitRepairFunds = Unit::GetUnitCost(pServiceUnit->m_properties.m_type) * (repairAmount/10);
 						if (unitRepairFunds <= m_arrPlayers[player].m_funds) {
 							m_arrPlayers[player].m_funds -= unitRepairFunds;
-							pUnit->health += repairAmount;
+							pServiceUnit->health += repairAmount;
 						}
 					}
 				}

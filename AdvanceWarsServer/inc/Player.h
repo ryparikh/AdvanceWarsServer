@@ -42,6 +42,7 @@ enum class LuckPolicy {
 	None = 0,
 	AlwaysLowestValue,
 	AlwaysHighestValue,
+	AlwaysMiddleValue,
 };
 
 class Player final {

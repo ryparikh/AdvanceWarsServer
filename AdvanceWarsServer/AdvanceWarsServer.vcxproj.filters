@@ -310,6 +310,7 @@
     <None Include="test\json\misc\begin-turn-fuel-out_of_fuel.json" />
     <None Include="test\json\misc\begin-turn-funds.json" />
     <None Include="test\json\misc\begin-turn-repair-enough-funds.json" />
+    <None Include="test\json\misc\begin-turn-property-repair-class-compatibility.json" />
     <None Include="test\json\captures\infantry-join-capture.json" />
     <None Include="test\json\captures\infantry-stops-capture.json" />
     <None Include="test\json\misc\end-game-rout-indirect-attack.json" />

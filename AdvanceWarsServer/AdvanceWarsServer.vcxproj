@@ -349,6 +349,7 @@
     <None Include="test\json\misc\begin-turn-fuel.json" />
     <None Include="test\json\misc\begin-turn-funds.json" />
     <None Include="test\json\misc\begin-turn-no-repair-enemy-property.json" />
+    <None Include="test\json\misc\begin-turn-property-repair-class-compatibility.json" />
     <None Include="test\json\misc\begin-turn-repair-enough-funds.json" />
     <None Include="test\json\misc\end-game-capturelimit-player0.json" />
     <None Include="test\json\misc\end-game-hqcap-player0.json" />

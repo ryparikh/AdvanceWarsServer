@@ -114,7 +114,7 @@ The unit fixture manifest lives at `AdvanceWarsServer/test/json/units/README.md`
 | --- | --- | --- | --- | --- |
 | Core terrain movement | JSON fixtures cover many terrain, weather, air, land, and sea movement cases. | AWBW movement tables. | Partial where Piperunner/Sturm/Teleport remain | #35, #85, #93 |
 | Properties and income | Cities/Bases/Airports/Ports/HQ income behavior exists; Labs/Com Towers no-income fixtures exist. | AWBW fund-producing properties only. | Complete for normal income, configurable settings partial | #65 |
-| Property repair/resupply | Begin-turn repair currently applies too broadly by property type. | Land on City/Base/HQ, air on Airport, sea on Port; owner only. | Partial | #71 |
+| Property repair/resupply | Begin-turn property service is gated by owner, property type, and unit class; Labs and Com Towers do not repair or resupply. | Land on City/Base/HQ, air on Airport, sea on Port; owner only. | Complete for normal property service | none |
 | Rachel property repair | Normal property repair is not Rachel-aware. | Rachel repairs +1 extra displayed HP on compatible properties. | Partial | #72 |
 | APC/Cruiser/Carrier resupply | Dedicated transport and loaded-resupply fixtures exist. | AWBW logistics order and compatible cargo. | Complete for current Standard coverage | none |
 | Labs | Lab capture/no-income/lab-victory fixtures exist. | Labs can act as no-HQ loss condition and do not produce income. | Complete for two-player Standard model | #76 for lab-unit production setting |
@@ -208,7 +208,6 @@ Actions, units, and data:
 
 Properties, economy, and COs:
 
-- #71: Restrict property repair and resupply by property type and unit class.
 - #72: Implement Rachel property repair bonus.
 - #81: Verify CO star costs and power-meter charge math against AWBW.
 - #83: Implement Jess Turbo Charge COP resupply side effect.

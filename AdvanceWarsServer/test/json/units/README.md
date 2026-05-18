@@ -14,7 +14,7 @@ Coverage key:
 
 | UnitProperties::Type | JSON type | Fixture home | Happy path | Boundary | Existing coverage notes |
 | --- | --- | --- | --- | --- | --- |
-| AntiAir | `anti-air` | `units/anti-air/` | partial | partial | Present as infantry combat target/opponent and production option. Owner-side attack coverage is tracked by [#104](https://github.com/ryparikh/AdvanceWarsServer/issues/104). |
+| AntiAir | `anti-air` | `units/anti-air/` | yes | yes | `units/anti-air/` covers primary anti-air attacks, lower-damage ground attacks, ammo consumption, no-ammo rejection, invalid sea targets, and direct-combat counterattack expectations. |
 | Apc | `apc` | `units/apc/` | yes | yes | `transport/apc/` covers load, unload, resupply, movement, and capacity boundaries. |
 | Artillery | `artillery` | `units/artillery/` | yes | yes | `units/artillery/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |
 | BCopter | `bcopter` | `units/bcopter/` | yes | yes | `units/bcopter/` covers air movement over mixed terrain, begin-turn fuel drain, ammo consumption, and invalid plane targets. Existing fixtures also cover infantry combat target/opponent and cruiser cargo. |

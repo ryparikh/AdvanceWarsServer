@@ -78,8 +78,7 @@ bool TopLeftComesFirst(int x, int y, int otherX, int otherY) noexcept {
 }
 
 bool FStandardGroundProductionUnit(UnitProperties::Type unitType) noexcept {
-	return UnitProperties::IsGroundUnit(unitType) &&
-		unitType != UnitProperties::Type::Piperunner;
+	return UnitProperties::IsGroundUnit(unitType);
 }
 
 int DamageValueForRachelMissile(const Unit& unit) noexcept {

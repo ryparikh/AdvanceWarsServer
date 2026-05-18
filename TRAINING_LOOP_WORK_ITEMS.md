@@ -2,6 +2,8 @@
 
 This file tracks the major work needed to turn the current Advance Wars simulator into an AlphaZero-style self-play training system.
 
+The rules/API completeness target for the initial playable environment is normal Global League Standard play. See `STANDARD_ENGINE_COMPLETENESS.md` for the current implementation matrix and issue index.
+
 ## Current Direction
 
 - Use action-level MCTS first. A full player turn is represented as a sequence of same-player atomic actions ending with `EndTurn`.
@@ -11,7 +13,7 @@ This file tracks the major work needed to turn the current Advance Wars simulato
 
 ## Open Product Decisions
 
-- [ ] Decide whether v1 targets full AWBW fidelity or a simplified deterministic subset.
+- [x] Decide whether v1 targets full AWBW fidelity or a simplified deterministic subset. V1 targets normal Global League Standard play, with other modes explicitly deferred in `STANDARD_ENGINE_COMPLETENESS.md`.
 - [ ] Decide how combat luck should work during self-play: disabled, averaged, or seeded.
 - [ ] Decide whether v1 includes fog, hidden units, CO powers, transports, naval units, and all unit types.
 - [ ] Decide the first map set for self-play. Small maps will make early iteration much faster.
@@ -20,21 +22,21 @@ This file tracks the major work needed to turn the current Advance Wars simulato
 ## Phase 0: Stabilize The Simulator
 
 - [ ] Run the JSON subsystem tests from a current build and make failures visible in CI or local output.
-- [ ] Fix action deserialization for `unloadIndex`; it is read but not assigned to `Action::m_optUnloadIndex`.
-- [ ] Fix capture-limit property counting. The current lab/com tower exclusion condition appears to use `||` where `&&` was likely intended.
+- [ ] Fix action deserialization for `unloadIndex`; it is read but not assigned to `Action::m_optUnloadIndex`. Track under submitted-action validation work in #67 if still present.
+- [ ] Fix capture-limit property counting. The current lab/com tower exclusion condition appears to use `||` where `&&` was likely intended. Tracked by #73.
 - [ ] Audit unit count caching around load/unload, clone, add, and destroy paths before relying on unit-cap logic in training.
 - [ ] Replace hardcoded local paths such as `D:/awai`, `D:/MNIST`, and local libtorch directories with config or command-line options.
-- [ ] Add a maximum turn/action limit outcome for self-play games so training cannot hang indefinitely.
-- [ ] Make combat RNG deterministic, seedable, or policy-controlled from the self-play runner.
+- [ ] Add a maximum turn/action limit outcome for self-play games so training cannot hang indefinitely. Coordinate with day-limit and terminal metadata work in #74 and #82.
+- [x] Make combat RNG deterministic, seedable, or policy-controlled from the self-play runner (#2).
 
 ## Phase 1: Trainable Environment API
 
-- [ ] Add a small environment wrapper around `GameState`.
+- [ ] Add a small environment wrapper around `GameState`; the REST/self-play API contract is tracked by #66.
 - [ ] Expose `reset`, `legalActions`, `step`, `isTerminal`, `currentPlayer`, and `winner` operations.
 - [ ] Add stable state serialization for replay data.
-- [ ] Add state tensor encoding in `Tensor.cpp`.
-- [ ] Add a stable action encoding scheme for every `Action` variant.
-- [ ] Add legal action masks aligned with the action encoding.
+- [ ] Add state tensor encoding in `Tensor.cpp` (#3).
+- [ ] Add a stable action encoding scheme for every `Action` variant (#4).
+- [ ] Add legal action masks aligned with the action encoding (#4).
 - [ ] Add tests proving encode/decode preserves actions, including move-attack, unload, buy, powers, and end-turn.
 
 ## Phase 2: MCTS Improvements
@@ -86,11 +88,16 @@ This file tracks the major work needed to turn the current Advance Wars simulato
 
 ## Candidate GitHub Issues
 
-- [ ] Create deterministic combat RNG for self-play.
-- [ ] Implement state tensor encoding.
-- [ ] Implement action encoding and legal action masks.
-- [ ] Refactor MCTS for action-level self-play and same-player turn sequences.
-- [ ] Add self-play replay writer.
-- [ ] Add policy/value network scaffold.
-- [ ] Add training command-line entry point.
-- [ ] Add checkpoint evaluation harness.
+- [x] #2 Create deterministic combat RNG for self-play.
+- [ ] #3 Implement state tensor encoding.
+- [ ] #4 Implement action encoding and legal action masks.
+- [ ] #5 Refactor MCTS for action-level self-play and same-player turn sequences.
+- [ ] #6 Add self-play replay writer.
+- [ ] #7 Add policy/value network scaffold.
+- [ ] #8 Add training command-line entry point.
+- [ ] #9 Add checkpoint evaluation harness.
+- [ ] #65 Define and enforce normal Global League Standard game settings.
+- [ ] #66 Add REST game lifecycle and step API contract for self-play.
+- [ ] #67 Validate and atomically reject illegal submitted actions.
+- [ ] #68 Make REST action stepping explicit and remove implicit auto-end-turn.
+- [ ] #69 Remove heuristic auto-resign from Standard engine terminal logic.

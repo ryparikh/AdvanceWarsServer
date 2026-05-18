@@ -1,6 +1,6 @@
 # Commanding Officer Support
 
-The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page](https://awbw.fandom.com/wiki/CO). The simulator currently supports a simplified CO model: JSON identity, power-meter costs, power-status transitions, and the checked-in normal/COP/SCOP damage charts are treated as source-of-truth behavior.
+The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page](https://awbw.fandom.com/wiki/CO). The simulator currently supports a simplified CO model: JSON identity, power-meter costs, power-status transitions, and the checked-in normal/COP/SCOP damage charts are treated as source-of-truth behavior. The broader Standard rules matrix is maintained in `STANDARD_ENGINE_COMPLETENESS.md`.
 
 ## Supported
 
@@ -24,7 +24,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 - Weather JSON uses `"weather": "rain"` or `"weather": "snow"`. CO-created weather also writes `"weather-turns-remaining"` and expires on a later `BeginTurn`.
 - Rain and snow movement costs follow the AWBW weather tables, including Drake rain immunity, Olaf snow immunity, and Olaf treating rain like snow.
-- Rain vision penalties are intentionally deferred because this simulator does not yet have fog-of-war or vision state; that broader subsystem is tracked by #25.
+- Rain vision penalties are intentionally deferred because this simulator does not yet have fog-of-war or vision state; that broader subsystem is tracked by [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90).
 
 ## HP Effect Notes
 
@@ -60,4 +60,14 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#25](https://github.com/ryparikh/AdvanceWarsServer/issues/25): fog, vision, hiding, and terrain-defense CO effects.
+- [#72](https://github.com/ryparikh/AdvanceWarsServer/issues/72): Rachel property repair bonus.
+- [#81](https://github.com/ryparikh/AdvanceWarsServer/issues/81): CO star costs and power-meter charge math audit.
+- [#83](https://github.com/ryparikh/AdvanceWarsServer/issues/83): Jess Turbo Charge COP resupply side effect.
+- [#84](https://github.com/ryparikh/AdvanceWarsServer/issues/84): Eagle air-unit fuel upkeep modifier.
+- [#85](https://github.com/ryparikh/AdvanceWarsServer/issues/85): Sturm all-terrain movement rules.
+- [#86](https://github.com/ryparikh/AdvanceWarsServer/issues/86): Lash terrain-star attack and movement effects.
+- [#87](https://github.com/ryparikh/AdvanceWarsServer/issues/87): Javier indirect-defense and Comm Tower defense bonuses.
+- [#88](https://github.com/ryparikh/AdvanceWarsServer/issues/88): Kanbei Samurai Spirit counterattack bonus.
+- [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89): Sonja counterattack bonus and hidden-HP API redaction.
+- [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90): fog, vision, hiding visibility, and fog-only CO effects.
+- [#99](https://github.com/ryparikh/AdvanceWarsServer/issues/99), [#100](https://github.com/ryparikh/AdvanceWarsServer/issues/100), [#101](https://github.com/ryparikh/AdvanceWarsServer/issues/101), [#102](https://github.com/ryparikh/AdvanceWarsServer/issues/102), and [#103](https://github.com/ryparikh/AdvanceWarsServer/issues/103): deterministic luck CO combat fixtures for Nell, Rachel, Flak, Jugger, and Sonja.

@@ -289,6 +289,10 @@
     <None Include="test\json\captures\infantry100FlipNeutralPort.json" />
     <None Include="test\json\captures\infantry100FlipNeutralComTower.json" />
     <None Include="test\json\captures\infantry100FlipNeutralLab.json" />
+    <None Include="test\json\captures\capture-limit-excludes-com-tower.json" />
+    <None Include="test\json\captures\capture-limit-excludes-lab.json" />
+    <None Include="test\json\captures\capture-limit-normal-property-wins.json" />
+    <None Include="test\json\captures\capture-limit-rejects-normal-property-after-win.json" />
     <None Include="test\json\captures\airport-port-capture-progress-and-transfer.json" />
     <None Include="test\json\com-tower\attack-bonus-control.json" />
     <None Include="test\json\com-tower\attack-bonus-one-owned-tower.json" />

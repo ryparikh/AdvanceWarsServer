@@ -582,6 +582,10 @@ void GameState::TickTemporaryWeather() noexcept {
 }
 
 Result GameState::GetValidActions(std::vector<Action>& vecActions) const noexcept {
+	if (m_fGameOver) {
+		return Result::Succeeded;
+	}
+
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
 			IfFailedReturn(GetValidActions(x, y, vecActions));
@@ -691,6 +695,10 @@ int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
 }
 
 Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept {
+	if (m_fGameOver) {
+		return Result::Succeeded;
+	}
+
 	const MapTile* pmaptile;
 	m_spmap->TryGetTile(x, y, &pmaptile);
 	const Unit* pUnit = pmaptile->TryGetUnit();
@@ -928,6 +936,10 @@ bool GameState::AnyValidActions() const noexcept {
 }
 
 Result GameState::DoAction(const Action& action) noexcept {
+	if (m_fGameOver) {
+		return Result::Failed;
+	}
+
 	if (!action.m_optSource.has_value()) {
 		switch (action.m_type) {
 		case Action::Type::EndTurn:
@@ -1204,7 +1216,7 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 				m_spmap->TryGetTile(x, y, &pTile);
 				if (pTile->m_spPropertyInfo != nullptr &&
 					pTile->m_spPropertyInfo->m_owner == &GetCurrentPlayer() &&
-					(pTile->GetTerrain().m_type != Terrain::Type::Lab || pTile->GetTerrain().m_type != Terrain::Type::ComTower)) {
+					FProducesIncome(pTile->GetTerrain().m_type)) {
 					++totalProperties;
 				}
 			}

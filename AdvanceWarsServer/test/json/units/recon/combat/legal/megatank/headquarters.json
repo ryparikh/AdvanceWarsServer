@@ -1,0 +1,193 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "recon-megatank-headquarters",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 80,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "recon"
+          }
+        },
+        {
+          "terrain": 47,
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "unit": {
+            "ammo": 3,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        0
+      ],
+      "target": [
+        0,
+        0
+      ],
+      "direction": "east"
+    }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "recon-megatank-headquarters",
+    "map": [
+      [
+        {
+          "terrain": 15
+        },
+        {
+          "terrain": 47,
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "unit": {
+            "ammo": 2,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "megatank"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 0,
+        "power-meter": {
+          "charge": 4000,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 2000,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

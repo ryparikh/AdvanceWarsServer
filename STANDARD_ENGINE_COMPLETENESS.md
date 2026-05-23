@@ -51,7 +51,7 @@ Explicitly deferred modes and options:
 | Starting funds and income | Normal income exists; Sasha income modifier exists; configurable mode presets are incomplete. | 0 starting funds and 1000/property for Standard. | Partial | #65 |
 | High Funds | No preset. | 2000/property only in High Funds modes. | Deferred | #91 |
 | Unit cap | `unit-cap` serializes and production fixtures cover under-cap and at-cap behavior. | Enforce configured unit limit. | Complete for current model | none |
-| Capture limit | Capture-limit terminal path exists, but Labs/Comm Towers are counted incorrectly. | Limit excludes Labs and Comm Towers. | Partial | #73 |
+| Capture limit | Capture-limit terminal path counts Cities, Bases, Airports, Ports, and HQs; Labs/Comm Towers are excluded. | Limit excludes Labs and Comm Towers. | Complete for current model | none |
 | Day limit | No day-limit terminal rule. | Configurable day limit with property-count winner/tie handling. | Partial | #74 |
 | Unit bans | No setup-level ban list. | Standard bans Black Bomb production. | Partial | #75 |
 | Lab units | No setup-level lab-unit requirement. | Selected lab units require owned Lab access. | Partial | #76 |
@@ -79,7 +79,7 @@ Explicitly deferred modes and options:
 | --- | --- | --- | --- | --- |
 | Movement and wait | Covered broadly by JSON fixtures. | AWBW movement/fuel/path legality. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combat actions | Direct, indirect, counterattack, ammo, HP, terrain, and many CO/power cases are covered. | AWBW combat formula and data. | Audit | #80, #81 |
-| Capture | Capture progress, interruption, HQ capture, Labs, Com Towers, Airports, Ports, and Sami capture have fixtures. | AWBW capture points and capture-limit counting. | Partial | #73 |
+| Capture | Capture progress, interruption, HQ capture, Labs, Com Towers, Airports, Ports, Sami capture, and capture-limit counting have fixtures. | AWBW capture points and capture-limit counting. | Complete for current Standard coverage | none |
 | Buy | Production fixtures cover common buy legality, unit cap, and Piperunner production from Bases/Hachi Merchant Union cities. | Add setup bans, lab units, and ghosted blockers. | Partial | #75, #76, #78 |
 | Load and unload | APC, T-Copter, Lander, Black Boat, Cruiser, Carrier, loaded-unit destruction, and many boundaries are covered. | AWBW free unload behavior and legal terrain/occupancy. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combine/join | Joining/refund/capture-preservation fixtures exist. | AWBW join/refund behavior. | Complete for current Standard coverage | none |
@@ -185,7 +185,6 @@ Standard API, settings, and terminal behavior:
 - #68: Make REST action stepping explicit and remove implicit auto-end-turn.
 - #69: Remove heuristic auto-resign from Standard engine terminal logic.
 - #70: Support AWBW map imports with all two-player country identities.
-- #73: Fix capture-limit counting to exclude Labs and Comm Towers.
 - #74: Implement day-limit victory and draw resolution.
 - #75: Add game setup support for unit bans and the Standard Black Bomb ban.
 - #76: Add lab-unit production requirements from game setup.

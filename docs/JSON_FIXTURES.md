@@ -171,6 +171,8 @@ When adding an action fixture, prefer copying the smallest nearby fixture that a
 | `weather/` | Rain/snow movement, temporary weather, Drake/Olaf powers. |
 | `units/` | Unit-owned movement, fuel, combat, ammo, and boundaries. |
 
+Capture-limit fixtures follow AWBW counting: Cities, Bases, Airports, Ports, and HQs count toward the configured limit; Labs and Com Towers do not.
+
 ## Debugging Failures
 
 On failure, the runner prints:

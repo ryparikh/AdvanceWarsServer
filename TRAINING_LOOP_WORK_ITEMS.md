@@ -23,7 +23,7 @@ The rules/API completeness target for the initial playable environment is normal
 
 - [ ] Run the JSON subsystem tests from a current build and make failures visible in CI or local output.
 - [ ] Fix action deserialization for `unloadIndex`; it is read but not assigned to `Action::m_optUnloadIndex`. Track under submitted-action validation work in #67 if still present.
-- [ ] Fix capture-limit property counting. The current lab/com tower exclusion condition appears to use `||` where `&&` was likely intended. Tracked by #73.
+- [x] Fix capture-limit property counting. Capture-limit wins count Cities, Bases, Airports, Ports, and HQs, excluding Labs and Com Towers (#73).
 - [ ] Audit unit count caching around load/unload, clone, add, and destroy paths before relying on unit-cap logic in training.
 - [ ] Replace hardcoded local paths such as `D:/awai`, `D:/MNIST`, and local libtorch directories with config or command-line options.
 - [ ] Add a maximum turn/action limit outcome for self-play games so training cannot hang indefinitely. Coordinate with day-limit and terminal metadata work in #74 and #82.

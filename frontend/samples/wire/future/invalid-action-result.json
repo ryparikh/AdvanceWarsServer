@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "error": {
+    "code": "illegal-action",
+    "message": "The selected unit cannot attack that target.",
+    "source": "validation",
+    "path": "action.target"
+  },
+  "action": {
+    "type": "move-attack",
+    "source": [0, 1],
+    "target": [2, 3],
+    "direction": "east"
+  }
+}

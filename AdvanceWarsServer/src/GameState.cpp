@@ -209,7 +209,7 @@ Result GameState::BeginTurn() noexcept {
 				}
 
 				if ((pUnit->m_properties.m_type == UnitProperties::Type::Carrier ||
-					pUnit->m_properties.m_type == UnitProperties::Type::Crusier) &&
+					pUnit->m_properties.m_type == UnitProperties::Type::Cruiser) &&
 					pUnit->m_owner == &GetCurrentPlayer()) {
 					for (int i = 0; i < pUnit->CLoadedUnits(); ++i) {
 						Unit* pLoadedUnit = pUnit->GetLoadedUnit(i);

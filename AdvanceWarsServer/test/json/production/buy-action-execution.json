@@ -317,7 +317,7 @@
     {
       "type": "buy",
       "source": [ 21, 0 ],
-      "unit": "crusier"
+      "unit": "cruiser"
     },
     {
       "type": "buy",
@@ -686,7 +686,7 @@
             "hidden": false,
             "moved": true,
             "owner": "orange-star",
-            "type": "crusier"
+            "type": "cruiser"
           }
         },
         {

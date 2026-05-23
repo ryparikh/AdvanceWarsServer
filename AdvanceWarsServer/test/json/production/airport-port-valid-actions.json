@@ -248,7 +248,7 @@
         {
           "type": "buy",
           "source": [ 2, 0 ],
-          "unit": "crusier"
+          "unit": "cruiser"
         },
         {
           "type": "buy",

@@ -30,6 +30,7 @@ See [STANDARD_ENGINE_COMPLETENESS.md](STANDARD_ENGINE_COMPLETENESS.md) for the c
 | `AdvanceWarsServer/src/` | Engine implementation, JSON fixture runner, map parser, HTTP routes, and platform code. |
 | `AdvanceWarsServer/test/json/` | Recursive JSON regression suite for engine behavior. |
 | `AdvanceWarsServer/res/AWBW/` | AWBW map/game source data used for development and conversion experiments. |
+| `frontend/` | TypeScript frontend contract layer, Zod wire schemas, normalized domain types, API adapter, and sample payloads. |
 | `BUILD_AND_TEST.md` | Build, executable, and test commands. |
 | `STANDARD_ENGINE_COMPLETENESS.md` | Standard-mode rules/API completeness matrix and issue index. |
 | `CO_SUPPORT.md` | Implemented CO behavior and focused CO follow-up issues. |
@@ -56,6 +57,15 @@ Run a focused subset:
 
 ```powershell
 ..\x64\Debug\AdvanceWarsServer.exe -test test/json/transport
+```
+
+Run the frontend contract checks:
+
+```powershell
+Set-Location .\frontend
+yarn install
+yarn typecheck
+yarn test
 ```
 
 More command details are in [BUILD_AND_TEST.md](BUILD_AND_TEST.md).
@@ -88,6 +98,7 @@ The desired direction is:
 
 - C++ engine owns rules, legal actions, and state transitions.
 - REST API exposes game creation, state fetch, legal actions, explicit action stepping, errors, and terminal metadata.
+- `frontend/` owns the UI-free TypeScript contract layer for #114: raw Zod schemas, normalized game-state/action types, API adapter behavior, and sample payloads.
 - React frontend renders board state and asks the server what actions are legal.
 - Bot replay and fixture visualizers reuse the same board renderer.
 

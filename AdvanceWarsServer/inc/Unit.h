@@ -19,7 +19,7 @@ struct UnitProperties final
 		BlackBomb,
 		Bomber,
 		Carrier,
-		Crusier,
+		Cruiser,
 		Fighter,
 		Infantry,
 		Lander,

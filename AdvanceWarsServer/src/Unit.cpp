@@ -2,6 +2,8 @@
 #include "UnitInfo.h"
 #include "Player.h"
 
+#include <algorithm>
+
 /*static*/ int Unit::GetUnitCost(const UnitProperties::Type& type) {
 	switch (type)
 	{
@@ -23,7 +25,7 @@
 		return 2200;
 	case UnitProperties::Type::Carrier:
 		return 3000;
-	case UnitProperties::Type::Crusier:
+	case UnitProperties::Type::Cruiser:
 		return 1800;
 	case UnitProperties::Type::Fighter:
 		return 2000;
@@ -83,7 +85,7 @@ bool Unit::IsVehicle() const noexcept {
 bool Unit::IsTransport() const noexcept {
 	return m_properties.m_type == UnitProperties::Type::Apc ||
 		m_properties.m_type == UnitProperties::Type::BlackBoat ||
-		m_properties.m_type == UnitProperties::Type::Crusier ||
+		m_properties.m_type == UnitProperties::Type::Cruiser ||
 		m_properties.m_type == UnitProperties::Type::Carrier ||
 		m_properties.m_type == UnitProperties::Type::Lander ||
 		m_properties.m_type == UnitProperties::Type::TCopter;
@@ -104,7 +106,7 @@ bool Unit::IsFootsoldier() const noexcept {
 	case UnitProperties::Type::Battleship:
 	case UnitProperties::Type::BlackBoat:
 	case UnitProperties::Type::Carrier:
-	case UnitProperties::Type::Crusier:
+	case UnitProperties::Type::Cruiser:
 	case UnitProperties::Type::Lander:
 	case UnitProperties::Type::Sub:
 		return true;
@@ -137,7 +139,7 @@ bool Unit::IsFootsoldier() const noexcept {
 	case UnitProperties::Type::AntiAir:
 	case UnitProperties::Type::BCopter:
 	case UnitProperties::Type::Bomber:
-	case UnitProperties::Type::Crusier:
+	case UnitProperties::Type::Cruiser:
 	case UnitProperties::Type::Fighter:
 	case UnitProperties::Type::Infantry:
 	case UnitProperties::Type::Mech:
@@ -214,7 +216,7 @@ bool Unit::CanLoad(UnitProperties::Type type) const noexcept {
 		unitTypeIsOk = (type == UnitProperties::Type::Infantry || type == UnitProperties::Type::Mech);
 	}
 
-	if (m_properties.m_type == UnitProperties::Type::Crusier) {
+	if (m_properties.m_type == UnitProperties::Type::Cruiser) {
 		unitTypeIsOk = type == UnitProperties::Type::BCopter || type == UnitProperties::Type::TCopter;
 	}
 
@@ -270,8 +272,8 @@ Unit* Unit::Unload(int i) {
 		return "bomber";
 	case UnitProperties::Type::Carrier:
 		return "carrier";
-	case UnitProperties::Type::Crusier:
-		return "crusier";
+	case UnitProperties::Type::Cruiser:
+		return "cruiser";
 	case UnitProperties::Type::Fighter:
 		return "fighter";
 	case UnitProperties::Type::Infantry:
@@ -343,8 +345,8 @@ bool Unit::IsHidden() const noexcept {
 	else if (strTypename == "carrier") {
 		return UnitProperties::Type::Carrier;
 	}
-	else if (strTypename == "crusier") {
-		return UnitProperties::Type::Crusier;
+	else if (strTypename == "cruiser") {
+		return UnitProperties::Type::Cruiser;
 	}
 	else if (strTypename == "fighter") {
 		return UnitProperties::Type::Fighter;
@@ -410,6 +412,7 @@ void to_json(json& j, const Unit& unit) {
 	to_json(j, unit.m_properties);
 	j["owner"] = unit.m_owner->getArmyTypeJson();
 	j["health"] = unit.health;
+	j["display-health"] = std::clamp((unit.health + 9) / 10, 0, 10);
 	j["moved"] = unit.m_moved;
 	j["hidden"] = unit.m_hidden;
 	if (unit.m_stunned) {

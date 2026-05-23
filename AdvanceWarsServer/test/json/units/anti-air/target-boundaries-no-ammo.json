@@ -7,7 +7,7 @@
     "map": [
       [
         { "terrain": 15, "unit": { "ammo": 9, "fuel": 60, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "anti-air" } },
-        { "terrain": 28, "unit": { "ammo": 9, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "crusier" } }
+        { "terrain": 28, "unit": { "ammo": 9, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "cruiser" } }
       ],
       [
         { "terrain": 15, "unit": { "ammo": 9, "fuel": 60, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "anti-air" } },

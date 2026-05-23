@@ -1,6 +1,6 @@
 # API Notes
 
-Last reviewed: 2026-05-18
+Last reviewed: 2026-05-23
 
 This document describes the current HTTP surface and the target API shape for the Standard engine/frontend work. The C++ engine must remain authoritative for legal actions and state transitions; API clients should not duplicate rule logic.
 
@@ -79,6 +79,20 @@ Legal-action responses should include:
 - the current active player context
 - the legal actions as server-serialized `Action` objects
 - optional selection/source metadata for tile-specific requests
+
+## Frontend Contract Layer
+
+The `frontend/` package is the current #114 compatibility layer between server JSON and future React UI code. It validates raw server/fixture payloads with Zod, accepts additive unknown fields while checking known fields, and normalizes data into UI-facing domain objects.
+
+Current package responsibilities:
+
+- Parse current game-state and legal-action payloads from the C++ server and JSON fixtures.
+- Expose `createApiClient()` with configurable `baseUrl` and injectable `fetch`.
+- Return `ApiResult<T>` values instead of throwing for network, HTTP, parse, and validation failures.
+- Serialize frontend domain actions back to the current server `Action` shape before submitting them.
+- Keep current wire samples in `frontend/samples/wire/current/` and future response-envelope sketches in `frontend/samples/wire/future/`.
+
+The adapter currently calls the existing routes where they exist (`POST /games`, `GET /actions/:gameid`, `GET /actions/:gameid/:x/:y`, and `POST /actions/:gameid`) and includes `GET /games/:gameid` as the target state-fetch route for #66.
 
 ## Frontend And Bot Consumer Rules
 

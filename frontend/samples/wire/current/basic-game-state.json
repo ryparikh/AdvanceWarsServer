@@ -1,0 +1,83 @@
+{
+  "gameId": "sample-game",
+  "activePlayer": 0,
+  "cap-limit": 21,
+  "game-over": false,
+  "map": [
+    [
+      {
+        "terrain": 35,
+        "property": {
+          "capture-points": 20,
+          "owner": "orange-star"
+        },
+        "unit": {
+          "ammo": 0,
+          "fuel": 99,
+          "health": 62,
+          "display-health": 7,
+          "hidden": false,
+          "moved": true,
+          "owner": "orange-star",
+          "type": "infantry"
+        }
+      },
+      {
+        "terrain": 1,
+        "unit": {
+          "ammo": 6,
+          "fuel": 60,
+          "health": 100,
+          "display-health": 10,
+          "hidden": false,
+          "moved": false,
+          "owner": "blue-moon",
+          "type": "cruiser"
+        }
+      }
+    ],
+    [
+      {
+        "terrain": 1
+      },
+      {
+        "terrain": 39,
+        "property": {
+          "capture-points": 20,
+          "owner": "neutral"
+        }
+      }
+    ]
+  ],
+  "players": [
+    {
+      "armyType": "orange-star",
+      "co": "Andy",
+      "funds": 1000,
+      "luck-policy": 1,
+      "power-meter": {
+        "charge": 0,
+        "cop-stars": 3,
+        "scop-stars": 3,
+        "star-value": 9000
+      },
+      "power-status": 0
+    },
+    {
+      "armyType": "blue-moon",
+      "co": "Adder",
+      "funds": 2000,
+      "luck-policy": 2,
+      "power-meter": {
+        "charge": 1000,
+        "cop-stars": 2,
+        "scop-stars": 3,
+        "star-value": 9000
+      },
+      "power-status": 0
+    }
+  ],
+  "turn-count": 3,
+  "unit-cap": 50,
+  "winner": -1
+}

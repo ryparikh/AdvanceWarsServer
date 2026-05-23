@@ -375,7 +375,7 @@
     <None Include="test\json\transport\blackboat\load-mech-multiple.json" />
     <None Include="test\json\transport\blackboat\load-mech.json" />
     <None Include="test\json\transport\carrier\load-multiple-units.json" />
-    <None Include="test\json\transport\crusier\load-multiple-units.json" />
+    <None Include="test\json\transport\cruiser\load-multiple-units.json" />
     <None Include="test\json\transport\lander\load-multiple-units.json" />
     <None Include="test\json\transport\tcopter\load-infantry.json" />
     <None Include="test\json\transport\tcopter\load-mech.json" />

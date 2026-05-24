@@ -30,6 +30,7 @@ Run tests from the `AdvanceWarsServer` project directory so the relative `test/j
 ```powershell
 Set-Location .\AdvanceWarsServer
 ..\x64\Debug\AdvanceWarsServer.exe -test test/json
+..\x64\Debug\AdvanceWarsServer.exe -test-api-contract
 ```
 
 Release:
@@ -52,9 +53,10 @@ The executable currently recognizes these development commands:
 | Option | Purpose | Notes |
 | --- | --- | --- |
 | `-test [path]` | Run the recursive JSON fixture suite. | Defaults to `test/json`. Run from `AdvanceWarsServer/` so relative paths resolve. |
+| `-test-api-contract` | Run focused REST lifecycle/action contract tests. | Run from `AdvanceWarsServer/` so map templates and fixtures resolve. |
 | `-sim-random-move-game [seed]` | Run an experimental random-action simulation. | Uses local output paths that still need cleanup before general use. |
 | `-sim-mcts-game` | Run an experimental MCTS simulation. | Uses local output paths that still need cleanup before general use. |
-| `-server` | Run the current HTTP server on port 80. | Serves the legacy routes documented in `docs/API.md`; route cleanup is tracked by #66. |
+| `-server` | Run the current HTTP server on port 80. | Serves the canonical REST routes documented in `docs/API.md`. |
 | `-converter` | Regenerate the hardcoded Lefty map JSON. | Developer utility. |
 | `-torchlib` | Run a local libtorch/MNIST experiment. | Depends on local `D:/MNIST` and libtorch paths. |
 

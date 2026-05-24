@@ -107,39 +107,12 @@ struct Action {
 	Action(Type type, int xSource, int ySource, UnitProperties::Type unitType) : m_type(type), m_optSource({ xSource, ySource }), m_optUnitType(unitType) {}
 
 	bool operator==(const Action& other) const {
-		if (m_type != other.m_type) {
-			return false;
-		}
-
-		if (m_optDirection.has_value()) {
-			if (!other.m_optDirection.has_value() ||
-				(m_optDirection.value() != other.m_optDirection.value())) {
-				return false;
-			}
-		}
-
-		if (m_optSource.has_value()) {
-			if (!other.m_optSource.has_value() ||
-				(m_optSource.value() != other.m_optSource.value())) {
-				return false;
-			}
-		}
-
-		if (m_optTarget.has_value()) {
-			if (!other.m_optTarget.has_value() ||
-				(m_optTarget.value() != other.m_optTarget.value())) {
-				return false;
-			}
-		}
-
-		if (m_optUnitType.has_value()) {
-			if (!other.m_optUnitType.has_value() ||
-				(m_optUnitType.value() != other.m_optUnitType.value())) {
-				return false;
-			}
-		}
-
-		return true;
+		return m_type == other.m_type &&
+			m_optSource == other.m_optSource &&
+			m_optTarget == other.m_optTarget &&
+			m_optDirection == other.m_optDirection &&
+			m_optUnitType == other.m_optUnitType &&
+			m_optUnloadIndex == other.m_optUnloadIndex;
 	}
 
 	Type m_type{ Type::Invalid };
@@ -269,6 +242,10 @@ public:
 		return m_fGameOver;
 	}
 
+	const std::optional<std::string>& GetTerminalReason() const noexcept {
+		return m_terminalReason;
+	}
+
 	bool FEnemyHasLabs() const noexcept;
 	void SetCombatRngSeed(std::uint32_t seed);
 	void ClearCombatRngSeed() noexcept;
@@ -352,6 +329,7 @@ private:
 	bool m_isFirstPlayerTurn{ true };
 	bool m_fGameOver = false;
 	int m_winningPlayer = -1;
+	std::optional<std::string> m_terminalReason;
 	std::optional<std::uint32_t> m_combatRngSeed;
 	std::optional<std::mt19937> m_combatRng;
 	WeatherType m_weather{ WeatherType::Clear };

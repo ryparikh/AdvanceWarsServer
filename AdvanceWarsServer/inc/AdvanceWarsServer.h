@@ -10,6 +10,7 @@
 #include "Map.h"
 #include "MapParser.h"
 #include "MovementTypes.h"
+#include "RestGameService.h"
 #include "Result.h"
 #include "Terrain.h"
 
@@ -37,21 +38,13 @@ public:
 
 	static AdvanceWarsServer& getInstance();
 	static tx_response post_games_handler(const http_request& request, const Parameters& parameters, const std::string& data, std::string& response_body);
+	static tx_response get_game_handler(const http_request& request, const Parameters& parameters, const std::string& data, std::string& response_body);
 	static tx_response post_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
-	static tx_response get_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
 	static tx_response get_valid_game_actions(const http_request& request, const Parameters& parameters, const std::string&data, std::string&response_body);
-
-	json create_new_game(std::string& gameId);
-	json get_valid_actions(const std::string& gameId) const;
-	Result get_valid_actions(const std::string& gameId, std::vector<Action>& vecActions) const;
-	json get_actions(const std::string& gameId, int x, int y) const;
-	json do_action(const std::string& gameId, const Action& action);
-	bool game_over(const std::string& gameId);
-
-	GameState CloneGameState(const std::string& gameId) const;
+	static tx_response options_handler(const http_request& request, const Parameters& parameters, const std::string& data, std::string& response_body);
 private:
 	static std::unique_ptr<AdvanceWarsServer> s_spServer;
 	asio::io_context m_io_context;
 	http_server_type m_http_server;
-	std::map<std::string, std::unique_ptr<GameState>> m_gameCache;
+	RestGameService m_gameService;
 };

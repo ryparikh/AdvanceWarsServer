@@ -34,7 +34,7 @@
   },
   "actions": [
     { "type": "move-load", "source": [0, 0], "target": [1, 0] },
-    { "type": "unload", "source": [1, 1], "direction": "east" },
+    { "type": "unload", "source": [1, 1], "direction": "east", "unloadIndex": 0 },
     { "type": "move-wait", "source": [0, 2], "target": [3, 2] }
   ],
   "final-game-state": {

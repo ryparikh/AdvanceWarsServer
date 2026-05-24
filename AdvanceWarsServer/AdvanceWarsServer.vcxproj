@@ -170,10 +170,12 @@
     <ClCompile Include="src\MapParser.cpp" />
     <ClCompile Include="src\MapTile.cpp" />
     <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\RestGameService.cpp" />
     <ClCompile Include="src\Tensor.cpp" />
     <ClCompile Include="src\TerrainInfo.cpp" />
     <ClCompile Include="src\Unit.cpp" />
     <ClCompile Include="src\UnitInfo.cpp" />
+    <ClCompile Include="src\RestApiContractTest.cpp" />
     <ClCompile Include="src\win32\Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +195,7 @@
     <ClInclude Include="inc\Platform.h" />
     <ClInclude Include="inc\Player.h" />
     <ClInclude Include="inc\Result.h" />
+    <ClInclude Include="inc\RestGameService.h" />
     <ClInclude Include="inc\Reward.h" />
     <ClInclude Include="inc\SubsystemTest.h" />
     <ClInclude Include="inc\Terrain.h" />

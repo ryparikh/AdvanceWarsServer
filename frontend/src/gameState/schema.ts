@@ -24,6 +24,12 @@ export const actionSchema = z.object({
 export type Action = z.infer<typeof actionSchema>;
 export type Coordinate = z.infer<typeof coordinateSchema>;
 export const actionListSchema = z.array(actionSchema).max(maxActionCount);
+export const legalActionEnvelopeSchema = z.object({
+  gameId: shortText,
+  activePlayer: finiteInteger.min(0).max(7),
+  source: coordinateSchema.optional(),
+  actions: actionListSchema
+});
 
 const powerMeterSchema = z.object({
   "cop-stars": finiteInteger.min(0).max(20),
@@ -111,6 +117,8 @@ export const gameStateSchema = z.object({
   activePlayer: finiteInteger.min(0).max(7),
   "game-over": z.boolean(),
   winner: finiteInteger.min(-1).max(7),
+  terminalReason: shortText.nullable().optional(),
+  settings: z.record(z.unknown()).optional(),
   weather: z.enum(["clear", "rain", "snow"]).optional(),
   "weather-turns-remaining": finiteInteger.min(0).max(100).optional(),
   "combat-rng-seed": finiteInteger.min(0).max(4_294_967_295).optional()

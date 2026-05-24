@@ -87,7 +87,8 @@
     {
       "type": "unload",
       "source": [ 2, 0 ],
-      "direction": "west"
+      "direction": "west",
+      "unloadIndex": 0
     }
   ]
 }

@@ -41,7 +41,7 @@ Set-Location .\AdvanceWarsServer
 ..\x64\Debug\AdvanceWarsServer.exe -server
 ```
 
-The current server uses the legacy routes documented in `docs/API.md`, including `POST /games` and `GET /actions/:gameid/:x/:y`, and listens on port 80. The frontend defaults to `http://localhost:80`, but the base URL is editable and saved in browser local storage.
+The current server uses the canonical routes documented in `docs/API.md`, including `POST /games` and `GET /games/:gameid/actions?x=4&y=7`, and listens on port 80. The frontend defaults to `http://localhost:80`, but the base URL is editable and saved in browser local storage.
 
 ## Verification
 

@@ -255,6 +255,7 @@ Result GameState::BeginTurn() noexcept {
 					if (FPlayerRouted(GetCurrentPlayer())) {
 						m_fGameOver = true;
 						m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
+						m_terminalReason = "fuel-rout";
 					}
 				}
 			}
@@ -1196,6 +1197,7 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		if (fHqCapture) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+			m_terminalReason = "hq-capture";
 			return Result::Succeeded;
 		}
 		// Add logic to test if all labs are lost
@@ -1204,6 +1206,7 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 				if (!FEnemyHasLabs()) {
 					m_fGameOver = true;
 					m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+					m_terminalReason = "lab-capture";
 					return Result::Succeeded;
 				}
 			}
@@ -1224,6 +1227,7 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 		if (totalProperties >= m_nCaptureLimit) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+			m_terminalReason = "capture-limit";
 		}
 	}
 
@@ -1380,6 +1384,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		if (FPlayerRouted(*pdefendingplayer)) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+			m_terminalReason = "rout";
 		}
 		return Result::Succeeded;
 	}
@@ -1415,6 +1420,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		if (FPlayerRouted(*pattackingplayer)) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
+			m_terminalReason = "rout";
 		}
 		return Result::Succeeded;
 	}
@@ -2245,6 +2251,7 @@ bool GameState::CheckPlayerResigns() noexcept {
 		//std::cout << "Forfeit by player" << (m_isFirstPlayerTurn ? 0 : 1) << std::endl;
 		//std::cout << "Winning player" << m_winningPlayer << std::endl;
 		m_fGameOver = true;
+		m_terminalReason = "heuristic-resign";
 	}
 
 	return true;
@@ -2261,6 +2268,7 @@ GameState::GameState(const GameState& other) noexcept :
 	m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
 	m_fGameOver = other.m_fGameOver;
 	m_winningPlayer = other.m_winningPlayer;
+	m_terminalReason = other.m_terminalReason;
 	m_combatRngSeed = other.m_combatRngSeed;
 	m_combatRng = other.m_combatRng;
 	m_weather = other.m_weather;
@@ -2286,6 +2294,7 @@ GameState& GameState::operator=(const GameState& other) noexcept {
 		m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
 		m_fGameOver = other.m_fGameOver;
 		m_winningPlayer = other.m_winningPlayer;
+		m_terminalReason = other.m_terminalReason;
 		m_combatRngSeed = other.m_combatRngSeed;
 		m_combatRng = other.m_combatRng;
 		m_weather = other.m_weather;
@@ -2464,6 +2473,12 @@ void GameState::from_json(json& j, GameState& gameState) {
 	j.at("turn-count").get_to(gameState.m_nTurnCount);
 	j.at("game-over").get_to(gameState.m_fGameOver);
 	j.at("winner").get_to(gameState.m_winningPlayer);
+	if (j.contains("terminalReason") && !j.at("terminalReason").is_null()) {
+		gameState.m_terminalReason = j.at("terminalReason").get<std::string>();
+	}
+	else {
+		gameState.m_terminalReason.reset();
+	}
 	int activePlayer;
 	j.at("activePlayer").get_to(activePlayer);
 	gameState.m_isFirstPlayerTurn = activePlayer == 0;

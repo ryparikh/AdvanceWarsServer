@@ -17,7 +17,7 @@ The HTTP route registration lives in `AdvanceWarsServer/src/AdvanceWarsServer.cp
 
 Important caveats:
 
-- The current `main.cpp` usage text advertises `-server`, but the command dispatcher does not currently call `AdvanceWarsServer::run()` for that option.
+- The executable supports `-server`, which starts the current HTTP wrapper on port 80.
 - Game creation ignores map, settings, players, countries, COs, and seed.
 - Unknown game ids and invalid action responses are not a stable contract yet.
 - `POST /actions/:gameid` can apply implicit extra state change through auto-end-turn behavior.

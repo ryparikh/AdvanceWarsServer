@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdint>
+#include <exception>
 #include <random>
 #include <thread>
 #include <future>
@@ -251,6 +252,9 @@ int main(int argc, char* argv[]) noexcept {
 			time_point endTime = std::chrono::steady_clock::now();
 			std::cout << "Tests took to simulate: " << std::chrono::duration<double>(endTime - startTime).count() << "s" << std::endl;
 		}
+		else if (argument == "-server") {
+			return AdvanceWarsServer::getInstance().run();
+		}
 		else if (argument == "-converter") {
 
 			Player player1(CommandingOfficier::Type::Andy, Player::ArmyType::OrangeStar);
@@ -265,8 +269,13 @@ int main(int argc, char* argv[]) noexcept {
 			outFile.close();
 		}
 	}
+	catch (const std::exception& err) {
+		std::cerr << "exception was thrown: " << err.what() << std::endl;
+		return 1;
+	}
 	catch (...) {
-		std::cout << "exception was thrown" << std::endl;
+		std::cerr << "exception was thrown" << std::endl;
+		return 1;
 	}
 	return 0;
 }

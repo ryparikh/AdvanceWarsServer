@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ActionHighlights } from "../rendering/actions";
+import { movementTrailAfterHover, type ActionHighlights } from "../rendering/actions";
 import { boardTileSize, type BoardImages, renderBoard } from "../rendering/renderBoard";
 import { unitAssetPath } from "../rendering/unitAssets";
 import type { Coordinate, GameState } from "../gameState/schema";
@@ -52,6 +52,7 @@ export function BoardCanvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<BoardImages>({ units: new Map() });
   const [hover, setHover] = useState<Coordinate | undefined>();
+  const [movementTrail, setMovementTrail] = useState<Coordinate[] | undefined>();
   const assetPaths = useMemo(() => unitAssetPaths(gameState), [gameState]);
   const cols = gameState.map[0]?.length ?? 0;
   const rows = gameState.map.length;
@@ -89,6 +90,10 @@ export function BoardCanvas({
   }, [assetPaths]);
 
   useEffect(() => {
+    setMovementTrail(selected ? [selected] : undefined);
+  }, [highlights, selected]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
@@ -110,12 +115,13 @@ export function BoardCanvas({
       images,
       selected,
       hover,
+      movementTrail,
       highlights,
       showCoordinates,
       showGrid,
       showTerrainIds
     });
-  }, [cssHeight, cssWidth, gameState, highlights, hover, images, selected, showCoordinates, showGrid, showTerrainIds, zoom]);
+  }, [cssHeight, cssWidth, gameState, highlights, hover, images, movementTrail, selected, showCoordinates, showGrid, showTerrainIds, zoom]);
 
   function eventToCoordinate(event: React.MouseEvent<HTMLCanvasElement>): Coordinate | undefined {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -132,10 +138,16 @@ export function BoardCanvas({
       ref={canvasRef}
       className="board-canvas"
       onPointerLeave={() => setHover(undefined)}
-      onPointerMove={(event) => setHover(eventToCoordinate(event))}
+      onPointerMove={(event) => {
+        const coordinate = eventToCoordinate(event);
+        setHover(coordinate);
+        setMovementTrail((current) => movementTrailAfterHover(current, selected, coordinate, highlights));
+      }}
       onClick={(event) => {
         const coordinate = eventToCoordinate(event);
         if (coordinate) {
+          setHover(coordinate);
+          setMovementTrail((current) => movementTrailAfterHover(current, selected, coordinate, highlights));
           onSelectTile(coordinate);
         }
       }}

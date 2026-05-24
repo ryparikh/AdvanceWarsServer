@@ -227,6 +227,7 @@ public:
 
 	GameState Clone();
 	Result InitializeGame() noexcept;
+	Result StartFirstTurn() noexcept;
 	Result DoAction(const Action& action) noexcept;
 	Map* TryGetMap() const noexcept;
 	const std::string& GetId() const noexcept;

@@ -50,6 +50,15 @@ bool RunCreateGetAndLegalActionContract() {
 	if (!Expect(create.body.contains("terminalReason") && create.body.at("terminalReason").is_null(), "active game should have null terminalReason")) {
 		return false;
 	}
+	if (!Expect(create.body.at("turn-count") == 1, "create should run the opening turn start")) {
+		return false;
+	}
+	if (!Expect(create.body.at("players").at(0).at("funds") == 2000, "opening turn start should pay player 1 income")) {
+		return false;
+	}
+	if (!Expect(create.body.at("players").at(1).at("funds") == 0, "opening turn start should not pay player 2 income yet")) {
+		return false;
+	}
 
 	const std::string gameId = create.body.at("gameId").get<std::string>();
 	ApiResponse get = service.GetGame(gameId);
@@ -74,6 +83,16 @@ bool RunCreateGetAndLegalActionContract() {
 		return false;
 	}
 	if (!Expect(allActions.body.at("actions").is_array() && !allActions.body.at("actions").empty(), "all legal actions should include actions")) {
+		return false;
+	}
+	bool hasEndTurn = false;
+	for (const json& action : allActions.body.at("actions")) {
+		if (action.at("type") == "end-turn") {
+			hasEndTurn = true;
+			break;
+		}
+	}
+	if (!Expect(hasEndTurn, "all legal actions should include end-turn")) {
 		return false;
 	}
 

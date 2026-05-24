@@ -169,6 +169,14 @@ Result GameState::EndTurn() noexcept {
 	return Result::Succeeded;
 }
 
+Result GameState::StartFirstTurn() noexcept {
+	if (m_nTurnCount != 0 || !m_isFirstPlayerTurn || m_fGameOver) {
+		return Result::Failed;
+	}
+
+	return BeginTurn();
+}
+
 Result GameState::BeginTurn() noexcept {
 	// TODO Refactor to get rid of 4O(n^2)
 	if (m_isFirstPlayerTurn) {

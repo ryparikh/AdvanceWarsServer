@@ -1,8 +1,8 @@
-import type { ActionHighlights } from "./actions";
+import { actionPreviewForTile, type ActionHighlights, type ActionPreview } from "./actions";
 import { spriteLocations } from "./spriteLocations";
 import { terrainSpriteName } from "./terrain";
 import { unitAssetPath, unitFallbackLabel } from "./unitAssets";
-import type { Coordinate, GameState, MapTile } from "../gameState/schema";
+import { coordinateKey, type Coordinate, type GameState, type MapTile, type Unit } from "../gameState/schema";
 
 const tileSize = 16;
 const plainSprite = spriteLocations.clear.plain;
@@ -17,6 +17,7 @@ export type RenderBoardOptions = {
   images: BoardImages;
   selected?: Coordinate;
   hover?: Coordinate;
+  movementTrail?: Coordinate[];
   highlights?: ActionHighlights;
   showCoordinates: boolean;
   showGrid: boolean;
@@ -29,6 +30,19 @@ type SpriteInfo = {
   w: number;
   h: number;
 };
+
+type CanvasPoint = {
+  x: number;
+  y: number;
+};
+
+type RouteStroke = {
+  linePoints: CanvasPoint[];
+  arrowFrom?: CanvasPoint;
+  arrowTo?: CanvasPoint;
+};
+
+const routeArrowInset = 6;
 
 function drawTextBadge(
   ctx: CanvasRenderingContext2D,
@@ -49,6 +63,106 @@ function drawTextBadge(
   ctx.fillRect(left, y, width, 9);
   ctx.fillStyle = color;
   ctx.fillText(text, x + (align === "right" ? -2 : 2), y + 1);
+  ctx.restore();
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function tileCenter(coordinate: Coordinate): CanvasPoint {
+  return {
+    x: coordinate[0] * tileSize + tileSize / 2,
+    y: coordinate[1] * tileSize + tileSize / 2
+  };
+}
+
+function drawArrowHead(ctx: CanvasRenderingContext2D, from: CanvasPoint, to: CanvasPoint, color: string, size = 6) {
+  const angle = Math.atan2(to.y - from.y, to.x - from.x);
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(to.x, to.y);
+  ctx.lineTo(to.x - Math.cos(angle - Math.PI / 6) * size, to.y - Math.sin(angle - Math.PI / 6) * size);
+  ctx.lineTo(to.x - Math.cos(angle + Math.PI / 6) * size, to.y - Math.sin(angle + Math.PI / 6) * size);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawOutlinedArrowHead(ctx: CanvasRenderingContext2D, from: CanvasPoint, to: CanvasPoint) {
+  drawArrowHead(ctx, from, to, "#ffd74a", 8);
+  drawArrowHead(ctx, from, to, "#ed271d", 6);
+}
+
+function strokeRoutePath(ctx: CanvasRenderingContext2D, points: CanvasPoint[]) {
+  ctx.beginPath();
+  points.forEach((point, index) => {
+    if (index === 0) {
+      ctx.moveTo(point.x, point.y);
+    } else {
+      ctx.lineTo(point.x, point.y);
+    }
+  });
+  ctx.stroke();
+}
+
+export function routeStrokeForPath(path: Coordinate[], withArrow = true): RouteStroke | undefined {
+  if (path.length < 2) {
+    return undefined;
+  }
+
+  const points = path.map(tileCenter);
+  if (!withArrow) {
+    return { linePoints: points };
+  }
+
+  const arrowFrom = points[points.length - 2];
+  const arrowTo = points[points.length - 1];
+  const dx = arrowTo.x - arrowFrom.x;
+  const dy = arrowTo.y - arrowFrom.y;
+  const length = Math.hypot(dx, dy);
+  if (length <= 0) {
+    return { linePoints: points, arrowFrom, arrowTo };
+  }
+
+  const inset = Math.min(routeArrowInset, Math.max(0, length - 1));
+  const linePoints = [...points];
+  linePoints[linePoints.length - 1] = {
+    x: arrowTo.x - (dx / length) * inset,
+    y: arrowTo.y - (dy / length) * inset
+  };
+
+  return { linePoints, arrowFrom, arrowTo };
+}
+
+function drawRoute(ctx: CanvasRenderingContext2D, path: Coordinate[], withArrow = true) {
+  const routeStroke = routeStrokeForPath(path, withArrow);
+  if (!routeStroke) {
+    return;
+  }
+
+  ctx.save();
+  ctx.lineJoin = "miter";
+  ctx.lineCap = "butt";
+
+  ctx.translate(1, 1);
+  ctx.strokeStyle = "rgba(97, 21, 17, 0.58)";
+  ctx.lineWidth = 8;
+  strokeRoutePath(ctx, routeStroke.linePoints);
+  ctx.translate(-1, -1);
+
+  ctx.strokeStyle = "#ffd63a";
+  ctx.lineWidth = 7;
+  strokeRoutePath(ctx, routeStroke.linePoints);
+
+  ctx.strokeStyle = "#ed271d";
+  ctx.lineWidth = 5;
+  strokeRoutePath(ctx, routeStroke.linePoints);
+
+  if (routeStroke.arrowFrom && routeStroke.arrowTo) {
+    drawOutlinedArrowHead(ctx, routeStroke.arrowFrom, routeStroke.arrowTo);
+  }
   ctx.restore();
 }
 
@@ -219,6 +333,35 @@ function drawTerrain(ctx: CanvasRenderingContext2D, state: GameState, images: Bo
   }
 }
 
+function unitAt(state: GameState, coordinate: Coordinate): Unit | undefined {
+  return state.map[coordinate[1]]?.[coordinate[0]]?.unit;
+}
+
+function drawUnitIcon(
+  ctx: CanvasRenderingContext2D,
+  images: BoardImages,
+  unit: Unit | undefined,
+  x: number,
+  y: number
+) {
+  if (!unit) {
+    ctx.fillStyle = "#d8e0e8";
+    ctx.fillRect(x, y, tileSize, tileSize);
+    return;
+  }
+
+  const assetPath = unitAssetPath(unit.owner, unit.type, false);
+  const image = assetPath ? images.units.get(assetPath) : undefined;
+  if (image) {
+    ctx.drawImage(image, x, y, tileSize, tileSize);
+    return;
+  }
+
+  ctx.fillStyle = unit.owner === "blue-moon" ? "#2b67d1" : "#d86f1f";
+  ctx.fillRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
+  drawTextBadge(ctx, unitFallbackLabel(unit.type), x + 1, y + 4, "#fff");
+}
+
 function drawUnits(ctx: CanvasRenderingContext2D, state: GameState, images: BoardImages) {
   for (let row = 0; row < state.map.length; row += 1) {
     for (let col = 0; col < state.map[row].length; col += 1) {
@@ -296,6 +439,119 @@ function drawHighlights(ctx: CanvasRenderingContext2D, options: RenderBoardOptio
   ctx.restore();
 }
 
+function drawAttackArrow(ctx: CanvasRenderingContext2D, attacker: Coordinate, defender: Coordinate) {
+  const start = tileCenter(attacker);
+  const end = tileCenter(defender);
+  const angle = Math.atan2(end.y - start.y, end.x - start.x);
+  const from = {
+    x: start.x + Math.cos(angle) * 5,
+    y: start.y + Math.sin(angle) * 5
+  };
+  const to = {
+    x: end.x - Math.cos(angle) * 5,
+    y: end.y - Math.sin(angle) * 5
+  };
+
+  ctx.save();
+  ctx.strokeStyle = "#ffd63a";
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(from.x, from.y);
+  ctx.lineTo(to.x, to.y);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#ed271d";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(from.x, from.y);
+  ctx.lineTo(to.x, to.y);
+  ctx.stroke();
+  drawArrowHead(ctx, from, to, "#ed271d", 7);
+  ctx.restore();
+}
+
+function drawAttackCard(ctx: CanvasRenderingContext2D, state: GameState, images: BoardImages, preview: Extract<ActionPreview, { kind: "attack" }>) {
+  const attackerPoint = tileCenter(preview.attacker);
+  const defenderPoint = tileCenter(preview.defender);
+  const width = 78;
+  const height = 31;
+  const boardWidth = (state.map[0]?.length ?? 0) * tileSize;
+  const boardHeight = state.map.length * tileSize;
+  const centerX = (attackerPoint.x + defenderPoint.x) / 2;
+  let x = clamp(Math.round(centerX - width / 2), 2, Math.max(2, boardWidth - width - 2));
+  let y = Math.min(attackerPoint.y, defenderPoint.y) - height - 10;
+  if (y < 2) {
+    y = Math.max(attackerPoint.y, defenderPoint.y) + 10;
+  }
+  y = clamp(Math.round(y), 2, Math.max(2, boardHeight - height - 2));
+
+  const attackerUnit = unitAt(state, preview.attackerUnit);
+  const defenderUnit = unitAt(state, preview.defender);
+
+  ctx.save();
+  ctx.fillStyle = "rgba(16, 22, 30, 0.28)";
+  ctx.fillRect(x + 2, y + 2, width, height);
+  ctx.fillStyle = "rgba(255, 255, 248, 0.94)";
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = "#f2362d";
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
+
+  drawUnitIcon(ctx, images, attackerUnit, x + 4, y + 7);
+  drawUnitIcon(ctx, images, defenderUnit, x + width - 20, y + 7);
+
+  ctx.fillStyle = "#101832";
+  ctx.font = "8px 'Trebuchet MS', Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Attack", x + width / 2, y + 10);
+  ctx.fillText("Counter", x + width / 2, y + 22);
+
+  const arrowLeft = x + 24;
+  const arrowRight = x + width - 24;
+  drawArrowHead(ctx, { x: arrowLeft, y: y + 10 }, { x: arrowRight, y: y + 10 }, "#ed271d", 4);
+  drawArrowHead(ctx, { x: arrowRight, y: y + 22 }, { x: arrowLeft, y: y + 22 }, "#ed271d", 4);
+  ctx.strokeStyle = "#ed271d";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(arrowLeft, y + 10);
+  ctx.lineTo(arrowRight, y + 10);
+  ctx.moveTo(arrowRight, y + 22);
+  ctx.lineTo(arrowLeft, y + 22);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function actionPreviewFromOptions(options: RenderBoardOptions): ActionPreview | undefined {
+  if (!options.selected || !options.hover || !options.highlights) {
+    return undefined;
+  }
+
+  const actions = options.highlights.actionsByTile.get(coordinateKey(options.hover)) ?? [];
+  return actionPreviewForTile(actions, options.selected, options.hover, options.movementTrail);
+}
+
+function drawActionPreview(ctx: CanvasRenderingContext2D, state: GameState, options: RenderBoardOptions) {
+  const preview = actionPreviewFromOptions(options);
+  if (!preview) {
+    return;
+  }
+
+  ctx.save();
+  if (preview.kind === "move") {
+    drawRoute(ctx, preview.path);
+  } else {
+    if (preview.route && preview.route.length > 1) {
+      drawRoute(ctx, preview.route);
+    }
+    ctx.fillStyle = "rgba(238, 42, 32, 0.38)";
+    ctx.fillRect(preview.defender[0] * tileSize, preview.defender[1] * tileSize, tileSize, tileSize);
+    drawAttackArrow(ctx, preview.attacker, preview.defender);
+    drawAttackCard(ctx, state, options.images, preview);
+  }
+  ctx.restore();
+}
+
 function drawDebugOverlays(ctx: CanvasRenderingContext2D, state: GameState, options: RenderBoardOptions) {
   for (let row = 0; row < state.map.length; row += 1) {
     for (let col = 0; col < state.map[row].length; col += 1) {
@@ -346,6 +602,7 @@ export function renderBoard(ctx: CanvasRenderingContext2D, state: GameState, opt
   drawCaptureProgress(ctx, state);
   drawUnits(ctx, state, options.images);
   drawDebugOverlays(ctx, state, options);
+  drawActionPreview(ctx, state, options);
   drawCursor(ctx, options);
 }
 

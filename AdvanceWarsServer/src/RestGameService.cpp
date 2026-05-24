@@ -370,6 +370,8 @@ ApiResponse RestGameService::CreateGame(const std::string& requestBody) {
 	templateJson["gameId"] = Platform::createUuid();
 	templateJson["unit-cap"] = 50;
 	templateJson["cap-limit"] = 21;
+	templateJson["activePlayer"] = 0;
+	templateJson["turn-count"] = 0;
 	templateJson.erase("combat-rng-seed");
 
 	for (int i = 0; i < 2; ++i) {
@@ -427,6 +429,10 @@ ApiResponse RestGameService::CreateGame(const std::string& requestBody) {
 			return ErrorResponse(HttpBadRequest, "invalid-field", "seed must be an integer.", { { "field", "seed" } });
 		}
 		gameState.SetCombatRngSeed(request.at("seed").get<std::uint32_t>());
+	}
+
+	if (gameState.StartFirstTurn() == Result::Failed) {
+		return ErrorResponse(HttpInternalServerError, "game-initialization-failed", "Game could not run the opening turn start.", { { "mapId", mapId } });
 	}
 
 	const std::string gameId = gameState.GetId();

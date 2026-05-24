@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BoardCanvas } from "./components/BoardCanvas";
 import { actionHighlightsForSource } from "./rendering/actions";
+import { actionToSubmitFromBoardTarget, actionsVisibleInInspector, buyMenuItems, globalActionsFromLegalActions, labelForAction } from "./gameState/actionDisplay";
 import { coordinateKey, parseGameStatePayload, type Action, legalActionEnvelopeSchema, type Coordinate, type GameState, type ValidActionGroup } from "./gameState/schema";
 import { normalizeServerBaseUrl, serverApiUrl } from "./api/url";
 import { terrainDisplayName } from "./rendering/terrain";
+import { unitAssetPath, unitFallbackLabel } from "./rendering/unitAssets";
 import "./styles.css";
 
 const defaultServerBaseUrl = "http://localhost:80";
@@ -14,6 +16,7 @@ type LoadSource = "sample" | "server" | "pasted";
 
 type LoadedState = {
   gameState: GameState;
+  globalActions: Action[];
   legalActionGroups: ValidActionGroup[];
   source: LoadSource;
   label: string;
@@ -47,6 +50,18 @@ async function fetchJson(path: string): Promise<unknown> {
     throw new Error(`${response.status} ${response.statusText}`);
   }
   return response.json();
+}
+
+async function fetchServerGlobalActions(baseUrl: string, gameId: string): Promise<Action[]> {
+  const response = await fetch(serverApiUrl(baseUrl, "games", gameId, "actions"), {
+    credentials: "omit"
+  });
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+
+  const envelope = legalActionEnvelopeSchema.parse(await response.json());
+  return globalActionsFromLegalActions(envelope.actions);
 }
 
 function actionGroupForSelection(groups: ValidActionGroup[], selected?: Coordinate): Action[] {
@@ -106,7 +121,7 @@ export default function App() {
         return;
       }
       actionRequestId.current += 1;
-      setLoaded({ ...parsed, source: "sample", label });
+      setLoaded({ ...parsed, globalActions: [], source: "sample", label });
       setSelected(undefined);
       setInspectedCoordinate(undefined);
       setSelectedActions([]);
@@ -160,11 +175,12 @@ export default function App() {
         throw new Error(`${response.status} ${response.statusText}`);
       }
       const parsed = parseGameStatePayload(await response.json());
+      const globalActions = await fetchServerGlobalActions(baseUrl, parsed.gameState.gameId);
       if (loadRequestId.current !== requestId) {
         return;
       }
       actionRequestId.current += 1;
-      setLoaded({ ...parsed, source: "server", label: "Server game" });
+      setLoaded({ ...parsed, globalActions, source: "server", label: "Server game" });
       setSelected(undefined);
       setInspectedCoordinate(undefined);
       setSelectedActions([]);
@@ -190,7 +206,7 @@ export default function App() {
       }
       const parsed = parseGameStatePayload(JSON.parse(pasteValue));
       actionRequestId.current += 1;
-      setLoaded({ ...parsed, source: "pasted", label: "Pasted JSON" });
+      setLoaded({ ...parsed, globalActions: [], source: "pasted", label: "Pasted JSON" });
       setSelected(undefined);
       setInspectedCoordinate(undefined);
       setSelectedActions([]);
@@ -202,7 +218,15 @@ export default function App() {
 
   async function selectTile(coordinate: Coordinate) {
     const targetActions = highlights?.actionsByTile.get(coordinateKey(coordinate));
-    if (selected && targetActions && (coordinate[0] !== selected[0] || coordinate[1] !== selected[1])) {
+    if (selected && targetActions) {
+      const actionToSubmit = loaded?.source === "server" && loaded.gameState["game-over"] === false
+        ? actionToSubmitFromBoardTarget(targetActions)
+        : undefined;
+      if (actionToSubmit) {
+        await submitServerAction(actionToSubmit);
+        return;
+      }
+
       setInspectedCoordinate(coordinate);
       setInspectedActions(targetActions);
       return;
@@ -242,13 +266,70 @@ export default function App() {
     }
   }
 
+  async function submitServerAction(action: Action) {
+    if (!loaded || loaded.source !== "server") {
+      return;
+    }
+
+    const requestId = loadRequestId.current + 1;
+    loadRequestId.current = requestId;
+    actionRequestId.current += 1;
+    setIsLoading(true);
+    setError(undefined);
+    try {
+      const baseUrl = normalizeServerBaseUrl(serverBaseUrl);
+      rememberServerBaseUrl(baseUrl);
+      setServerBaseUrl(baseUrl);
+      const response = await fetch(serverApiUrl(baseUrl, "games", loaded.gameState.gameId, "actions"), {
+        method: "POST",
+        credentials: "omit",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(action)
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}`);
+      }
+
+      const parsed = parseGameStatePayload(await response.json());
+      const globalActions = await fetchServerGlobalActions(baseUrl, parsed.gameState.gameId);
+      if (loadRequestId.current !== requestId) {
+        return;
+      }
+
+      setLoaded({ ...parsed, globalActions, source: "server", label: loaded.label });
+      setSelected(undefined);
+      setInspectedCoordinate(undefined);
+      setSelectedActions([]);
+      setInspectedActions([]);
+    } catch (err) {
+      if (loadRequestId.current === requestId) {
+        setError(err instanceof Error ? err.message : "Unable to submit action");
+      }
+    } finally {
+      if (loadRequestId.current === requestId) {
+        setIsLoading(false);
+      }
+    }
+  }
+
   function toggle(key: keyof Toggles) {
     setToggles((current) => ({ ...current, [key]: !current[key] }));
   }
 
   const displayCoordinate = inspectedCoordinate ?? selected;
   const tile = loaded ? selectedTile(loaded.gameState, displayCoordinate) : undefined;
-  const displayedActions = inspectedActions.length > 0 ? inspectedActions : selectedActions;
+  const displayedActions = actionsVisibleInInspector({
+    globalActions: loaded?.globalActions ?? [],
+    inspectedActions,
+    selectedActions
+  });
+  const activePlayer = loaded?.gameState.players[loaded.gameState.activePlayer];
+  const buyItems = inspectedActions.length > 0 ? [] : buyMenuItems(selectedActions, activePlayer);
+  const buyActionSet = new Set(buyItems.map((item) => item.action));
+  const commandActions = displayedActions.filter((action) => !buyActionSet.has(action));
+  const canSubmitDisplayedActions = loaded?.source === "server" && loaded.gameState["game-over"] === false;
   const mapRows = loaded?.gameState.map.length ?? 0;
   const mapCols = loaded?.gameState.map[0]?.length ?? 0;
 
@@ -411,14 +492,44 @@ export default function App() {
 
           <div className="inspector-block">
             <h2>Actions</h2>
-            {displayedActions.length > 0 ? (
+            {buyItems.length > 0 || commandActions.length > 0 ? (
               <div className="action-list">
-                {displayedActions.map((action, index) => (
-                  <pre key={`${coordinateKey(action.source ?? [0, 0])}-${action.type}-${index}`}>{JSON.stringify(action)}</pre>
+                {buyItems.length > 0 && activePlayer && (
+                  <div className="buy-menu" aria-label="Deployment menu">
+                    {buyItems.map((item) => {
+                      const assetPath = unitAssetPath(activePlayer.armyType, item.unit, false);
+                      return (
+                        <button
+                          type="button"
+                          className="buy-menu-row"
+                          key={`${coordinateKey(item.action.source ?? [0, 0])}-${item.unit}`}
+                          onClick={() => submitServerAction(item.action)}
+                          disabled={!canSubmitDisplayedActions || isLoading}
+                          aria-label={`Buy ${item.label} for ${formatMoney(item.cost)}`}
+                        >
+                          <span className="buy-unit-icon" aria-hidden="true">
+                            {assetPath ? <img src={assetPath} alt="" /> : unitFallbackLabel(item.unit)}
+                          </span>
+                          <span className="buy-unit-name">{item.label}</span>
+                          <span className="buy-unit-cost">{formatMoney(item.cost)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {commandActions.map((action, index) => (
+                  <div className={canSubmitDisplayedActions ? "action-row" : "action-row action-row-readonly"} key={`${coordinateKey(action.source ?? [0, 0])}-${action.type}-${index}`}>
+                    {canSubmitDisplayedActions && (
+                      <button type="button" onClick={() => submitServerAction(action)} disabled={isLoading}>
+                        {labelForAction(action)}
+                      </button>
+                    )}
+                    <pre>{JSON.stringify(action)}</pre>
+                  </div>
                 ))}
               </div>
             ) : (
-              <p className="muted">No server or sample actions for this tile.</p>
+              <p className="muted">No actions available.</p>
             )}
           </div>
 

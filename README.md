@@ -30,6 +30,7 @@ See [STANDARD_ENGINE_COMPLETENESS.md](STANDARD_ENGINE_COMPLETENESS.md) for the c
 | `AdvanceWarsServer/src/` | Engine implementation, JSON fixture runner, map parser, HTTP routes, and platform code. |
 | `AdvanceWarsServer/test/json/` | Recursive JSON regression suite for engine behavior. |
 | `AdvanceWarsServer/res/AWBW/` | AWBW map/game source data used for development and conversion experiments. |
+| `frontend/` | React/Vite board viewer for server or sample `GameState` JSON. |
 | `BUILD_AND_TEST.md` | Build, executable, and test commands. |
 | `STANDARD_ENGINE_COMPLETENESS.md` | Standard-mode rules/API completeness matrix and issue index. |
 | `CO_SUPPORT.md` | Implemented CO behavior and focused CO follow-up issues. |
@@ -92,6 +93,8 @@ The desired direction is:
 - Bot replay and fixture visualizers reuse the same board renderer.
 
 The current HTTP wrapper is still early and hardcoded in places. See [docs/API.md](docs/API.md) and the related issues #66, #67, #68, #110, #111, #112, #113, #114, and #115.
+
+The React board viewer lives in [frontend/](frontend/). It can render checked-in sample JSON, pasted serialized `GameState` JSON, or a game created from the current HTTP server.
 
 ## Rule References
 

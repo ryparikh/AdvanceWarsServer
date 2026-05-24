@@ -7,6 +7,7 @@ This project can be built from the Visual Studio solution with MSBuild.
 - Visual Studio 2022 with the v143 C++ toolset.
 - Windows SDK 10.0.
 - The local dependency paths referenced by `AdvanceWarsServer/AdvanceWarsServer.vcxproj`, including libtorch, nlohmann-json, asio, and via-httplib.
+- Node.js 24 LTS and Yarn 1.x for the React board viewer.
 
 ## Build
 
@@ -53,10 +54,36 @@ The executable currently recognizes these development commands:
 | `-test [path]` | Run the recursive JSON fixture suite. | Defaults to `test/json`. Run from `AdvanceWarsServer/` so relative paths resolve. |
 | `-sim-random-move-game [seed]` | Run an experimental random-action simulation. | Uses local output paths that still need cleanup before general use. |
 | `-sim-mcts-game` | Run an experimental MCTS simulation. | Uses local output paths that still need cleanup before general use. |
+| `-server` | Run the current HTTP server on port 80. | Serves the legacy routes documented in `docs/API.md`; route cleanup is tracked by #66. |
 | `-converter` | Regenerate the hardcoded Lefty map JSON. | Developer utility. |
 | `-torchlib` | Run a local libtorch/MNIST experiment. | Depends on local `D:/MNIST` and libtorch paths. |
 
-The usage text also advertises `-server`, and the HTTP wrapper exists in `AdvanceWarsServer/src/AdvanceWarsServer.cpp`, but `main.cpp` does not currently dispatch `-server` to `AdvanceWarsServer::run()`. The REST/server contract cleanup is tracked by #66.
+## Frontend Board Viewer
+
+The React/Vite board viewer lives in `frontend/`.
+
+```powershell
+Set-Location .\frontend
+yarn install
+yarn dev
+```
+
+Open <http://127.0.0.1:5173/>. The app loads the checked-in Lefty sample by default, and the `Action sample` button loads a small fixture with legal-action highlights.
+
+Verification:
+
+```powershell
+yarn test
+yarn typecheck
+yarn build
+```
+
+The frontend defaults to `http://localhost:80` when creating a server-backed game. Start the C++ server from the engine project directory in a second terminal:
+
+```powershell
+Set-Location .\AdvanceWarsServer
+..\x64\Debug\AdvanceWarsServer.exe -server
+```
 
 ## Additional Docs
 

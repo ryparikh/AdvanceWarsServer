@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BoardCanvas } from "./components/BoardCanvas";
 import { actionHighlightsForSource } from "./rendering/actions";
-import { coordinateKey, parseGameStatePayload, type Action, actionListSchema, type Coordinate, type GameState, type ValidActionGroup } from "./gameState/schema";
+import { coordinateKey, parseGameStatePayload, type Action, legalActionEnvelopeSchema, type Coordinate, type GameState, type ValidActionGroup } from "./gameState/schema";
 import { normalizeServerBaseUrl, serverApiUrl } from "./api/url";
 import { terrainDisplayName } from "./rendering/terrain";
 import "./styles.css";
@@ -145,7 +145,16 @@ export default function App() {
       const response = await fetch(serverApiUrl(baseUrl, "games"), {
         method: "POST",
         credentials: "omit",
-        body: "{}"
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          mapId: "lefty",
+          players: [
+            { co: "andy", armyType: "orange-star" },
+            { co: "adder", armyType: "blue-moon" }
+          ]
+        })
       });
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
@@ -213,13 +222,16 @@ export default function App() {
 
     setError(undefined);
     try {
-      const response = await fetch(serverApiUrl(serverBaseUrl, "actions", loaded.gameState.gameId, coordinate[0], coordinate[1]), {
+      const actionsUrl = new URL(serverApiUrl(serverBaseUrl, "games", loaded.gameState.gameId, "actions"));
+      actionsUrl.searchParams.set("x", String(coordinate[0]));
+      actionsUrl.searchParams.set("y", String(coordinate[1]));
+      const response = await fetch(actionsUrl.toString(), {
         credentials: "omit"
       });
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
       }
-      const actions = actionListSchema.parse(await response.json());
+      const actions = legalActionEnvelopeSchema.parse(await response.json()).actions;
       if (actionRequestId.current === requestId) {
         setSelectedActions(actions);
       }

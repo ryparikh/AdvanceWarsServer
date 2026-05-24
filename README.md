@@ -92,7 +92,7 @@ The desired direction is:
 - React frontend renders board state and asks the server what actions are legal.
 - Bot replay and fixture visualizers reuse the same board renderer.
 
-The current HTTP wrapper is still early and hardcoded in places. See [docs/API.md](docs/API.md) and the related issues #66, #67, #68, #110, #111, #112, #113, #114, and #115.
+The HTTP wrapper exposes the canonical lifecycle/action contract documented in [docs/API.md](docs/API.md). Related follow-up work lives in #67, #68, #110, #111, #112, #113, #114, and #115.
 
 The React board viewer lives in [frontend/](frontend/). It can render checked-in sample JSON, pasted serialized `GameState` JSON, or a game created from the current HTTP server.
 
@@ -112,6 +112,6 @@ Primary local/reference docs:
 ## Known Caveats
 
 - The Standard completeness matrix is current as of its review date, not a substitute for issue triage.
-- The current REST wrapper does not yet satisfy the target API contract.
+- The REST wrapper is intentionally v1: games are process-local, Standard-only, and use a small curated map id catalog.
 - Several engine behaviors are intentionally documented as gaps rather than papered over in the docs.
 - Some local paths in experimental simulation/model code are still machine-specific and should be cleaned up before relying on those workflows broadly.

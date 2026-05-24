@@ -11,6 +11,8 @@
 #include "Platform.h"
 #include <torch/torch.h>
 
+int RunRestApiContractTests();
+
 int main(int argc, char* argv[]) noexcept {
 	try {
 		if (argc < 2) { // Check if the user provided exactly one argument
@@ -251,6 +253,9 @@ int main(int argc, char* argv[]) noexcept {
 
 			time_point endTime = std::chrono::steady_clock::now();
 			std::cout << "Tests took to simulate: " << std::chrono::duration<double>(endTime - startTime).count() << "s" << std::endl;
+		}
+		else if (argument == "-test-api-contract") {
+			return RunRestApiContractTests();
 		}
 		else if (argument == "-server") {
 			return AdvanceWarsServer::getInstance().run();

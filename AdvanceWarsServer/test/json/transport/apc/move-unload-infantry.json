@@ -119,7 +119,8 @@
     {
       "type": "unload",
       "source": [ 1, 0 ],
-      "direction": "east"
+      "direction": "east",
+      "unloadIndex": 0
     }
   ],
   "final-game-state": {

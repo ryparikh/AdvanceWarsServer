@@ -15,8 +15,8 @@ describe("normalizeServerBaseUrl", () => {
 
 describe("serverApiUrl", () => {
   it("encodes dynamic path segments instead of interpolating them", () => {
-    expect(serverApiUrl("http://localhost:8080/api", "actions", "game/../id", 1, 2)).toBe(
-      "http://localhost:8080/api/actions/game%2F..%2Fid/1/2"
+    expect(serverApiUrl("http://localhost:8080/api", "games", "game/../id", "actions")).toBe(
+      "http://localhost:8080/api/games/game%2F..%2Fid/actions"
     );
   });
 });

@@ -31,7 +31,7 @@
     "winner": -1
   },
   "failedActions": [
-    { "type": "unload", "source": [1, 0], "direction": "west" },
+    { "type": "unload", "source": [1, 0], "direction": "west", "unloadIndex": 0 },
     { "type": "move-wait", "source": [0, 1], "target": [1, 1] },
     { "type": "move-attack", "source": [0, 2], "target": [0, 2], "direction": "east" },
     { "type": "move-load", "source": [0, 3], "target": [1, 3] }

@@ -7,11 +7,11 @@ public:
 	PowerMeter(const CommandingOfficier::Type& type);
 	void AddCharge(int charge) noexcept;
 	bool FCopCharged() const noexcept {
-		return m_nCopStars > 0 && m_nCharge >= m_nCopStars * m_nStarValue;
+		return m_nCopStars > 0 && m_nCharge >= GetCopThreshold();
 	}
 
 	bool FScopCharged() const noexcept {
-		return m_nCharge >= GetTotalCharge();
+		return m_nCharge >= GetScopThreshold();
 	}
 
 	void UseCop() noexcept;
@@ -21,8 +21,16 @@ public:
 		return m_nCharge;
 	}
 
-	inline int GetTotalCharge() const noexcept {
+	inline int GetCopThreshold() const noexcept {
+		return m_nCopStars * m_nStarValue;
+	}
+
+	inline int GetScopThreshold() const noexcept {
 		return (m_nCopStars + m_nScopStars) * m_nStarValue;
+	}
+
+	inline int GetTotalCharge() const noexcept {
+		return GetScopThreshold();
 	}
 
 	static void to_json(json& j, const PowerMeter& powerMeter);

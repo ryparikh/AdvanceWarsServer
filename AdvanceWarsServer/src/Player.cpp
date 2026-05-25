@@ -71,8 +71,8 @@ PowerMeter::PowerMeter(const CommandingOfficier::Type& type) {
 		m_nScopStars = 4;
 		break;
 	case CommandingOfficier::Type::Sturm:
-		m_nCopStars = 5;
-		m_nScopStars = 5;
+		m_nCopStars = 6;
+		m_nScopStars = 4;
 		break;
 	case CommandingOfficier::Type::VonBolt:
 		m_nCopStars = 0;
@@ -97,7 +97,7 @@ void PowerMeter::UseScop() noexcept {
 }
 
 void PowerMeter::UseCop() noexcept {
-	m_nCharge -= m_nCopStars * m_nStarValue;
+	m_nCharge -= GetCopThreshold();
 	IncreaseStarCost();
 }
 
@@ -162,6 +162,10 @@ void from_json(json& j, Player& player) {
 		{"scop-stars", powerMeter.m_nScopStars},
 		{"charge", powerMeter.m_nCharge},
 		{"star-value", powerMeter.m_nStarValue},
+		{"cop-threshold", powerMeter.GetCopThreshold()},
+		{"scop-threshold", powerMeter.GetScopThreshold()},
+		{"can-use-cop", powerMeter.FCopCharged()},
+		{"can-use-scop", powerMeter.FScopCharged()},
 	};
 }
 

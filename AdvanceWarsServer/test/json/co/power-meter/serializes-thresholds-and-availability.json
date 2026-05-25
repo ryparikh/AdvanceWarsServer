@@ -1,0 +1,16 @@
+{
+  "co-contract": {
+    "name": "Andy",
+    "power-meter": {
+      "cop-stars": 3,
+      "scop-stars": 3,
+      "charge": 0,
+      "star-value": 9000,
+      "cop-threshold": 27000,
+      "scop-threshold": 54000,
+      "can-use-cop": false,
+      "can-use-scop": false
+    },
+    "stats": []
+  }
+}

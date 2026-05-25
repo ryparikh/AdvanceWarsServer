@@ -1371,7 +1371,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		int defenderVisualHealthEnd = std::max((pdefender->health + 9) / 10, 0);
 		int defenderUnitCost = (defenderVisualHealthStart - defenderVisualHealthEnd) * Unit::GetUnitCost(pdefender->m_properties.m_type);
 		if (pattackingplayer->PowerStatus() == 0) {
-			pattackingplayer->m_powerMeter.AddCharge(0.5 * defenderUnitCost);
+			pattackingplayer->m_powerMeter.AddCharge(defenderUnitCost / 2);
 		}
 		AddSashaWarBondsFunds(*pattackingplayer, defenderUnitCost);
 
@@ -1409,7 +1409,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		int attackerVisualHealthEnd = std::max((pattacker->health + 9) / 10, 0);
 		int attackerUnitCost = (attackerVisualHealthStart - attackerVisualHealthEnd) * Unit::GetUnitCost(pattacker->m_properties.m_type);
 		if (pdefendingplayer->PowerStatus() == 0) {
-			pdefendingplayer->m_powerMeter.AddCharge(0.5 * attackerUnitCost);
+			pdefendingplayer->m_powerMeter.AddCharge(attackerUnitCost / 2);
 		}
 		AddSashaWarBondsFunds(*pdefendingplayer, attackerUnitCost);
 		if (pattackingplayer->PowerStatus() == 0) {

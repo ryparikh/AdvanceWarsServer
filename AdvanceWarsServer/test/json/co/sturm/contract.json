@@ -2,8 +2,8 @@
   "co-contract": {
     "name": "Sturm",
     "power-meter": {
-      "cop-stars": 5,
-      "scop-stars": 5
+      "cop-stars": 6,
+      "scop-stars": 4
     },
     "stats": [
       {

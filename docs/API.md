@@ -1,6 +1,6 @@
 # API Notes
 
-Last reviewed: 2026-05-24
+Last reviewed: 2026-05-25
 
 The C++ engine is authoritative for legal actions and state transitions. REST clients should create games, fetch state, request legal actions, and submit exactly one server-validated action at a time.
 
@@ -39,6 +39,8 @@ Supported v1 map ids are `lefty` and `mcts`.
 ## Responses
 
 Successful create returns `201 Created`, a full game-state JSON body, and `Location: /games/:gameId`. Successful get and step responses return `200 OK` with the full current game state. Game-state responses include resolved `settings` and `terminalReason`; active games use `null` for `terminalReason`.
+
+Each player object includes a `power-meter` object. `cop-stars` and `scop-stars` are the CO's meter split, `charge` is current meter charge, and `star-value` is the current value of one star. `cop-threshold` and `scop-threshold` are the current charge thresholds for legal COP and SCOP actions, while `can-use-cop` and `can-use-scop` reflect whether those global power actions are currently available from meter charge.
 
 Legal-action responses use an envelope:
 

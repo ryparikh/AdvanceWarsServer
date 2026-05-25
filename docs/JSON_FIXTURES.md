@@ -1,6 +1,6 @@
 # JSON Fixture Guide
 
-Last reviewed: 2026-05-18
+Last reviewed: 2026-05-25
 
 The JSON suite under `AdvanceWarsServer/test/json` is the main executable documentation for engine behavior. The test runner recursively discovers `.json` files and runs each fixture independently.
 
@@ -108,7 +108,7 @@ For COs with bad luck, "lowest" means minimum good luck and maximum bad luck. "H
 
 ### CO Contract Fixture
 
-Use `co-contract` to check CO parser round-trip, power-meter stars, and checked-in chart values.
+Use `co-contract` to check CO parser round-trip, power-meter stars, thresholds, availability flags, and checked-in chart values.
 
 ```json
 {
@@ -116,7 +116,11 @@ Use `co-contract` to check CO parser round-trip, power-meter stars, and checked-
     "name": "Andy",
     "power-meter": {
       "cop-stars": 3,
-      "scop-stars": 6
+      "scop-stars": 6,
+      "cop-threshold": 27000,
+      "scop-threshold": 81000,
+      "can-use-cop": false,
+      "can-use-scop": false
     },
     "stats": [
       {
@@ -131,6 +135,8 @@ Use `co-contract` to check CO parser round-trip, power-meter stars, and checked-
 ```
 
 Use `invalid-co` to assert that an unknown CO string is rejected.
+
+Power-meter expectations are partial in CO contract fixtures: include only the fields relevant to the behavior under test. State-transition fixtures compare the full serialized game state, including `"charge"`, `"star-value"`, `"cop-threshold"`, `"scop-threshold"`, `"can-use-cop"`, and `"can-use-scop"` for each player.
 
 ## Action JSON
 

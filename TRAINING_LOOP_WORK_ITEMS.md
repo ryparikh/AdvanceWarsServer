@@ -100,4 +100,4 @@ The rules/API completeness target for the initial playable environment is normal
 - [ ] #66 Add REST game lifecycle and step API contract for self-play.
 - [ ] #67 Validate and atomically reject illegal submitted actions.
 - [x] #68 Make REST action stepping explicit and remove implicit auto-end-turn.
-- [ ] #69 Remove heuristic auto-resign from Standard engine terminal logic.
+- [x] #69 Remove heuristic auto-resign from Standard engine terminal logic.

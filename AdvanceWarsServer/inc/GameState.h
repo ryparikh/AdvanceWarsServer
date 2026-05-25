@@ -183,7 +183,6 @@ public:
 			to_json(jstate, *this);
 			std::cout << "Chose an invalid action:" << jaction.dump() << "\n" << jstate.dump() << std::endl;
 		}
-		actedGameState.CheckPlayerResigns();
 		return actedGameState;
 	}
 

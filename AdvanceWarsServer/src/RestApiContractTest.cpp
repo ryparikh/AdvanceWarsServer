@@ -158,6 +158,76 @@ json OneActionBeforeEndTurnGameState() {
 	};
 }
 
+json LowArmyValueNonTerminalGameState() {
+	json row = json::array();
+	for (int x = 0; x < 7; ++x) {
+		row.push_back({ { "terrain", 1 } });
+	}
+
+	row.at(0)["unit"] = {
+		{ "health", 100 },
+		{ "hidden", false },
+		{ "moved", false },
+		{ "owner", "orange-star" },
+		{ "type", "infantry" },
+	};
+	for (int x = 1; x < 5; ++x) {
+		row.at(x)["unit"] = {
+			{ "health", 100 },
+			{ "hidden", false },
+			{ "moved", false },
+			{ "owner", "blue-moon" },
+			{ "type", "tank" },
+		};
+	}
+	row.at(6) = {
+		{ "terrain", 47 },
+		{ "property", {
+			{ "capture-points", 20 },
+			{ "owner", "blue-moon" },
+		} },
+	};
+
+	return {
+		{ "activePlayer", 0 },
+		{ "cap-limit", 21 },
+		{ "game-over", false },
+		{ "gameId", "rest-no-heuristic-resign" },
+		{ "map", json::array({ row }) },
+		{ "players", json::array({
+			{
+				{ "armyType", "orange-star" },
+				{ "co", "Andy" },
+				{ "funds", 0 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 3 },
+					{ "scop-stars", 3 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 1 },
+			},
+			{
+				{ "armyType", "blue-moon" },
+				{ "co", "Adder" },
+				{ "funds", 0 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 2 },
+					{ "scop-stars", 3 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 1 },
+			},
+		}) },
+		{ "turn-count", 5 },
+		{ "unit-cap", 50 },
+		{ "winner", -1 },
+	};
+}
+
 bool RunCreateGetAndLegalActionContract() {
 	RestGameService service;
 	ApiResponse create = service.CreateGame(StandardCreatePayload("mcts").dump());
@@ -423,6 +493,36 @@ bool RunExplicitEndTurnStepContract() {
 	return true;
 }
 
+bool RunNoHeuristicResignContract() {
+	RestGameService service;
+	json fixture = LowArmyValueNonTerminalGameState();
+	GameState gameState;
+	GameState::from_json(fixture, gameState);
+	service.StoreGameForTesting(std::move(gameState));
+
+	const std::string gameId = fixture.at("gameId").get<std::string>();
+	json waitAction = {
+		{ "type", "move-wait" },
+		{ "source", json::array({ 0, 0 }) },
+		{ "target", json::array({ 0, 0 }) },
+	};
+	ApiResponse step = service.SubmitAction(gameId, waitAction.dump());
+	if (!Expect(step.status == 200, "low army value legal step should return 200")) {
+		return false;
+	}
+	if (!Expect(step.body.at("game-over") == false, "low army value alone should not end a standard game")) {
+		return false;
+	}
+	if (!Expect(step.body.at("winner") == -1, "low army value alone should not choose a winner")) {
+		return false;
+	}
+	if (!Expect(step.body.contains("terminalReason") && step.body.at("terminalReason").is_null(), "low army value alone should keep null terminalReason")) {
+		return false;
+	}
+
+	return true;
+}
+
 bool RunTerminalContract() {
 	RestGameService service;
 
@@ -508,6 +608,9 @@ int RunRestApiContractTests() {
 		return 1;
 	}
 	if (!RunExplicitEndTurnStepContract()) {
+		return 1;
+	}
+	if (!RunNoHeuristicResignContract()) {
 		return 1;
 	}
 	if (!RunTerminalContract()) {

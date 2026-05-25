@@ -578,7 +578,6 @@ ApiResponse RestGameService::SubmitAction(const std::string& gameId, const std::
 		return ErrorResponseWithGame(HttpUnprocessableEntity, "illegal-action", "Action failed during execution.", currentGame);
 	}
 
-	game->second->CheckPlayerResigns();
 	return JsonResponse(HttpOk, SerializeGameForApi(*game->second));
 }
 

@@ -46,10 +46,10 @@ This file captures the issue #66 REST contract decisions from the design intervi
 - Illegal action returns non-2xx error plus current authoritative game state.
 - Error responses use status codes plus stable `error.code`.
 - REST step validates against generated legal actions before mutation and applies exactly one action.
-- Add `terminalReason`, including `heuristic-resign` for current heuristic behavior.
+- Add `terminalReason`; canonical Standard/API responses should report real terminal rules, not heuristic army-value resigns.
 - Fix `Action::operator==` to include `unloadIndex`.
 - Unknown ids and unknown JSON fields are parse/validation errors, not silent `Invalid` enums or ignored extras.
-- Opened #138 for configurable heuristic resign.
+- Opened #138 for configurable training-only heuristic resign or early stopping.
 - Opened #139 for full map catalog expansion.
 - Opened #140 for explicit or randomized starting player setup.
 - Opened #141 for game cache persistence, cleanup, or TTL policy.

@@ -799,6 +799,134 @@ bool RunNoHeuristicResignContract() {
 	return true;
 }
 
+bool RunCreateConfiguredStandardSettingsContract() {
+	RestGameService service;
+	json createPayload = StandardCreatePayload("mcts");
+	createPayload["settings"] = {
+		{ "unitCap", 7 },
+		{ "captureLimit", 4 },
+		{ "dayLimit", 2 },
+	};
+
+	ApiResponse create = service.CreateGame(createPayload.dump());
+	if (!Expect(create.status == 201, "create should accept configured Standard limits")) {
+		return false;
+	}
+	if (!Expect(create.body.at("settings").at("unitCap") == 7, "create should return configured unit cap")) {
+		return false;
+	}
+	if (!Expect(create.body.at("settings").at("captureLimit") == 4, "create should return configured capture limit")) {
+		return false;
+	}
+	if (!Expect(create.body.at("settings").at("dayLimit") == 2, "create should return configured day limit")) {
+		return false;
+	}
+	if (!Expect(create.body.at("unit-cap") == 7, "create should mirror configured unit cap in legacy field")) {
+		return false;
+	}
+	if (!Expect(create.body.at("cap-limit") == 4, "create should mirror configured capture limit in legacy field")) {
+		return false;
+	}
+
+	return true;
+}
+
+bool RunGameSettingsModelContract() {
+	json fixture = OneActionBeforeEndTurnGameState();
+	GameState gameState;
+	GameState::from_json(fixture, gameState);
+
+	json serialized;
+	GameState::to_json(serialized, gameState);
+	if (!Expect(serialized.contains("settings"), "serialized GameState should include resolved settings")) {
+		return false;
+	}
+
+	const json& settings = serialized.at("settings");
+	if (!Expect(settings.at("mode") == "standard", "default settings mode should be standard")) {
+		return false;
+	}
+	if (!Expect(settings.at("fog") == false, "default settings should disable fog")) {
+		return false;
+	}
+	if (!Expect(settings.at("weather") == "clear", "default settings weather should be clear")) {
+		return false;
+	}
+	if (!Expect(settings.at("coPowers") == true, "default settings should enable CO powers")) {
+		return false;
+	}
+	if (!Expect(settings.at("tags") == false, "default settings should disable tags")) {
+		return false;
+	}
+	if (!Expect(settings.at("startingFunds") == 0, "default settings should use 0 starting funds")) {
+		return false;
+	}
+	if (!Expect(settings.at("incomePerProperty") == 1000, "default settings should use 1000 income per property")) {
+		return false;
+	}
+	if (!Expect(settings.at("unitCap") == 50, "default settings should use unit cap 50")) {
+		return false;
+	}
+	if (!Expect(settings.at("captureLimit") == 21, "default settings should use capture limit 21")) {
+		return false;
+	}
+	if (!Expect(settings.contains("dayLimit") && settings.at("dayLimit").is_null(), "default settings should not configure a day limit")) {
+		return false;
+	}
+	if (!Expect(settings.at("bannedUnits") == json::array({ "blackbomb" }), "default settings should ban Black Bomb production")) {
+		return false;
+	}
+
+	json settingsOnlyFixture = OneActionBeforeEndTurnGameState();
+	settingsOnlyFixture.erase("unit-cap");
+	settingsOnlyFixture.erase("cap-limit");
+	settingsOnlyFixture["settings"] = {
+		{ "mode", "standard" },
+		{ "fog", false },
+		{ "weather", "clear" },
+		{ "coPowers", true },
+		{ "tags", false },
+		{ "startingFunds", 0 },
+		{ "incomePerProperty", 1000 },
+		{ "unitCap", 7 },
+		{ "captureLimit", 4 },
+		{ "dayLimit", 3 },
+		{ "bannedUnits", json::array() },
+		{ "heuristicAutoResign", false },
+	};
+
+	GameState settingsOnlyState;
+	try {
+		GameState::from_json(settingsOnlyFixture, settingsOnlyState);
+	}
+	catch (const std::exception& err) {
+		return Expect(false, std::string("settings-only fixture should parse: ") + err.what());
+	}
+
+	json settingsOnlySerialized;
+	GameState::to_json(settingsOnlySerialized, settingsOnlyState);
+	if (!Expect(settingsOnlySerialized.at("settings").at("unitCap") == 7, "settings-only fixture should set unit cap")) {
+		return false;
+	}
+	if (!Expect(settingsOnlySerialized.at("settings").at("captureLimit") == 4, "settings-only fixture should set capture limit")) {
+		return false;
+	}
+	if (!Expect(settingsOnlySerialized.at("settings").at("dayLimit") == 3, "settings-only fixture should set day limit")) {
+		return false;
+	}
+	if (!Expect(settingsOnlySerialized.at("settings").at("bannedUnits").empty(), "settings-only fixture should allow explicit empty unit bans")) {
+		return false;
+	}
+	if (!Expect(settingsOnlySerialized.at("unit-cap") == 7, "legacy unit-cap should mirror settings")) {
+		return false;
+	}
+	if (!Expect(settingsOnlySerialized.at("cap-limit") == 4, "legacy cap-limit should mirror settings")) {
+		return false;
+	}
+
+	return true;
+}
+
 bool RunTerminalContract() {
 	RestGameService service;
 
@@ -890,6 +1018,12 @@ int RunRestApiContractTests() {
 		return 1;
 	}
 	if (!RunNoHeuristicResignContract()) {
+		return 1;
+	}
+	if (!RunCreateConfiguredStandardSettingsContract()) {
+		return 1;
+	}
+	if (!RunGameSettingsModelContract()) {
 		return 1;
 	}
 	if (!RunTerminalContract()) {

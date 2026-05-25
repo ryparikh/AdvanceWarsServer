@@ -1,0 +1,89 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "standard-blackbomb-ban",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 36
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 50000,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "validActions": [
+    {
+      "source": [ 0, 0 ],
+      "expected": [
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "bcopter"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "bomber"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "fighter"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "stealth"
+        },
+        {
+          "type": "buy",
+          "source": [ 0, 0 ],
+          "unit": "tcopter"
+        }
+      ]
+    }
+  ],
+  "failedActions": [
+    {
+      "type": "buy",
+      "source": [ 0, 0 ],
+      "unit": "blackbomb"
+    }
+  ]
+}

@@ -204,6 +204,20 @@
         "luck-policy": 2
       }
     ],
+    "settings": {
+      "mode": "standard",
+      "fog": false,
+      "weather": "clear",
+      "coPowers": true,
+      "tags": false,
+      "startingFunds": 0,
+      "incomePerProperty": 1000,
+      "unitCap": 50,
+      "captureLimit": 21,
+      "dayLimit": null,
+      "bannedUnits": [],
+      "heuristicAutoResign": false
+    },
     "turn-count": 1,
     "unit-cap": 50,
     "winner": -1
@@ -751,6 +765,20 @@
         "luck-policy": 2
       }
     ],
+    "settings": {
+      "mode": "standard",
+      "fog": false,
+      "weather": "clear",
+      "coPowers": true,
+      "tags": false,
+      "startingFunds": 0,
+      "incomePerProperty": 1000,
+      "unitCap": 50,
+      "captureLimit": 21,
+      "dayLimit": null,
+      "bannedUnits": [],
+      "heuristicAutoResign": false
+    },
     "turn-count": 1,
     "unit-cap": 50,
     "winner": -1

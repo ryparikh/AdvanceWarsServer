@@ -47,13 +47,13 @@ Explicitly deferred modes and options:
 | --- | --- | --- | --- | --- |
 | Player count | `GameState` is fixed to two players. | Standard is two-player. | Complete for Standard | #98 for non-Standard player counts |
 | Country identity | Player army identity supports Orange Star and Blue Moon only. | Any AWBW country identity used by two-player Standard maps should round-trip independently from CO choice. | Partial | #70 |
-| Game settings model | State has scattered fields, and REST create is hardcoded. | Serialize/create Standard settings: clear, no fog, powers on, tags off, 0 start funds, 1000 income, bans, limits, timers. | Partial | #65 |
-| Starting funds and income | Normal income exists; Sasha income modifier exists; configurable mode presets are incomplete. | 0 starting funds and 1000/property for Standard. | Partial | #65 |
+| Game settings model | `GameState` serializes resolved Standard settings and REST create accepts Standard setup metadata, including configurable unit/capture/day limits and the Standard Black Bomb ban. | Serialize/create Standard settings: clear, no fog, powers on, tags off, 0 start funds, 1000 income, bans, limits, timers. | Partial for timer metadata | #82 |
+| Starting funds and income | Standard create resolves 0 starting funds and 1000/property; fixtures can serialize explicit settings. Sasha income modifier exists. | 0 starting funds and 1000/property for Standard. | Complete for Standard | none |
 | High Funds | No preset. | 2000/property only in High Funds modes. | Deferred | #91 |
 | Unit cap | `unit-cap` serializes and production fixtures cover under-cap and at-cap behavior. | Enforce configured unit limit. | Complete for current model | none |
 | Capture limit | Capture-limit terminal path counts Cities, Bases, Airports, Ports, and HQs; Labs/Comm Towers are excluded. | Limit excludes Labs and Comm Towers. | Complete for current model | none |
-| Day limit | No day-limit terminal rule. | Configurable day limit with property-count winner/tie handling. | Partial | #74 |
-| Unit bans | No setup-level ban list. | Standard bans Black Bomb production. | Partial | #75 |
+| Day limit | Configured day limits resolve when the next day would begin; highest property count wins, ties draw. | Configurable day limit with property-count winner/tie handling. | Complete for current model | none |
+| Unit bans | Setup-level banned units are serialized and enforced for legal production and direct buy execution; Standard defaults ban Black Bomb production. | Standard bans Black Bomb production. | Complete for Standard | none |
 | Lab units | No setup-level lab-unit requirement. | Selected lab units require owned Lab access. | Partial | #76 |
 | Timers | No timer model or timeout terminal reason. | Standard timer metadata and optional enforcement story. | Partial | #82 |
 
@@ -80,12 +80,12 @@ Explicitly deferred modes and options:
 | Movement and wait | Covered broadly by JSON fixtures. | AWBW movement/fuel/path legality. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combat actions | Direct, indirect, counterattack, ammo, HP, terrain, and many CO/power cases are covered. Unit stat/data audit is documented in `docs/AWBW_UNIT_DATA_AUDIT.md`. | AWBW combat formula and data. | Partial | #147, #148, #149 |
 | Capture | Capture progress, interruption, HQ capture, Labs, Com Towers, Airports, Ports, Sami capture, and capture-limit counting have fixtures. | AWBW capture points and capture-limit counting. | Complete for current Standard coverage | none |
-| Buy | Production fixtures cover common buy legality, unit cap, and Piperunner production from Bases/Hachi Merchant Union cities. | Add setup bans, lab units, and ghosted blockers. | Partial | #75, #76, #78 |
+| Buy | Production fixtures cover common buy legality, unit cap, the Standard Black Bomb ban, and Piperunner production from Bases/Hachi Merchant Union cities. | Add lab units and ghosted blockers. | Partial | #76, #78 |
 | Load and unload | APC, T-Copter, Lander, Black Boat, Cruiser, Carrier, loaded-unit destruction, and many boundaries are covered. | AWBW free unload behavior and legal terrain/occupancy. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combine/join | Joining/refund/capture-preservation fixtures exist. | AWBW join/refund behavior. | Complete for current Standard coverage | none |
 | Black Boat repair action | Dedicated repair/resupply fixtures exist. | AWBW Black Boat repair and resupply. | Complete for current Standard coverage | none |
 | CO power actions | Power gates, spending, meter math, many direct effects, and mass effects are covered. | Full CO behavior. | Partial | #83, #84, #86, #87, #88, #89, #99, #100, #101, #102, #103 |
-| Black Bomb explode | Black Bomb movement/fuel/no-weapon fixtures exist; explosion action is absent. | Black Bomb explosion if predeployed/custom games need it; production banned in Standard. | Deferred from production, incomplete as unit behavior | #33, #75 |
+| Black Bomb explode | Black Bomb movement/fuel/no-weapon fixtures exist; explosion action is absent. | Black Bomb explosion if predeployed/custom games need it; production banned in Standard. | Deferred from production, incomplete as unit behavior | #33 |
 | Missile silo launch | Terrain exists, but launch behavior is incomplete. | Launch action, empty silo state, damage area, legal action generation. | Partial | #42 |
 | Resign/delete | Explicit player actions do not exist yet. | Explicit resign and delete-unit actions if AWBW permits delete. | Partial | #77 |
 | Heuristic auto-resign | Canonical Standard/API and MCTS-style `applyAction` paths call the army-value resign heuristic only when `heuristicAutoResign` is explicitly enabled; it defaults off. | Standard terminal logic should not auto-resign except through explicit/tracked rules. | Complete | none |
@@ -113,7 +113,7 @@ The unit fixture manifest lives at `AdvanceWarsServer/test/json/units/README.md`
 | Area | Current implementation | Standard target | Status | Issue |
 | --- | --- | --- | --- | --- |
 | Core terrain movement | JSON fixtures cover many terrain, weather, air, land, sea, and Sturm all-terrain movement cases. | AWBW movement tables. | Partial where Piperunner/Teleport remain | #35, #93 |
-| Properties and income | Cities/Bases/Airports/Ports/HQ income behavior exists; Labs/Com Towers no-income fixtures exist. | AWBW fund-producing properties only. | Complete for normal income, configurable settings partial | #65 |
+| Properties and income | Cities/Bases/Airports/Ports/HQ income behavior exists; Labs/Com Towers no-income fixtures exist; Standard income comes from settings. | AWBW fund-producing properties only. | Complete for Standard income | none |
 | Property repair/resupply | Begin-turn property service is gated by owner, property type, and unit class; Labs and Com Towers do not repair or resupply. | Land on City/Base/HQ, air on Airport, sea on Port; owner only. | Complete for normal property service | none |
 | Rachel property repair | Rachel repairs +1 extra displayed HP on compatible owned properties, with affordable partial repair and no off-class service. | Rachel repairs +1 extra displayed HP on compatible properties. | Complete | none |
 | APC/Cruiser/Carrier resupply | Dedicated transport and loaded-resupply fixtures exist. | AWBW logistics order and compatible cargo. | Complete for current Standard coverage | none |
@@ -184,8 +184,6 @@ Standard API, settings, and terminal behavior:
 - #67: Validate and atomically reject illegal submitted actions.
 - #68: Make REST action stepping explicit and remove implicit auto-end-turn.
 - #70: Support AWBW map imports with all two-player country identities.
-- #74: Implement day-limit victory and draw resolution.
-- #75: Add game setup support for unit bans and the Standard Black Bomb ban.
 - #76: Add lab-unit production requirements from game setup.
 - #77: Add explicit resign and delete-unit actions.
 - #82: Add timer settings and timeout terminal state metadata.

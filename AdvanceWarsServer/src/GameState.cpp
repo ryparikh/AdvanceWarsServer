@@ -502,7 +502,15 @@ int GameState::GetWeatherMovementCost(const Terrain& terrain, const Player& play
 	}
 
 	int baseCost = iterMovementCost->second;
-	if (baseCost < 1 || m_weather == WeatherType::Clear) {
+	if (baseCost < 1) {
+		return baseCost;
+	}
+
+	if (player.m_co.m_type == CommandingOfficier::Type::Sturm && m_weather != WeatherType::Snow) {
+		return 1;
+	}
+
+	if (m_weather == WeatherType::Clear) {
 		return baseCost;
 	}
 

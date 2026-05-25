@@ -16,7 +16,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
 - Implemented Rachel day-to-day property repair: compatible owned properties repair up to 3 displayed HP instead of the normal 2, with funds charged for displayed HP actually restored.
 - Implemented production effects: Hachi's Merchant Union allows standard ground-unit deployment, including Piperunners, from owned empty cities; Sensei's Copter Command/Airborne Assault spawn 9 HP unwaited Infantry/Mechs on owned empty cities in top-row, left-to-right order until the unit cap is reached.
-- Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, and Sensei transports.
+- Implemented movement modifiers: Adder, Andy SCOP, Drake sea units, Jake SCOP, Jess vehicles, Koal, Max direct units, Sami transports/footsoldiers, Sensei transports, and Sturm legal-terrain movement costs outside snow.
 - Implemented fuel-upkeep modifiers: Eagle air units consume 2 less fuel per day.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
@@ -43,6 +43,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 - Weather JSON uses `"weather": "rain"` or `"weather": "snow"`. CO-created weather also writes `"weather-turns-remaining"` and expires on a later `BeginTurn`.
 - Rain and snow movement costs follow the AWBW weather tables, including Drake rain immunity, Olaf snow immunity, and Olaf treating rain like snow.
+- Sturm units pay 1 fuel/move point on terrain their movement type can legally enter in clear and rain weather, including during active COP/SCOP turns. Snow disables this passive, so normal snow movement costs apply. Illegal terrain remains illegal, including non-Piperunner units entering pipes.
 - Rain vision penalties are intentionally deferred because this simulator does not yet have fog-of-war or vision state; that broader subsystem is tracked by [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90).
 
 ## HP Effect Notes
@@ -86,7 +87,6 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#85](https://github.com/ryparikh/AdvanceWarsServer/issues/85): Sturm all-terrain movement rules.
 - [#86](https://github.com/ryparikh/AdvanceWarsServer/issues/86): Lash terrain-star attack and movement effects.
 - [#87](https://github.com/ryparikh/AdvanceWarsServer/issues/87): Javier indirect-defense and Comm Tower defense bonuses.
 - [#88](https://github.com/ryparikh/AdvanceWarsServer/issues/88): Kanbei Samurai Spirit counterattack bonus.

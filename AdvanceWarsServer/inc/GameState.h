@@ -183,6 +183,9 @@ public:
 			to_json(jstate, *this);
 			std::cout << "Chose an invalid action:" << jaction.dump() << "\n" << jstate.dump() << std::endl;
 		}
+		if (actedGameState.FHeuristicAutoResign()) {
+			actedGameState.CheckPlayerResigns();
+		}
 		return actedGameState;
 	}
 
@@ -238,6 +241,12 @@ public:
 	bool AnyValidActions() const noexcept;
 	Result EndTurn() noexcept;
 	bool CheckPlayerResigns() noexcept;
+	bool FHeuristicAutoResign() const noexcept {
+		return m_fHeuristicAutoResign;
+	}
+	void SetHeuristicAutoResign(bool enabled) noexcept {
+		m_fHeuristicAutoResign = enabled;
+	}
 	bool FGameOver() const noexcept {
 		return m_fGameOver;
 	}
@@ -335,6 +344,7 @@ private:
 	std::optional<std::string> m_terminalReason;
 	std::optional<std::uint32_t> m_combatRngSeed;
 	std::optional<std::mt19937> m_combatRng;
+	bool m_fHeuristicAutoResign = false;
 	WeatherType m_weather{ WeatherType::Clear };
 	std::optional<int> m_weatherTurnsRemaining;
 };

@@ -64,7 +64,7 @@ Explicitly deferred modes and options:
 | Game lifecycle API | `POST /games` ignores request body and creates a hardcoded Lefty game. | Create/get/reset/step/terminal contract for map, players, settings, and seed. | Partial | #66 |
 | Submitted action validation | Legal actions are generated, but direct submitted actions can bypass some validation or mutate before failing. | Submitted actions are validated and rejected atomically. | Partial | #67 |
 | Step semantics | REST action application commits exactly the submitted action and can report an `EndTurn`-only legal-action list without advancing. | One submitted action causes exactly one committed action. | Complete | #68 |
-| Terminal reasons | HQ capture, lab win, rout/fuel-out behavior exist. Canonical Standard/API stepping does not auto-resign by heuristic army value. | Terminal reason should be explicit: HQ, lab, rout, capture limit, day limit, timeout, resign. | Partial | #74, #77, #82 |
+| Terminal reasons | HQ capture, lab win, rout/fuel-out behavior exist. Canonical Standard/API stepping does not auto-resign by heuristic army value unless `heuristicAutoResign` is explicitly enabled. | Terminal reason should be explicit: HQ, lab, rout, capture limit, day limit, timeout, resign, or opt-in heuristic resign. | Partial | #74, #77, #82 |
 | State tensor | `Tensor.cpp` exists as planned home. | Deterministic current-player-relative tensor. | Partial | #3 |
 | Action encoding and masks | `Action` variants and legal action generation exist. | Stable encoded action space plus mask. | Partial | #4 |
 | MCTS sequence handling | Existing MCTS needs action-level self-play cleanup. | Same-player action sequences backed up correctly until `EndTurn`. | Partial | #5 |
@@ -88,7 +88,7 @@ Explicitly deferred modes and options:
 | Black Bomb explode | Black Bomb movement/fuel/no-weapon fixtures exist; explosion action is absent. | Black Bomb explosion if predeployed/custom games need it; production banned in Standard. | Deferred from production, incomplete as unit behavior | #33, #75 |
 | Missile silo launch | Terrain exists, but launch behavior is incomplete. | Launch action, empty silo state, damage area, legal action generation. | Partial | #42 |
 | Resign/delete | Explicit player actions do not exist yet. | Explicit resign and delete-unit actions if AWBW permits delete. | Partial | #77 |
-| Heuristic auto-resign | Canonical Standard/API and MCTS-style `applyAction` paths do not call the army-value resign heuristic; experimental random simulation still opts in explicitly. | Standard terminal logic should not auto-resign except through explicit/tracked rules. | Complete | none |
+| Heuristic auto-resign | Canonical Standard/API and MCTS-style `applyAction` paths call the army-value resign heuristic only when `heuristicAutoResign` is explicitly enabled; it defaults off. | Standard terminal logic should not auto-resign except through explicit/tracked rules. | Complete | none |
 
 ## Units
 

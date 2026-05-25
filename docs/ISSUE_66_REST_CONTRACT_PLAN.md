@@ -46,7 +46,7 @@ This file captures the issue #66 REST contract decisions from the design intervi
 - Illegal action returns non-2xx error plus current authoritative game state.
 - Error responses use status codes plus stable `error.code`.
 - REST step validates against generated legal actions before mutation and applies exactly one action.
-- Add `terminalReason`; canonical Standard/API responses should report real terminal rules, not heuristic army-value resigns.
+- Add `terminalReason`; canonical Standard/API responses should report real terminal rules unless the caller opts into `settings.heuristicAutoResign`.
 - Fix `Action::operator==` to include `unloadIndex`.
 - Unknown ids and unknown JSON fields are parse/validation errors, not silent `Invalid` enums or ignored extras.
 - Opened #138 for configurable training-only heuristic resign or early stopping.
@@ -85,10 +85,13 @@ Resolved v1 settings:
     "incomePerProperty": 1000,
     "unitCap": 50,
     "captureLimit": 21,
-    "bannedUnits": ["blackbomb"]
+    "bannedUnits": ["blackbomb"],
+    "heuristicAutoResign": false
   }
 }
 ```
+
+`heuristicAutoResign` defaults to `false`. It may be set to `true` for training/early-stop runs that intentionally want the army-value heuristic to produce `terminalReason: "heuristic-resign"` after legal steps.
 
 Do not include day limit, timer/live settings, lab units, High Funds, tag COs, random weather, or fog metadata in v1. Reject those if submitted.
 

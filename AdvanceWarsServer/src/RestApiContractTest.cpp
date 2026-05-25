@@ -243,6 +243,9 @@ bool RunCreateGetAndLegalActionContract() {
 	if (!Expect(create.body.at("settings").at("mode") == "standard", "settings mode should be standard")) {
 		return false;
 	}
+	if (!Expect(create.body.at("settings").at("heuristicAutoResign") == false, "heuristic auto-resign should default off")) {
+		return false;
+	}
 	if (!Expect(!create.body.contains("combat-rng-seed"), "create should not expose combat RNG seed")) {
 		return false;
 	}
@@ -494,6 +497,12 @@ bool RunExplicitEndTurnStepContract() {
 }
 
 bool RunNoHeuristicResignContract() {
+	json waitAction = {
+		{ "type", "move-wait" },
+		{ "source", json::array({ 0, 0 }) },
+		{ "target", json::array({ 0, 0 }) },
+	};
+
 	RestGameService service;
 	json fixture = LowArmyValueNonTerminalGameState();
 	GameState gameState;
@@ -501,11 +510,6 @@ bool RunNoHeuristicResignContract() {
 	service.StoreGameForTesting(std::move(gameState));
 
 	const std::string gameId = fixture.at("gameId").get<std::string>();
-	json waitAction = {
-		{ "type", "move-wait" },
-		{ "source", json::array({ 0, 0 }) },
-		{ "target", json::array({ 0, 0 }) },
-	};
 	ApiResponse step = service.SubmitAction(gameId, waitAction.dump());
 	if (!Expect(step.status == 200, "low army value legal step should return 200")) {
 		return false;
@@ -517,6 +521,46 @@ bool RunNoHeuristicResignContract() {
 		return false;
 	}
 	if (!Expect(step.body.contains("terminalReason") && step.body.at("terminalReason").is_null(), "low army value alone should keep null terminalReason")) {
+		return false;
+	}
+
+	RestGameService optInService;
+	json optInFixture = LowArmyValueNonTerminalGameState();
+	GameState optInGameState;
+	GameState::from_json(optInFixture, optInGameState);
+	optInGameState.SetHeuristicAutoResign(true);
+	optInService.StoreGameForTesting(std::move(optInGameState));
+
+	const std::string optInGameId = optInFixture.at("gameId").get<std::string>();
+	ApiResponse optInGet = optInService.GetGame(optInGameId);
+	if (!Expect(optInGet.status == 200, "opt-in heuristic game should be retrievable")) {
+		return false;
+	}
+	if (!Expect(optInGet.body.at("settings").at("heuristicAutoResign") == true, "opt-in heuristic setting should serialize as enabled")) {
+		return false;
+	}
+
+	ApiResponse optInStep = optInService.SubmitAction(optInGameId, waitAction.dump());
+	if (!Expect(optInStep.status == 200, "opt-in heuristic legal step should return 200")) {
+		return false;
+	}
+	if (!Expect(optInStep.body.at("game-over") == true, "opt-in heuristic should be able to end a game")) {
+		return false;
+	}
+	if (!Expect(optInStep.body.at("winner") == 1, "opt-in heuristic should choose the stronger player")) {
+		return false;
+	}
+	if (!Expect(optInStep.body.at("terminalReason") == "heuristic-resign", "opt-in heuristic should report heuristic-resign")) {
+		return false;
+	}
+
+	json createPayload = StandardCreatePayload("mcts");
+	createPayload["settings"] = { { "heuristicAutoResign", true } };
+	ApiResponse create = optInService.CreateGame(createPayload.dump());
+	if (!Expect(create.status == 201, "create should accept heuristicAutoResign setting")) {
+		return false;
+	}
+	if (!Expect(create.body.at("settings").at("heuristicAutoResign") == true, "create should return resolved opt-in heuristic setting")) {
 		return false;
 	}
 

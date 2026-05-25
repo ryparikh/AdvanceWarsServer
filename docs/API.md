@@ -33,7 +33,7 @@ Minimal request:
 }
 ```
 
-`settings` is optional. If present, `mode` belongs inside `settings`; v1 accepts only strict Standard values. `seed` is optional and request-only: it enables deterministic combat RNG but is not returned in normal API game-state responses.
+`settings` is optional. If present, `mode` belongs inside `settings`; v1 accepts only strict Standard values. `settings.heuristicAutoResign` is a training/early-stop option that defaults to `false`; when set to `true`, the existing army-value heuristic can end a game with `terminalReason: "heuristic-resign"` after a legal step. `seed` is optional and request-only: it enables deterministic combat RNG but is not returned in normal API game-state responses.
 
 Supported v1 map ids are `lefty` and `mcts`.
 

@@ -1,0 +1,24 @@
+{
+  "initial-game-state": {
+    "activePlayer": 1,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "sub-hidden-attack-restrictions",
+    "map": [
+      [
+        { "terrain": 28, "unit": { "ammo": 6, "fuel": 60, "health": 100, "hidden": true, "moved": false, "owner": "orange-star", "type": "sub" } },
+        { "terrain": 28, "unit": { "ammo": 9, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "bomber" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "failedActions": [
+    { "type": "move-attack", "source": [1, 0], "target": [1, 0], "direction": "west" }
+  ]
+}

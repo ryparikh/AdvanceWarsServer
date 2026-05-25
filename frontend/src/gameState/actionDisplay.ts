@@ -101,6 +101,8 @@ const unitOrderIndex = new Map(unitDisplayOrder.map((unit, index) => [unit, inde
 
 const boardClickConfirmActionTypes = new Set([
   "move-wait",
+  "move-hide",
+  "move-unhide",
   "move-capture",
   "move-load",
   "move-combine"

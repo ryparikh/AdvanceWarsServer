@@ -143,6 +143,8 @@ Action JSON is parsed by `from_json(json&, Action&)` in `GameState.cpp`. Existin
 - `attack`
 - `end-turn`
 - `move-wait`
+- `move-hide`
+- `move-unhide`
 - `move-attack`
 - `unload`
 - `move-load`

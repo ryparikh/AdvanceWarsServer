@@ -97,6 +97,67 @@ json SonjaHiddenHpGameState() {
 	};
 }
 
+json OneActionBeforeEndTurnGameState() {
+	json row = json::array();
+	for (int x = 0; x < 8; ++x) {
+		row.push_back({ { "terrain", 1 } });
+	}
+
+	row.at(0)["unit"] = {
+		{ "health", 100 },
+		{ "hidden", false },
+		{ "moved", false },
+		{ "owner", "blue-moon" },
+		{ "type", "infantry" },
+	};
+	row.at(7)["unit"] = {
+		{ "health", 100 },
+		{ "hidden", false },
+		{ "moved", true },
+		{ "owner", "orange-star" },
+		{ "type", "infantry" },
+	};
+
+	return {
+		{ "activePlayer", 1 },
+		{ "cap-limit", 21 },
+		{ "game-over", false },
+		{ "gameId", "rest-explicit-end-turn" },
+		{ "map", json::array({ row }) },
+		{ "players", json::array({
+			{
+				{ "armyType", "orange-star" },
+				{ "co", "Andy" },
+				{ "funds", 0 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 3 },
+					{ "scop-stars", 3 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 1 },
+			},
+			{
+				{ "armyType", "blue-moon" },
+				{ "co", "Adder" },
+				{ "funds", 0 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 2 },
+					{ "scop-stars", 3 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 1 },
+			},
+		}) },
+		{ "turn-count", 1 },
+		{ "unit-cap", 50 },
+		{ "winner", -1 },
+	};
+}
+
 bool RunCreateGetAndLegalActionContract() {
 	RestGameService service;
 	ApiResponse create = service.CreateGame(StandardCreatePayload("mcts").dump());
@@ -299,6 +360,69 @@ bool RunStepAndErrorContract() {
 	return true;
 }
 
+bool RunExplicitEndTurnStepContract() {
+	RestGameService service;
+	json fixture = OneActionBeforeEndTurnGameState();
+	GameState gameState;
+	GameState::from_json(fixture, gameState);
+	service.StoreGameForTesting(std::move(gameState));
+
+	const std::string gameId = fixture.at("gameId").get<std::string>();
+	json lastUnitAction = {
+		{ "type", "move-wait" },
+		{ "source", json::array({ 0, 0 }) },
+		{ "target", json::array({ 0, 0 }) },
+	};
+	ApiResponse lastUnitStep = service.SubmitAction(gameId, lastUnitAction.dump());
+	if (!Expect(lastUnitStep.status == 200, "last unit step should return 200")) {
+		return false;
+	}
+	if (!Expect(lastUnitStep.body.at("activePlayer") == 1, "last unit step should not implicitly end player 2 turn")) {
+		return false;
+	}
+	if (!Expect(lastUnitStep.body.at("turn-count") == 1, "last unit step should not implicitly advance the day")) {
+		return false;
+	}
+
+	ApiResponse onlyEndTurnActions = service.ListActions(gameId, "");
+	if (!Expect(onlyEndTurnActions.status == 200, "end-turn-only legal actions should return 200")) {
+		return false;
+	}
+	if (!Expect(onlyEndTurnActions.body.at("activePlayer") == 1, "end-turn-only legal actions should keep active player")) {
+		return false;
+	}
+	if (!Expect(onlyEndTurnActions.body.at("actions").is_array() && onlyEndTurnActions.body.at("actions").size() == 1, "legal actions should contain only end-turn")) {
+		return false;
+	}
+	if (!Expect(onlyEndTurnActions.body.at("actions").front().at("type") == "end-turn", "only legal action should be end-turn")) {
+		return false;
+	}
+
+	ApiResponse afterList = service.GetGame(gameId);
+	if (!Expect(afterList.status == 200, "get after end-turn-only legal actions should return 200")) {
+		return false;
+	}
+	if (!Expect(afterList.body.at("activePlayer") == 1, "listing end-turn-only actions should not advance active player")) {
+		return false;
+	}
+	if (!Expect(afterList.body.at("turn-count") == 1, "listing end-turn-only actions should not advance the day")) {
+		return false;
+	}
+
+	ApiResponse explicitEndTurn = service.SubmitAction(gameId, R"({"type":"end-turn"})");
+	if (!Expect(explicitEndTurn.status == 200, "explicit end-turn should return 200")) {
+		return false;
+	}
+	if (!Expect(explicitEndTurn.body.at("activePlayer") == 0, "explicit end-turn should advance to player 1")) {
+		return false;
+	}
+	if (!Expect(explicitEndTurn.body.at("turn-count") == 2, "explicit player 2 end-turn should advance the day")) {
+		return false;
+	}
+
+	return true;
+}
+
 bool RunTerminalContract() {
 	RestGameService service;
 
@@ -381,6 +505,9 @@ int RunRestApiContractTests() {
 		return 1;
 	}
 	if (!RunStepAndErrorContract()) {
+		return 1;
+	}
+	if (!RunExplicitEndTurnStepContract()) {
 		return 1;
 	}
 	if (!RunTerminalContract()) {

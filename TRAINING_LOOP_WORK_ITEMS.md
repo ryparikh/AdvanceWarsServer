@@ -99,5 +99,5 @@ The rules/API completeness target for the initial playable environment is normal
 - [ ] #65 Define and enforce normal Global League Standard game settings.
 - [ ] #66 Add REST game lifecycle and step API contract for self-play.
 - [ ] #67 Validate and atomically reject illegal submitted actions.
-- [ ] #68 Make REST action stepping explicit and remove implicit auto-end-turn.
+- [x] #68 Make REST action stepping explicit and remove implicit auto-end-turn.
 - [ ] #69 Remove heuristic auto-resign from Standard engine terminal logic.

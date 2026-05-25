@@ -39,7 +39,7 @@ Supported v1 map ids are `lefty` and `mcts`.
 
 ## Responses
 
-Successful create returns `201 Created`, a full game-state JSON body, and `Location: /games/:gameId`. Successful get and step responses return `200 OK` with the full current game state. Game-state responses include resolved `settings` and `terminalReason`; active games use `null` for `terminalReason`.
+Successful create returns `201 Created`, a full game-state JSON body, and `Location: /games/:gameId`. Successful get and step responses return `200 OK` with the full current game state. A step commits exactly the submitted action: if only `end-turn` remains legal after a unit action, the server reports that legal action and waits for the client to submit it. Game-state responses include resolved `settings` and `terminalReason`; active games use `null` for `terminalReason`.
 
 `GET /games/:gameid` without a query is the full authoritative/debug view and includes exact unit `health`. `GET /games/:gameid?player=0` or `player=1` returns a player-perspective view. In a perspective view, enemy Sonja units hide exact HP as `"health": null` with `"hidden-health": true`; the authoritative engine state and Sonja player's own view keep exact HP.
 

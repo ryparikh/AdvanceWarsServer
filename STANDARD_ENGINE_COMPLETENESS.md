@@ -1,6 +1,6 @@
 # Standard Engine Completeness Matrix
 
-Last reviewed: 2026-05-18
+Last reviewed: 2026-05-25
 
 This document tracks the simulator against the first playable target: normal Advance Wars By Web Global League Standard games that can be driven through a REST API or AI training loop. Local source code and JSON fixtures are the source of truth for current implementation behavior. The gameplay target is checked against the local report at `C:\Users\Roshan\Downloads\advance-wars-by-web-report.md` and the [Advance Wars By Web Wiki](https://awbw.fandom.com/wiki/Advance_Wars_By_Web_Wiki), especially [Metagame](https://awbw.fandom.com/wiki/Metagame), [AWBW Guide](https://awbw.fandom.com/wiki/AWBW_Guide), [Units](https://awbw.fandom.com/wiki/Units), [Properties](https://awbw.fandom.com/wiki/Properties), [Damage Formula](https://awbw.fandom.com/wiki/Damage_Formula), [CO](https://awbw.fandom.com/wiki/CO), and [Changes in AWBW](https://awbw.fandom.com/wiki/Changes_in_AWBW).
 
@@ -78,13 +78,13 @@ Explicitly deferred modes and options:
 | Area | Current implementation | Standard target | Status | Issue |
 | --- | --- | --- | --- | --- |
 | Movement and wait | Covered broadly by JSON fixtures. | AWBW movement/fuel/path legality. | Partial because submitted invalid actions need atomic rejection | #67 |
-| Combat actions | Direct, indirect, counterattack, ammo, HP, terrain, and many CO/power cases are covered. | AWBW combat formula and data. | Audit | #80, #81 |
+| Combat actions | Direct, indirect, counterattack, ammo, HP, terrain, and many CO/power cases are covered. | AWBW combat formula and data. | Audit | #80 |
 | Capture | Capture progress, interruption, HQ capture, Labs, Com Towers, Airports, Ports, Sami capture, and capture-limit counting have fixtures. | AWBW capture points and capture-limit counting. | Complete for current Standard coverage | none |
 | Buy | Production fixtures cover common buy legality, unit cap, and Piperunner production from Bases/Hachi Merchant Union cities. | Add setup bans, lab units, and ghosted blockers. | Partial | #75, #76, #78 |
 | Load and unload | APC, T-Copter, Lander, Black Boat, Cruiser, Carrier, loaded-unit destruction, and many boundaries are covered. | AWBW free unload behavior and legal terrain/occupancy. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combine/join | Joining/refund/capture-preservation fixtures exist. | AWBW join/refund behavior. | Complete for current Standard coverage | none |
 | Black Boat repair action | Dedicated repair/resupply fixtures exist. | AWBW Black Boat repair and resupply. | Complete for current Standard coverage | none |
-| CO power actions | Power gates, spending, many direct effects, and mass effects are covered. | Full CO behavior and meter math. | Partial | #81, #83, #84, #85, #86, #87, #88, #89, #99, #100, #101, #102, #103 |
+| CO power actions | Power gates, spending, meter math, many direct effects, and mass effects are covered. | Full CO behavior. | Partial | #83, #84, #85, #86, #87, #88, #89, #99, #100, #101, #102, #103 |
 | Black Bomb explode | Black Bomb movement/fuel/no-weapon fixtures exist; explosion action is absent. | Black Bomb explosion if predeployed/custom games need it; production banned in Standard. | Deferred from production, incomplete as unit behavior | #33, #75 |
 | Missile silo launch | Terrain exists, but launch behavior is incomplete. | Launch action, empty silo state, damage area, legal action generation. | Partial | #42 |
 | Resign/delete | Heuristic resign exists; explicit player actions do not. | Explicit resign and delete-unit actions if AWBW permits delete. | Partial | #77 |
@@ -131,8 +131,8 @@ Detailed implementation notes live in `CO_SUPPORT.md`.
 | Area | Current implementation | Status | Issue |
 | --- | --- | --- | --- |
 | CO parsing and contracts | All COs parse/serialize with contract fixtures. | Complete | none |
-| Power costs and meter state | Star costs and charge exist. | Audit | #81 |
-| Checked-in attack/defense charts | Normal/COP/SCOP charts exist. | Audit with combat data | #80, #81 |
+| Power costs and meter state | Star costs, combat charge math, thresholds, and availability flags are covered by fixtures and serialized for clients. | Complete | none |
+| Checked-in attack/defense charts | Normal/COP/SCOP charts exist. | Audit with combat data | #80 |
 | Mass HP, weather, economy, production, range, movement, capture, and many power effects | See `CO_SUPPORT.md`. | Partial but broad support exists | focused gaps below |
 | Rachel property repair | Compatible owned property service repairs Rachel units up to 3 displayed HP and respects off-class restrictions. | Complete | none |
 | Jess COP resupply | SCOP resupply exists; COP resupply missing. | Partial | #83 |
@@ -207,7 +207,6 @@ Actions, units, and data:
 
 Properties, economy, and COs:
 
-- #81: Verify CO star costs and power-meter charge math against AWBW.
 - #83: Implement Jess Turbo Charge COP resupply side effect.
 - #84: Implement Eagle air-unit fuel upkeep modifier.
 - #85: Implement Sturm all-terrain movement rules.

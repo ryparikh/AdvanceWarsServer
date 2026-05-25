@@ -41,11 +41,13 @@ Result RunCommandingOfficierContract(json& jContract, std::string& expected, std
 	json actualPowerMeter;
 	PowerMeter::to_json(actualPowerMeter, powerMeter);
 	const json& expectedPowerMeter = jContract.at("power-meter");
-	if (actualPowerMeter["cop-stars"] != expectedPowerMeter.at("cop-stars") ||
-		actualPowerMeter["scop-stars"] != expectedPowerMeter.at("scop-stars")) {
-		expected = expectedPowerMeter.dump();
-		actual = actualPowerMeter.dump();
-		return Result::Failed;
+	for (const auto& expectedField : expectedPowerMeter.items()) {
+		const std::string& key = expectedField.key();
+		if (!actualPowerMeter.contains(key) || actualPowerMeter.at(key) != expectedField.value()) {
+			expected = expectedPowerMeter.dump();
+			actual = actualPowerMeter.dump();
+			return Result::Failed;
+		}
 	}
 
 	const DamageCharts& charts = rgCharts[static_cast<int>(co.m_type)];

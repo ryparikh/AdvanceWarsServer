@@ -1,6 +1,6 @@
 # Commanding Officer Support
 
-The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page](https://awbw.fandom.com/wiki/CO). The simulator currently supports a simplified CO model: JSON identity, power-meter costs, power-status transitions, and the checked-in normal/COP/SCOP damage charts are treated as source-of-truth behavior. The broader Standard rules matrix is maintained in `STANDARD_ENGINE_COMPLETENESS.md`.
+The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page](https://awbw.fandom.com/wiki/CO), cross-checked against the official AWBW CO chart when auditing meter data. The simulator currently supports a simplified CO model: JSON identity, power-meter costs, power-status transitions, and the checked-in normal/COP/SCOP damage charts are treated as source-of-truth behavior. The broader Standard rules matrix is maintained in `STANDARD_ENGINE_COMPLETENESS.md`.
 
 ## Supported
 
@@ -28,6 +28,14 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - For bad-luck COs, the lowest total outcome uses minimum good luck and maximum bad luck; the highest total outcome uses maximum good luck and minimum bad luck.
 - Sonja's AWBW combat luck is covered separately from her information and counterattack effects: she keeps +0..+9 good luck and 0..9 bad luck in day-to-day, Enhanced Vision, and Counter Break, while COP/SCOP still use the universal AWBW +10 attack/+10 defense chart bonus.
 - Sonja's hidden HP, fog vision, day-to-day counterattack multiplier, and Counter Break first-strike edge cases remain tracked by [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89) and [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90), rather than by the combat-luck fixtures.
+
+## Power Meter Notes
+
+- CO star costs are covered by contract fixtures for every CO. The audited values match the AWBW wiki/official chart, including Sturm at 6+4 stars and Von Bolt as SCOP-only at 0+10 stars.
+- Power meters start at a star value of 9000. COP threshold is `cop-stars * star-value`; SCOP/full threshold is `(cop-stars + scop-stars) * star-value`. After either power is used, the star value is multiplied by 1.2, truncated to an integer, and capped at 55720.
+- Combat charge uses displayed HP lost and the simulator's scaled unit cost, where `Unit::GetUnitCost` is one tenth of the normal build price. Damage dealt grants half of the lost displayed-HP value to the attacker, integer-truncated if needed; damage received grants the full lost displayed-HP value to the defender.
+- Zero displayed-HP loss adds no charge. Destruction charge is based on the displayed HP actually removed before the unit reaches zero. Combat does not add charge for a side whose CO power status is active, and direct HP effects from powers do not add meter charge.
+- Serialized player JSON exposes `"charge"`, `"star-value"`, `"cop-stars"`, `"scop-stars"`, `"cop-threshold"`, `"scop-threshold"`, `"can-use-cop"`, and `"can-use-scop"` so clients can display meter progress and identify legal power actions without duplicating the threshold formula.
 
 ## Weather Notes
 
@@ -76,7 +84,6 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#81](https://github.com/ryparikh/AdvanceWarsServer/issues/81): CO star costs and power-meter charge math audit.
 - [#83](https://github.com/ryparikh/AdvanceWarsServer/issues/83): Jess Turbo Charge COP resupply side effect.
 - [#85](https://github.com/ryparikh/AdvanceWarsServer/issues/85): Sturm all-terrain movement rules.
 - [#86](https://github.com/ryparikh/AdvanceWarsServer/issues/86): Lash terrain-star attack and movement effects.

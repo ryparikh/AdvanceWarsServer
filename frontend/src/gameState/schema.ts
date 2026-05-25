@@ -35,7 +35,11 @@ const powerMeterSchema = z.object({
   "cop-stars": finiteInteger.min(0).max(20),
   "scop-stars": finiteInteger.min(0).max(20),
   charge: finiteInteger.min(0).max(1_000_000),
-  "star-value": finiteInteger.min(1).max(1_000_000)
+  "star-value": finiteInteger.min(1).max(1_000_000),
+  "cop-threshold": finiteInteger.min(0).max(1_000_000).optional(),
+  "scop-threshold": finiteInteger.min(0).max(1_000_000).optional(),
+  "can-use-cop": z.boolean().optional(),
+  "can-use-scop": z.boolean().optional()
 });
 
 export const playerSchema = z.object({

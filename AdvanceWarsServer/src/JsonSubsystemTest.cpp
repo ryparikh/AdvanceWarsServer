@@ -105,7 +105,6 @@ Result BuildActionTrace(GameState gameState, const std::vector<Action>& actions,
 
 	for (const Action& action : actions) {
 		IfFailedReturn(gameState.DoAction(action));
-		gameState.CheckPlayerResigns();
 
 		json actedGameState;
 		GameState::to_json(actedGameState, gameState);

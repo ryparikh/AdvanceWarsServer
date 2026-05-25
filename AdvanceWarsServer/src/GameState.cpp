@@ -2347,6 +2347,7 @@ GameState::GameState(const GameState& other) noexcept :
 	m_terminalReason = other.m_terminalReason;
 	m_combatRngSeed = other.m_combatRngSeed;
 	m_combatRng = other.m_combatRng;
+	m_fHeuristicAutoResign = other.m_fHeuristicAutoResign;
 	m_weather = other.m_weather;
 	m_weatherTurnsRemaining = other.m_weatherTurnsRemaining;
 }
@@ -2373,6 +2374,7 @@ GameState& GameState::operator=(const GameState& other) noexcept {
 		m_terminalReason = other.m_terminalReason;
 		m_combatRngSeed = other.m_combatRngSeed;
 		m_combatRng = other.m_combatRng;
+		m_fHeuristicAutoResign = other.m_fHeuristicAutoResign;
 		m_weather = other.m_weather;
 		m_weatherTurnsRemaining = other.m_weatherTurnsRemaining;
 	}
@@ -2394,6 +2396,10 @@ void GameState::to_json(json& j, const GameState& gameState) {
 
 	if (gameState.m_combatRngSeed.has_value()) {
 		j["combat-rng-seed"] = gameState.m_combatRngSeed.value();
+	}
+
+	if (gameState.m_fHeuristicAutoResign) {
+		j["heuristic-auto-resign"] = true;
 	}
 
 	if (gameState.m_weather != WeatherType::Clear) {
@@ -2566,6 +2572,13 @@ void GameState::from_json(json& j, GameState& gameState) {
 	}
 	else {
 		gameState.ClearCombatRngSeed();
+	}
+
+	if (j.contains("heuristic-auto-resign")) {
+		j.at("heuristic-auto-resign").get_to(gameState.m_fHeuristicAutoResign);
+	}
+	else {
+		gameState.m_fHeuristicAutoResign = false;
 	}
 
 	if (j.contains("weather")) {

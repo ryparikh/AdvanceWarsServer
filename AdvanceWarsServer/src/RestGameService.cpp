@@ -31,7 +31,7 @@ constexpr std::array<MapTemplate, 2> MapTemplates{ {
 	{ "mcts", "res/AWBW/MapSources/MCTS.json" },
 } };
 
-json StandardSettingsJson() {
+json StandardSettingsJson(bool heuristicAutoResign = false) {
 	return {
 		{ "mode", "standard" },
 		{ "fog", false },
@@ -43,6 +43,7 @@ json StandardSettingsJson() {
 		{ "unitCap", 50 },
 		{ "captureLimit", 21 },
 		{ "bannedUnits", json::array({ "blackbomb" }) },
+		{ "heuristicAutoResign", heuristicAutoResign },
 	};
 }
 
@@ -161,7 +162,7 @@ ApiResponse ValidateSettings(const json& request) {
 	}
 
 	std::string invalidField;
-	if (!ContainsOnlyFields(settings, { "mode", "fog", "weather", "coPowers", "tags", "startingFunds", "incomePerProperty", "unitCap", "captureLimit", "bannedUnits" }, invalidField)) {
+	if (!ContainsOnlyFields(settings, { "mode", "fog", "weather", "coPowers", "tags", "startingFunds", "incomePerProperty", "unitCap", "captureLimit", "bannedUnits", "heuristicAutoResign" }, invalidField)) {
 		return ErrorResponse(HttpBadRequest, "invalid-field", "Unknown settings field.", { { "field", "settings." + invalidField } });
 	}
 
@@ -196,19 +197,24 @@ ApiResponse ValidateSettings(const json& request) {
 		if (settings.contains("bannedUnits") && !IsStandardBannedUnits(settings.at("bannedUnits"))) {
 			return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "Only the standard blackbomb ban is supported.", { { "field", "settings.bannedUnits" }, { "value", settings.at("bannedUnits") } });
 		}
+		if (settings.contains("heuristicAutoResign") && !settings.at("heuristicAutoResign").is_boolean()) {
+			return ErrorResponse(HttpBadRequest, "invalid-field", "heuristicAutoResign must be a boolean.", { { "field", "settings.heuristicAutoResign" } });
+		}
 	}
 	catch (const std::exception&) {
 		return ErrorResponse(HttpBadRequest, "invalid-field", "settings contains a value with the wrong type.", { { "field", "settings" } });
 	}
 
-	return JsonResponse(HttpOk, StandardSettingsJson());
+	const bool heuristicAutoResign = settings.contains("heuristicAutoResign") && settings.at("heuristicAutoResign").get<bool>();
+	return JsonResponse(HttpOk, StandardSettingsJson(heuristicAutoResign));
 }
 
 json SerializeGameForApi(const GameState& gameState) {
 	json game;
 	GameState::to_json(game, gameState);
 	game.erase("combat-rng-seed");
-	game["settings"] = StandardSettingsJson();
+	game.erase("heuristic-auto-resign");
+	game["settings"] = StandardSettingsJson(gameState.FHeuristicAutoResign());
 	if (gameState.GetTerminalReason().has_value()) {
 		game["terminalReason"] = gameState.GetTerminalReason().value();
 	}
@@ -404,6 +410,7 @@ ApiResponse RestGameService::CreateGame(const std::string& requestBody) {
 	if (settingsValidation.status != HttpOk) {
 		return settingsValidation;
 	}
+	const bool heuristicAutoResign = settingsValidation.body.at("heuristicAutoResign").get<bool>();
 
 	std::fstream filestream(mapTemplate->path, std::ios::in);
 	if (filestream.fail() || filestream.eof()) {
@@ -475,6 +482,7 @@ ApiResponse RestGameService::CreateGame(const std::string& requestBody) {
 		}
 		gameState.SetCombatRngSeed(request.at("seed").get<std::uint32_t>());
 	}
+	gameState.SetHeuristicAutoResign(heuristicAutoResign);
 
 	if (gameState.StartFirstTurn() == Result::Failed) {
 		return ErrorResponse(HttpInternalServerError, "game-initialization-failed", "Game could not run the opening turn start.", { { "mapId", mapId } });
@@ -578,7 +586,10 @@ ApiResponse RestGameService::SubmitAction(const std::string& gameId, const std::
 		return ErrorResponseWithGame(HttpUnprocessableEntity, "illegal-action", "Action failed during execution.", currentGame);
 	}
 
-	game->second->CheckPlayerResigns();
+	if (game->second->FHeuristicAutoResign()) {
+		game->second->CheckPlayerResigns();
+	}
+
 	return JsonResponse(HttpOk, SerializeGameForApi(*game->second));
 }
 

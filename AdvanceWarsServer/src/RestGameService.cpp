@@ -5,6 +5,7 @@
 #include <cctype>
 #include <filesystem>
 #include <fstream>
+#include <initializer_list>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -217,6 +218,40 @@ json SerializeGameForApi(const GameState& gameState) {
 	return game;
 }
 
+void RedactSonjaHiddenHp(json& unit, const std::string& sonjaArmyType) {
+	if (!unit.is_object()) {
+		return;
+	}
+
+	if (unit.contains("owner") && unit.at("owner").is_string() && unit.at("owner").get<std::string>() == sonjaArmyType) {
+		unit["health"] = nullptr;
+		unit["hidden-health"] = true;
+	}
+
+	if (unit.contains("loaded-units") && unit.at("loaded-units").is_array()) {
+		for (json& loadedUnit : unit["loaded-units"]) {
+			RedactSonjaHiddenHp(loadedUnit, sonjaArmyType);
+		}
+	}
+}
+
+void RedactHiddenHpForPerspective(json& game, int playerIndex) {
+	const int opponentIndex = playerIndex == 0 ? 1 : 0;
+	const json& opponent = game.at("players").at(opponentIndex);
+	if (opponent.at("co") != "Sonja") {
+		return;
+	}
+
+	const std::string sonjaArmyType = opponent.at("armyType").get<std::string>();
+	for (json& row : game["map"]) {
+		for (json& tile : row) {
+			if (tile.contains("unit")) {
+				RedactSonjaHiddenHp(tile["unit"], sonjaArmyType);
+			}
+		}
+	}
+}
+
 ApiResponse UnknownGameResponse() {
 	return ErrorResponse(HttpNotFound, "unknown-game-id", "Game id was not found.");
 }
@@ -232,7 +267,17 @@ bool TryGetInteger(const std::string& value, int& parsed) {
 	}
 }
 
-std::map<std::string, std::string> ParseQueryString(const std::string& query, bool& valid) {
+bool ContainsQueryField(std::initializer_list<const char*> allowedFields, const std::string& key) {
+	for (const char* allowedField : allowedFields) {
+		if (key == allowedField) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+std::map<std::string, std::string> ParseQueryString(const std::string& query, std::initializer_list<const char*> allowedFields, bool& valid) {
 	valid = true;
 	std::map<std::string, std::string> parsed;
 	if (query.empty()) {
@@ -250,7 +295,7 @@ std::map<std::string, std::string> ParseQueryString(const std::string& query, bo
 
 		std::string key = part.substr(0, equals);
 		std::string value = part.substr(equals + 1);
-		if ((key != "x" && key != "y") || parsed.find(key) != parsed.end()) {
+		if (!ContainsQueryField(allowedFields, key) || parsed.find(key) != parsed.end()) {
 			valid = false;
 			return parsed;
 		}
@@ -443,13 +488,31 @@ ApiResponse RestGameService::CreateGame(const std::string& requestBody) {
 	return response;
 }
 
-ApiResponse RestGameService::GetGame(const std::string& gameId) const {
+ApiResponse RestGameService::GetGame(const std::string& gameId, const std::string& query) const {
 	const auto game = FindGame(gameId);
 	if (game == m_games.end()) {
 		return UnknownGameResponse();
 	}
 
-	return JsonResponse(HttpOk, SerializeGameForApi(*game->second));
+	bool validQuery = true;
+	std::map<std::string, std::string> queryParams = ParseQueryString(query, { "player" }, validQuery);
+	if (!validQuery) {
+		return ErrorResponse(HttpBadRequest, "invalid-query", "Game query may only include player.");
+	}
+
+	int playerIndex = -1;
+	if (!queryParams.empty()) {
+		if (!TryGetInteger(queryParams["player"], playerIndex) || playerIndex < 0 || playerIndex > 1) {
+			return ErrorResponse(HttpUnprocessableEntity, "invalid-player", "Player perspective must be 0 or 1.", { { "field", "player" }, { "value", queryParams["player"] } });
+		}
+	}
+
+	json response = SerializeGameForApi(*game->second);
+	if (playerIndex != -1) {
+		RedactHiddenHpForPerspective(response, playerIndex);
+	}
+
+	return JsonResponse(HttpOk, std::move(response));
 }
 
 ApiResponse RestGameService::ListActions(const std::string& gameId, const std::string& query) const {
@@ -459,7 +522,7 @@ ApiResponse RestGameService::ListActions(const std::string& gameId, const std::s
 	}
 
 	bool validQuery = true;
-	std::map<std::string, std::string> queryParams = ParseQueryString(query, validQuery);
+	std::map<std::string, std::string> queryParams = ParseQueryString(query, { "x", "y" }, validQuery);
 	if (!validQuery || queryParams.size() == 1) {
 		return ErrorResponse(HttpBadRequest, "invalid-query", "Legal action query must include both x and y, or neither.");
 	}

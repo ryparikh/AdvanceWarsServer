@@ -15,7 +15,7 @@ struct ApiResponse {
 class RestGameService {
 public:
 	ApiResponse CreateGame(const std::string& requestBody);
-	ApiResponse GetGame(const std::string& gameId) const;
+	ApiResponse GetGame(const std::string& gameId, const std::string& query = "") const;
 	ApiResponse ListActions(const std::string& gameId, const std::string& query) const;
 	ApiResponse SubmitAction(const std::string& gameId, const std::string& requestBody);
 

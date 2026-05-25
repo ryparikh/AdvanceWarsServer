@@ -29,6 +29,74 @@ json StandardCreatePayload(const std::string& mapId = "lefty") {
 	};
 }
 
+json SonjaHiddenHpGameState() {
+	return {
+		{ "activePlayer", 0 },
+		{ "cap-limit", 21 },
+		{ "game-over", false },
+		{ "gameId", "rest-sonja-hidden-hp" },
+		{ "map", json::array({
+			json::array({
+				{
+					{ "terrain", 15 },
+					{ "unit", {
+						{ "ammo", 9 },
+						{ "fuel", 70 },
+						{ "health", 88 },
+						{ "hidden", false },
+						{ "moved", false },
+						{ "owner", "orange-star" },
+						{ "type", "tank" },
+					} },
+				},
+				{
+					{ "terrain", 15 },
+					{ "unit", {
+						{ "ammo", 9 },
+						{ "fuel", 70 },
+						{ "health", 73 },
+						{ "hidden", false },
+						{ "moved", false },
+						{ "owner", "blue-moon" },
+						{ "type", "tank" },
+					} },
+				},
+			}),
+		}) },
+		{ "players", json::array({
+			{
+				{ "armyType", "orange-star" },
+				{ "co", "Andy" },
+				{ "funds", 0 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 3 },
+					{ "scop-stars", 3 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 1 },
+			},
+			{
+				{ "armyType", "blue-moon" },
+				{ "co", "Sonja" },
+				{ "funds", 0 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 3 },
+					{ "scop-stars", 2 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 3 },
+			},
+		}) },
+		{ "turn-count", 1 },
+		{ "unit-cap", 50 },
+		{ "winner", -1 },
+	};
+}
+
 bool RunCreateGetAndLegalActionContract() {
 	RestGameService service;
 	ApiResponse create = service.CreateGame(StandardCreatePayload("mcts").dump());
@@ -114,6 +182,70 @@ bool RunCreateGetAndLegalActionContract() {
 		return false;
 	}
 	if (!Expect(tileActions.body.at("source").at(0) == x && tileActions.body.at("source").at(1) == y, "tile legal action envelope should include source")) {
+		return false;
+	}
+
+	return true;
+}
+
+bool RunSonjaHiddenHpPerspectiveContract() {
+	RestGameService service;
+	json fixture = SonjaHiddenHpGameState();
+	GameState gameState;
+	GameState::from_json(fixture, gameState);
+	service.StoreGameForTesting(std::move(gameState));
+
+	const std::string gameId = fixture.at("gameId").get<std::string>();
+	ApiResponse full = service.GetGame(gameId);
+	if (!Expect(full.status == 200, "full get should return 200")) {
+		return false;
+	}
+	const json& fullSonjaUnit = full.body.at("map").at(0).at(1).at("unit");
+	if (!Expect(fullSonjaUnit.at("health") == 73, "full get should expose authoritative Sonja HP")) {
+		return false;
+	}
+	if (!Expect(!fullSonjaUnit.contains("hidden-health"), "full get should not mark hidden HP")) {
+		return false;
+	}
+
+	ApiResponse attackerView = service.GetGame(gameId, "player=0");
+	if (!Expect(attackerView.status == 200, "player 0 get should return 200")) {
+		return false;
+	}
+	const json& visibleAndyUnit = attackerView.body.at("map").at(0).at(0).at("unit");
+	if (!Expect(visibleAndyUnit.at("health") == 88, "player perspective should keep own HP exact")) {
+		return false;
+	}
+	const json& hiddenSonjaUnit = attackerView.body.at("map").at(0).at(1).at("unit");
+	if (!Expect(hiddenSonjaUnit.at("health").is_null(), "opponent perspective should hide Sonja HP")) {
+		return false;
+	}
+	if (!Expect(hiddenSonjaUnit.at("hidden-health") == true, "opponent perspective should flag hidden Sonja HP")) {
+		return false;
+	}
+
+	ApiResponse defenderView = service.GetGame(gameId, "player=1");
+	if (!Expect(defenderView.status == 200, "player 1 get should return 200")) {
+		return false;
+	}
+	const json& ownSonjaUnit = defenderView.body.at("map").at(0).at(1).at("unit");
+	if (!Expect(ownSonjaUnit.at("health") == 73, "Sonja player should see own exact HP")) {
+		return false;
+	}
+	if (!Expect(!ownSonjaUnit.contains("hidden-health"), "Sonja player should not see own HP as hidden")) {
+		return false;
+	}
+
+	ApiResponse unsupportedPlayer = service.GetGame(gameId, "player=2");
+	if (!Expect(unsupportedPlayer.status == 422, "unsupported perspective player should return 422")) {
+		return false;
+	}
+	if (!Expect(unsupportedPlayer.body.at("error").at("code") == "invalid-player", "unsupported perspective should use invalid-player code")) {
+		return false;
+	}
+
+	ApiResponse invalidQuery = service.GetGame(gameId, "viewer=0");
+	if (!Expect(invalidQuery.status == 400, "unknown get query field should return 400")) {
 		return false;
 	}
 
@@ -243,6 +375,9 @@ bool RunCreateValidationContract() {
 
 int RunRestApiContractTests() {
 	if (!RunCreateGetAndLegalActionContract()) {
+		return 1;
+	}
+	if (!RunSonjaHiddenHpPerspectiveContract()) {
 		return 1;
 	}
 	if (!RunStepAndErrorContract()) {

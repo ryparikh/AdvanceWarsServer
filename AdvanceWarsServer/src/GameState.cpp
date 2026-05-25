@@ -1360,18 +1360,18 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	Player* pattackingplayer = &GetCurrentPlayer();
 	Player* pdefendingplayer = &GetEnemyPlayer();
 	bool fSonjaPower = pdefendingplayer->m_co.m_type == CommandingOfficier::Type::Sonja && pdefendingplayer->PowerStatus() == 2;
+	Unit* pActingUnit = pattacker;
+	MapTile* pCombatAttackerTile = pAttackerTile;
+	MapTile* pCombatDefenderTile = pDefenderTile;
 
 	if (fSonjaPower) {
-		Player* playerswap = pattackingplayer;
-		pattackingplayer = pdefendingplayer;
-		pdefendingplayer = playerswap;
-		Unit* unitswap = pattacker;
-		pattacker = pdefender;
-		pdefender = unitswap;
+		std::swap(pattackingplayer, pdefendingplayer);
+		std::swap(pattacker, pdefender);
+		std::swap(pCombatAttackerTile, pCombatDefenderTile);
 	}
 
 	// Calculate Attacker damange
-	int attackDamage = calculateDamage(pattackingplayer, pdefendingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pAttackerTile->GetTerrain(), pDefenderTile->GetTerrain(), false);
+	int attackDamage = calculateDamage(pattackingplayer, pdefendingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pCombatAttackerTile->GetTerrain(), pCombatDefenderTile->GetTerrain(), fSonjaPower);
 	if (attackDamage <= -1) {
 		if (!fSonjaPower) {
 			return Result::Failed;
@@ -1395,26 +1395,26 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		}
 	}
 
-	pattacker->m_moved = true;
+	pActingUnit->m_moved = true;
 	if (pdefender->health <= 0) {
-		pDefenderTile->TryDestroyUnit();
-		if (pDefenderTile->m_spPropertyInfo != nullptr && pDefenderTile->m_spPropertyInfo->m_capturePoints != 20) {
-			pDefenderTile->m_spPropertyInfo->m_capturePoints = 20;
+		pCombatDefenderTile->TryDestroyUnit();
+		if (pCombatDefenderTile->m_spPropertyInfo != nullptr && pCombatDefenderTile->m_spPropertyInfo->m_capturePoints != 20) {
+			pCombatDefenderTile->m_spPropertyInfo->m_capturePoints = 20;
 		}
 		if (FPlayerRouted(*pdefendingplayer)) {
 			m_fGameOver = true;
-			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
+			m_winningPlayer = PlayerIndex(*pattackingplayer);
 			m_terminalReason = "rout";
 		}
 		return Result::Succeeded;
 	}
 
 	// Calculate counter attack only for direct combat
-	if (pattacker->m_properties.m_range.first != 1 || pdefender->m_properties.m_range.first != 1) {
+	if (!fSonjaPower && (pattacker->m_properties.m_range.first != 1 || pdefender->m_properties.m_range.first != 1)) {
 		return Result::Succeeded;
 	}
 
-	attackDamage = calculateDamage(pdefendingplayer, pattackingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pDefenderTile->GetTerrain(), pAttackerTile->GetTerrain(), true);
+	attackDamage = calculateDamage(pdefendingplayer, pattackingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pCombatDefenderTile->GetTerrain(), pCombatAttackerTile->GetTerrain(), !fSonjaPower);
 	if (attackDamage >= 0) {
 		int attackerVisualHealthStart = (pattacker->health + 9) / 10;
 		pattacker->health -= attackDamage;
@@ -1433,13 +1433,13 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	}
 
 	if (pattacker->health <= 0) {
-		pAttackerTile->TryDestroyUnit();
-		if (pAttackerTile->m_spPropertyInfo != nullptr && pAttackerTile->m_spPropertyInfo->m_capturePoints != 20) {
-			pAttackerTile->m_spPropertyInfo->m_capturePoints = 20;
+		pCombatAttackerTile->TryDestroyUnit();
+		if (pCombatAttackerTile->m_spPropertyInfo != nullptr && pCombatAttackerTile->m_spPropertyInfo->m_capturePoints != 20) {
+			pCombatAttackerTile->m_spPropertyInfo->m_capturePoints = 20;
 		}
 		if (FPlayerRouted(*pattackingplayer)) {
 			m_fGameOver = true;
-			m_winningPlayer = m_isFirstPlayerTurn ? 1 : 0;
+			m_winningPlayer = PlayerIndex(*pdefendingplayer);
 			m_terminalReason = "rout";
 		}
 		return Result::Succeeded;
@@ -1461,6 +1461,10 @@ bool GameState::FPlayerRouted(const Player& player) const noexcept {
 	}
 
 	return true;
+}
+
+int GameState::PlayerIndex(const Player& player) const noexcept {
+	return &player == &m_arrPlayers[0] ? 0 : 1;
 }
 
 int GameState::calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, const Terrain& attackerTerrain, const Terrain& defenderTerrain, bool fCounterAttack) {
@@ -1546,6 +1550,9 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 	int defenderHealth = (defender.health + 9) / 10;
 	double damage = ((baseDamage * attackValue / 100.0) + goodLuckRoll - badLuckRoll) * attackerHealth / 10.0 * ((200 - (defenceValue + defenderTerrainStars * defenderHealth)) / 100.0);
 	if (fCounterAttack && attackerCO == CommandingOfficier::Type::Kanbei && pattackingplayer->PowerStatus() == 2) {
+		damage *= 1.5;
+	}
+	if (fCounterAttack && attackerCO == CommandingOfficier::Type::Sonja) {
 		damage *= 1.5;
 	}
 

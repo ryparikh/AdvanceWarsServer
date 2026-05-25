@@ -299,6 +299,7 @@ private:
 	int CountOwnedComTowers(const Player& player) const noexcept;
 	int CountOwnedProperties(const Player& player) const noexcept;
 	bool FCanProduceUnitFromTerrain(const Player& player, Terrain::Type terrainType, UnitProperties::Type unitType) const noexcept;
+	int PlayerIndex(const Player& player) const noexcept;
 
 	int GetMaxGoodLuck(const Player& player) noexcept;
 	int GetMaxBadLuck(const Player& player) noexcept;

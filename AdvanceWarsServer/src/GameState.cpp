@@ -1775,6 +1775,7 @@ int GameState::GetMaxGoodLuck(const Player& player) noexcept {
 		if (status == 1) {
 			return 39;
 		}
+		return 9;
 	case CommandingOfficier::Type::Nell:
 		if (status == 0) {
 			return 19;

@@ -27,6 +27,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - JSON combat fixtures can force deterministic luck with `"luck-policy"`: `0` uses normal RNG or `"combat-rng-seed"`, `1` forces the lowest total luck outcome, `2` forces the highest total luck outcome, and `3` forces the middle value of each luck range.
 - For bad-luck COs, the lowest total outcome uses minimum good luck and maximum bad luck; the highest total outcome uses maximum good luck and minimum bad luck.
 - Nell uses positive good luck only: +0..+19 day-to-day, +0..+59 during Lady Luck, and +0..+99 during Lucky Star. Her fixtures include a standard-CO high-roll baseline plus low/high, power, super, and damaged-unit rounding coverage.
+- Rachel uses standard +0..+9 good luck day-to-day and during Covering Fire, while Lucky Lass raises combat luck to +0..+39. Her combat-luck fixtures are separate from her property-repair and missile-effect coverage.
 - Sonja keeps +0..+9 good luck and 0..9 bad luck in day-to-day, Enhanced Vision, and Counter Break, while COP/SCOP still use the universal AWBW +10 attack/+10 defense chart bonus.
 - Flak uses independent AWBW good-luck and bad-luck rolls. Day-to-day uses 0..24 good luck and 0..9 bad luck, Brute Force uses 0..49 and 0..19, and Barbaric Blow uses 0..89 and 0..39; the resulting total ranges are -9..+24, -19..+49, and -39..+89.
 - Jugger uses independent AWBW good-luck and bad-luck rolls. Day-to-day uses 0..29 good luck and 0..14 bad luck, Overclock uses 0..54 and 0..24, and System Crash uses 0..94 and 0..44; the resulting total ranges are -14..+29, -24..+54, and -44..+94.
@@ -101,4 +102,3 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
 - [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90): fog, vision, hiding visibility, and fog-only CO effects.
-- [#100](https://github.com/ryparikh/AdvanceWarsServer/issues/100): deterministic luck CO combat fixtures for Rachel.

@@ -2048,6 +2048,9 @@ Result GameState::DoCOPowerAction() {
 			HealUnits(currentPlayer, 1);
 			DamageUnits(GetEnemyPlayer(), 1);
 			return Result::Succeeded;
+		case CommandingOfficier::Type::Jess:
+			IfFailedReturn(ResupplyPlayersUnits(&GetCurrentPlayer()));
+			return Result::Succeeded;
 		case CommandingOfficier::Type::Kindle:
 			DamageUnitsOnUrbanTerrain(GetEnemyPlayer(), 3);
 			return Result::Succeeded;
@@ -2134,8 +2137,8 @@ Result GameState::ResupplyPlayersUnits(const Player* player) {
 	};
 
 
-	for (int y = 0; y < m_spmap->GetCols(); ++y) {
-		for (int x = 0; x < m_spmap->GetRows(); ++x) {
+	for (int y = 0; y < m_spmap->GetRows(); ++y) {
+		for (int x = 0; x < m_spmap->GetCols(); ++x) {
 			IfFailedReturn(tryResupplyUnit(x, y));
 		}
 	}

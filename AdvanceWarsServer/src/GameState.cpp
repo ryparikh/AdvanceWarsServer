@@ -1371,7 +1371,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 	}
 
 	// Calculate Attacker damange
-	int attackDamage = calculateDamage(pattackingplayer, pdefendingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pAttackerTile->GetTerrain(), pDefenderTile->GetTerrain());
+	int attackDamage = calculateDamage(pattackingplayer, pdefendingplayer, pattackingplayer->m_co.m_type, pdefendingplayer->m_co.m_type, *pattacker, *pdefender, pAttackerTile->GetTerrain(), pDefenderTile->GetTerrain(), false);
 	if (attackDamage <= -1) {
 		if (!fSonjaPower) {
 			return Result::Failed;
@@ -1414,7 +1414,7 @@ Result GameState::DoAttackAction(int x, int y, const Action& action) {
 		return Result::Succeeded;
 	}
 
-	attackDamage = calculateDamage(pdefendingplayer, pattackingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pDefenderTile->GetTerrain(), pAttackerTile->GetTerrain());
+	attackDamage = calculateDamage(pdefendingplayer, pattackingplayer, pdefendingplayer->m_co.m_type, pattackingplayer->m_co.m_type, *pdefender, *pattacker, pDefenderTile->GetTerrain(), pAttackerTile->GetTerrain(), true);
 	if (attackDamage >= 0) {
 		int attackerVisualHealthStart = (pattacker->health + 9) / 10;
 		pattacker->health -= attackDamage;
@@ -1463,7 +1463,7 @@ bool GameState::FPlayerRouted(const Player& player) const noexcept {
 	return true;
 }
 
-int GameState::calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, const Terrain& attackerTerrain, const Terrain& defenderTerrain) {
+int GameState::calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, const Terrain& attackerTerrain, const Terrain& defenderTerrain, bool fCounterAttack) {
 	int defenderTerrainStars = defenderTerrain.m_defense;
 	int baseDamage = -1;
 	// Use machine gun against footsolider
@@ -1545,6 +1545,10 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 	int attackerHealth = (attacker.health + 9) / 10;
 	int defenderHealth = (defender.health + 9) / 10;
 	double damage = ((baseDamage * attackValue / 100.0) + goodLuckRoll - badLuckRoll) * attackerHealth / 10.0 * ((200 - (defenceValue + defenderTerrainStars * defenderHealth)) / 100.0);
+	if (fCounterAttack && attackerCO == CommandingOfficier::Type::Kanbei && pattackingplayer->PowerStatus() == 2) {
+		damage *= 1.5;
+	}
+
 	if (damage <= 0) {
 		return 0;
 	}

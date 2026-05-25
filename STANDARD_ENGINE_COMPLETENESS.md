@@ -63,7 +63,7 @@ Explicitly deferred modes and options:
 | --- | --- | --- | --- | --- |
 | Game lifecycle API | `POST /games` ignores request body and creates a hardcoded Lefty game. | Create/get/reset/step/terminal contract for map, players, settings, and seed. | Partial | #66 |
 | Submitted action validation | Legal actions are generated, but direct submitted actions can bypass some validation or mutate before failing. | Submitted actions are validated and rejected atomically. | Partial | #67 |
-| Step semantics | REST action application can auto-end-turn after a submitted action. | One submitted action causes exactly one committed action. | Partial | #68 |
+| Step semantics | REST action application commits exactly the submitted action and can report an `EndTurn`-only legal-action list without advancing. | One submitted action causes exactly one committed action. | Complete | #68 |
 | Terminal reasons | HQ capture, lab win, rout/fuel-out behavior exist; heuristic auto-resign also exists. | Terminal reason should be explicit: HQ, lab, rout, capture limit, day limit, timeout, resign. | Partial | #69, #74, #77, #82 |
 | State tensor | `Tensor.cpp` exists as planned home. | Deterministic current-player-relative tensor. | Partial | #3 |
 | Action encoding and masks | `Action` variants and legal action generation exist. | Stable encoded action space plus mask. | Partial | #4 |

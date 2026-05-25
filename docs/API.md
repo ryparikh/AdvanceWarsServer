@@ -10,6 +10,7 @@ The C++ engine is authoritative for legal actions and state transitions. REST cl
 | --- | --- | --- |
 | `POST` | `/games` | Create a Standard game from a setup payload. |
 | `GET` | `/games/:gameid` | Fetch the current authoritative game state. |
+| `GET` | `/games/:gameid?player=0` | Fetch game state for one player perspective. |
 | `GET` | `/games/:gameid/actions` | Fetch all legal actions for the active player. |
 | `GET` | `/games/:gameid/actions?x=4&y=7` | Fetch legal actions for one selected coordinate. |
 | `POST` | `/games/:gameid/actions` | Submit exactly one action. |
@@ -39,6 +40,8 @@ Supported v1 map ids are `lefty` and `mcts`.
 ## Responses
 
 Successful create returns `201 Created`, a full game-state JSON body, and `Location: /games/:gameId`. Successful get and step responses return `200 OK` with the full current game state. Game-state responses include resolved `settings` and `terminalReason`; active games use `null` for `terminalReason`.
+
+`GET /games/:gameid` without a query is the full authoritative/debug view and includes exact unit `health`. `GET /games/:gameid?player=0` or `player=1` returns a player-perspective view. In a perspective view, enemy Sonja units hide exact HP as `"health": null` with `"hidden-health": true`; the authoritative engine state and Sonja player's own view keep exact HP.
 
 Each player object includes a `power-meter` object. `cop-stars` and `scop-stars` are the CO's meter split, `charge` is current meter charge, and `star-value` is the current value of one star. `cop-threshold` and `scop-threshold` are the current charge thresholds for legal COP and SCOP actions, while `can-use-cop` and `can-use-scop` reflect whether those global power actions are currently available from meter charge.
 
@@ -92,7 +95,7 @@ Status mapping:
 - `400 Bad Request`: malformed JSON, wrong field type, invalid query shape, unknown JSON field, unknown action/unit id.
 - `404 Not Found`: unknown `gameId`.
 - `409 Conflict`: action submitted after terminal state.
-- `422 Unprocessable Entity`: valid JSON but invalid setup/action, such as unknown `mapId`, unsupported setting, unsupported CO/army, illegal action, or invalid coordinate.
+- `422 Unprocessable Entity`: valid JSON but invalid setup/action, such as unknown `mapId`, unsupported setting, unsupported CO/army, illegal action, invalid coordinate, or invalid player perspective.
 
 ## Lifecycle
 

@@ -47,7 +47,7 @@ std::unique_ptr<AdvanceWarsServer> AdvanceWarsServer::s_spServer{ nullptr };
 /*static*/ tx_response AdvanceWarsServer::get_game_handler(const http_request& request, const Parameters& parameters, const std::string& data, std::string& response_body) {
 	std::string gameId = parameters.find("gameid")->second;
 	AdvanceWarsServer& server = AdvanceWarsServer::getInstance();
-	return ToHttpResponse(server.m_gameService.GetGame(gameId), response_body);
+	return ToHttpResponse(server.m_gameService.GetGame(gameId, QueryFromRequest(request)), response_body);
 }
 
 /*static*/ tx_response AdvanceWarsServer::post_game_actions(const http_request& request, const Parameters& parameters, const std::string& data, std::string& response_body) {

@@ -20,16 +20,18 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented fuel-upkeep modifiers: Eagle air units consume 2 less fuel per day.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
-- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
+- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Lash terrain-star attack and Prime Tactics terrain-star defense, Javier indirect-defense and Comm Tower defense modifiers, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Kanbei Samurai Spirit counterattack damage, Sonja counterattack damage and hidden-HP API redaction, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
 ## Luck Notes
 
 - JSON combat fixtures can force deterministic luck with `"luck-policy"`: `0` uses normal RNG or `"combat-rng-seed"`, `1` forces the lowest total luck outcome, `2` forces the highest total luck outcome, and `3` forces the middle value of each luck range.
 - For bad-luck COs, the lowest total outcome uses minimum good luck and maximum bad luck; the highest total outcome uses maximum good luck and minimum bad luck.
-- Sonja's AWBW combat luck is covered separately from her information and counterattack effects: she keeps +0..+9 good luck and 0..9 bad luck in day-to-day, Enhanced Vision, and Counter Break, while COP/SCOP still use the universal AWBW +10 attack/+10 defense chart bonus.
+- Nell uses positive good luck only: +0..+19 day-to-day, +0..+59 during Lady Luck, and +0..+99 during Lucky Star. Her fixtures include a standard-CO high-roll baseline plus low/high, power, super, and damaged-unit rounding coverage.
+- Rachel uses standard +0..+9 good luck day-to-day and during Covering Fire, while Lucky Lass raises combat luck to +0..+39. Her combat-luck fixtures are separate from her property-repair and missile-effect coverage.
+- Sonja keeps +0..+9 good luck and 0..9 bad luck in day-to-day, Enhanced Vision, and Counter Break, while COP/SCOP still use the universal AWBW +10 attack/+10 defense chart bonus.
 - Flak uses independent AWBW good-luck and bad-luck rolls. Day-to-day uses 0..24 good luck and 0..9 bad luck, Brute Force uses 0..49 and 0..19, and Barbaric Blow uses 0..89 and 0..39; the resulting total ranges are -9..+24, -19..+49, and -39..+89.
 - Jugger uses independent AWBW good-luck and bad-luck rolls. Day-to-day uses 0..29 good luck and 0..14 bad luck, Overclock uses 0..54 and 0..24, and System Crash uses 0..94 and 0..44; the resulting total ranges are -14..+29, -24..+54, and -44..+94.
-- Sonja's hidden HP, fog vision, day-to-day counterattack multiplier, and Counter Break first-strike edge cases remain tracked by [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89) and [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90), rather than by the combat-luck fixtures.
+- Sonja's fog-only vision effects remain tracked by [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90), rather than by the combat-luck fixtures.
 
 ## Power Meter Notes
 
@@ -56,6 +58,18 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 ## Range Notes
 
 - Indirect range modifiers adjust maximum range only; minimum range is unchanged. Grit applies to all indirect units, Jake applies to vehicle indirects during COP/SCOP, and Max applies his -1 maximum-range penalty to indirect units without changing adjacent direct attacks.
+
+## Terrain Notes
+
+- Lash receives +10 attack per attacker terrain star during day-to-day and Terrain Tactics, while Prime Tactics doubles the terrain-star attack bonus to +20 per star and doubles terrain-star defense for Lash defenders. Air units do not receive Lash's terrain-star attack or defense benefits.
+- Lash's Terrain Tactics and Prime Tactics make legal terrain movement cost 1 fuel/move point outside snow. Snow uses normal weather movement costs, and illegal terrain remains illegal.
+
+## Defense Notes
+
+- Javier receives +20 defense against indirect attacks day-to-day, +40 during Tower Shield, and +80 during Tower of Power. Owned Comm Towers add +10 defense per tower day-to-day, +20 during Tower Shield, and +30 during Tower of Power. These bonuses compose with normal terrain defense.
+- Javier's fog-only vision effects remain deferred to [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90).
+- Kanbei's Samurai Spirit multiplies real counterattack damage by 1.5 after the normal combat formula has applied his SCOP attack and defense chart values. Normal attacks during Samurai Spirit and attacks that cannot receive a counterattack do not receive this extra multiplier.
+- Sonja counterattacks multiply real damage by 1.5 after her normal chart, luck, health, and defense calculations. Counter Break first-strike damage is treated as a counterattack for this multiplier; the original acting unit is still the unit marked moved. Opponent-facing `GET /games/:gameid?player=N` responses redact exact HP for enemy Sonja units with `"health": null` and `"hidden-health": true`, while no-query debug responses and Sonja's own player perspective keep authoritative HP.
 
 ## Economy Notes
 
@@ -87,9 +101,4 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#86](https://github.com/ryparikh/AdvanceWarsServer/issues/86): Lash terrain-star attack and movement effects.
-- [#87](https://github.com/ryparikh/AdvanceWarsServer/issues/87): Javier indirect-defense and Comm Tower defense bonuses.
-- [#88](https://github.com/ryparikh/AdvanceWarsServer/issues/88): Kanbei Samurai Spirit counterattack bonus.
-- [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89): Sonja counterattack bonus and hidden-HP API redaction.
 - [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90): fog, vision, hiding visibility, and fog-only CO effects.
-- [#99](https://github.com/ryparikh/AdvanceWarsServer/issues/99) and [#100](https://github.com/ryparikh/AdvanceWarsServer/issues/100): deterministic luck CO combat fixtures for Nell and Rachel.

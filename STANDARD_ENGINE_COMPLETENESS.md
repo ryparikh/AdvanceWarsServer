@@ -78,7 +78,7 @@ Explicitly deferred modes and options:
 | Area | Current implementation | Standard target | Status | Issue |
 | --- | --- | --- | --- | --- |
 | Movement and wait | Covered broadly by JSON fixtures. | AWBW movement/fuel/path legality. | Partial because submitted invalid actions need atomic rejection | #67 |
-| Combat actions | Direct, indirect, counterattack, ammo, HP, terrain, and many CO/power cases are covered. | AWBW combat formula and data. | Audit | #80 |
+| Combat actions | Direct, indirect, counterattack, ammo, HP, terrain, and many CO/power cases are covered. Unit stat/data audit is documented in `docs/AWBW_UNIT_DATA_AUDIT.md`. | AWBW combat formula and data. | Partial | #147, #148, #149 |
 | Capture | Capture progress, interruption, HQ capture, Labs, Com Towers, Airports, Ports, Sami capture, and capture-limit counting have fixtures. | AWBW capture points and capture-limit counting. | Complete for current Standard coverage | none |
 | Buy | Production fixtures cover common buy legality, unit cap, and Piperunner production from Bases/Hachi Merchant Union cities. | Add setup bans, lab units, and ghosted blockers. | Partial | #75, #76, #78 |
 | Load and unload | APC, T-Copter, Lander, Black Boat, Cruiser, Carrier, loaded-unit destruction, and many boundaries are covered. | AWBW free unload behavior and legal terrain/occupancy. | Partial because submitted invalid actions need atomic rejection | #67 |
@@ -97,7 +97,7 @@ The unit fixture manifest lives at `AdvanceWarsServer/test/json/units/README.md`
 | Area | Current implementation | Status | Issue |
 | --- | --- | --- | --- |
 | Full unit roster exists | All `UnitProperties::Type` values exist and many have dedicated fixtures. | Complete structurally | none |
-| Unit stat and damage data | Combat chart and stats exist with broad fixtures. | Audit | #80 |
+| Unit stat and damage data | Unit stats match the AWBW Units table. Current damage/targeting mismatches are tracked separately after the #80 audit. | Partial | #147, #148, #149 |
 | Anti-Air owner-side coverage | Mostly covered as target/opponent. | Partial | #104 |
 | Recon owner-side coverage | Mostly covered as target/opponent/production. | Partial | #105 |
 | Medium Tank owner-side coverage | Mostly covered as target/opponent/production. | Partial | #106 |
@@ -198,7 +198,9 @@ Actions, units, and data:
 - #35: Add piperunner pipe movement and attack coverage.
 - #42: Implement and test missile silo launch behavior.
 - #78: Implement ghosted production tile blockers.
-- #80: Verify unit stats and damage lookup data against AWBW charts.
+- #147: Correct Artillery base damage against Recon and Rocket.
+- #148: Allow Cruiser anti-air gun attacks against copters.
+- #149: Correct Neotank machine-gun damage against Infantry.
 - #104: Add Anti-Air owned combat coverage.
 - #105: Add Recon owned movement and combat coverage.
 - #106: Add Medium Tank owned combat coverage.

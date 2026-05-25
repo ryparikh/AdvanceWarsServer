@@ -143,7 +143,7 @@ Detailed implementation notes live in `CO_SUPPORT.md`.
 | Kanbei Samurai Spirit counterattack | Missing/incomplete. | Partial | #88 |
 | Sonja counterattack and hidden HP API view | Missing/incomplete. | Partial | #89 |
 | Sonja luck deterministic fixtures | D2D/COP/SCOP low, high, and middle combat fixtures cover luck separately from visibility and counterattack effects. | Complete | #103 |
-| Other luck CO deterministic fixtures | Luck bounds exist; exact deterministic fixtures split per CO. | Partial | #99, #100, #101, #102 |
+| Other luck CO deterministic fixtures | Luck bounds exist; exact deterministic fixtures split per CO; Flak D2D/COP/SCOP and seeded replay fixtures now cover his independent good-luck/bad-luck rolls. | Partial | #99, #100, #102 |
 | Fog/vision-only CO effects | Not needed for Standard fog-off target. | Deferred | #90 |
 
 ## Weather And Fog
@@ -218,7 +218,6 @@ Properties, economy, and COs:
 - #89: Implement Sonja counterattack bonus and hidden-HP API redaction.
 - #99: Implement and test Nell luck combat modifiers.
 - #100: Implement and test Rachel luck combat modifiers.
-- #101: Implement and test Flak luck combat modifiers.
 - #102: Implement and test Jugger luck combat modifiers.
 
 Deferred modes and map features:

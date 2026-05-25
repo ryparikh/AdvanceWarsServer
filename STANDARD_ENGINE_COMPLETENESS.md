@@ -84,7 +84,7 @@ Explicitly deferred modes and options:
 | Load and unload | APC, T-Copter, Lander, Black Boat, Cruiser, Carrier, loaded-unit destruction, and many boundaries are covered. | AWBW free unload behavior and legal terrain/occupancy. | Partial because submitted invalid actions need atomic rejection | #67 |
 | Combine/join | Joining/refund/capture-preservation fixtures exist. | AWBW join/refund behavior. | Complete for current Standard coverage | none |
 | Black Boat repair action | Dedicated repair/resupply fixtures exist. | AWBW Black Boat repair and resupply. | Complete for current Standard coverage | none |
-| CO power actions | Power gates, spending, meter math, many direct effects, and mass effects are covered. | Full CO behavior. | Partial | #83, #84, #85, #86, #87, #88, #89, #99, #100, #101, #102, #103 |
+| CO power actions | Power gates, spending, meter math, many direct effects, and mass effects are covered. | Full CO behavior. | Partial | #83, #84, #86, #87, #88, #89, #99, #100, #101, #102, #103 |
 | Black Bomb explode | Black Bomb movement/fuel/no-weapon fixtures exist; explosion action is absent. | Black Bomb explosion if predeployed/custom games need it; production banned in Standard. | Deferred from production, incomplete as unit behavior | #33, #75 |
 | Missile silo launch | Terrain exists, but launch behavior is incomplete. | Launch action, empty silo state, damage area, legal action generation. | Partial | #42 |
 | Resign/delete | Heuristic resign exists; explicit player actions do not. | Explicit resign and delete-unit actions if AWBW permits delete. | Partial | #77 |
@@ -112,7 +112,7 @@ The unit fixture manifest lives at `AdvanceWarsServer/test/json/units/README.md`
 
 | Area | Current implementation | Standard target | Status | Issue |
 | --- | --- | --- | --- | --- |
-| Core terrain movement | JSON fixtures cover many terrain, weather, air, land, and sea movement cases. | AWBW movement tables. | Partial where Piperunner/Sturm/Teleport remain | #35, #85, #93 |
+| Core terrain movement | JSON fixtures cover many terrain, weather, air, land, sea, and Sturm all-terrain movement cases. | AWBW movement tables. | Partial where Piperunner/Teleport remain | #35, #93 |
 | Properties and income | Cities/Bases/Airports/Ports/HQ income behavior exists; Labs/Com Towers no-income fixtures exist. | AWBW fund-producing properties only. | Complete for normal income, configurable settings partial | #65 |
 | Property repair/resupply | Begin-turn property service is gated by owner, property type, and unit class; Labs and Com Towers do not repair or resupply. | Land on City/Base/HQ, air on Airport, sea on Port; owner only. | Complete for normal property service | none |
 | Rachel property repair | Rachel repairs +1 extra displayed HP on compatible owned properties, with affordable partial repair and no off-class service. | Rachel repairs +1 extra displayed HP on compatible properties. | Complete | none |
@@ -137,7 +137,7 @@ Detailed implementation notes live in `CO_SUPPORT.md`.
 | Rachel property repair | Compatible owned property service repairs Rachel units up to 3 displayed HP and respects off-class restrictions. | Complete | none |
 | Jess COP resupply | SCOP resupply exists; COP resupply missing. | Partial | #83 |
 | Eagle air fuel upkeep | Missing. | Partial | #84 |
-| Sturm all-terrain movement | Missing/incomplete. | Partial | #85 |
+| Sturm all-terrain movement | Legal terrain costs 1 outside snow; snow disables the passive and normal snow costs apply. | Complete | none |
 | Lash terrain-star effects | Missing/incomplete. | Partial | #86 |
 | Javier indirect and Comm Tower defense | Missing/incomplete. | Partial | #87 |
 | Kanbei Samurai Spirit counterattack | Missing/incomplete. | Partial | #88 |
@@ -211,7 +211,6 @@ Properties, economy, and COs:
 
 - #83: Implement Jess Turbo Charge COP resupply side effect.
 - #84: Implement Eagle air-unit fuel upkeep modifier.
-- #85: Implement Sturm all-terrain movement rules.
 - #86: Implement Lash terrain-star attack and movement effects.
 - #87: Implement Javier indirect-defense and comm-tower defense bonuses.
 - #88: Implement Kanbei Samurai Spirit counterattack bonus.

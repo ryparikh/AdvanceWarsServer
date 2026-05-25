@@ -33,7 +33,26 @@ Minimal request:
 }
 ```
 
-`settings` is optional. If present, `mode` belongs inside `settings`; v1 accepts only strict Standard values. `settings.heuristicAutoResign` is a training/early-stop option that defaults to `false`; when set to `true`, the existing army-value heuristic can end a game with `terminalReason: "heuristic-resign"` after a legal step. `seed` is optional and request-only: it enables deterministic combat RNG but is not returned in normal API game-state responses.
+`settings` is optional. If present, `mode` belongs inside `settings`; v1 accepts Standard-only gameplay settings. Fog, non-clear weather, CO powers off, tags, High Funds income, and non-Standard unit bans are rejected. `unitCap`, `captureLimit`, and `dayLimit` may be configured for Standard setup. `dayLimit` may be `null` or a positive integer; when reached, the highest property count wins and a tie is a draw. `settings.heuristicAutoResign` is a training/early-stop option that defaults to `false`; when set to `true`, the existing army-value heuristic can end a game with `terminalReason: "heuristic-resign"` after a legal step. `seed` is optional and request-only: it enables deterministic combat RNG but is not returned in normal API game-state responses.
+
+Resolved default settings:
+
+```json
+{
+  "mode": "standard",
+  "fog": false,
+  "weather": "clear",
+  "coPowers": true,
+  "tags": false,
+  "startingFunds": 0,
+  "incomePerProperty": 1000,
+  "unitCap": 50,
+  "captureLimit": 21,
+  "dayLimit": null,
+  "bannedUnits": ["blackbomb"],
+  "heuristicAutoResign": false
+}
+```
 
 Supported v1 map ids are `lefty` and `mcts`.
 

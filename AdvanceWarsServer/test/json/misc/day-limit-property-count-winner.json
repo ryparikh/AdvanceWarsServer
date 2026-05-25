@@ -1,9 +1,9 @@
 {
   "initial-game-state": {
-    "activePlayer": 0,
+    "activePlayer": 1,
     "cap-limit": 21,
     "game-over": false,
-    "gameId": "airport-port-buy-actions",
+    "gameId": "day-limit-property-count-winner",
     "map": [
       [
         {
@@ -11,14 +11,21 @@
             "capture-points": 20,
             "owner": "orange-star"
           },
-          "terrain": 36
+          "terrain": 34
         },
         {
           "property": {
             "capture-points": 20,
             "owner": "orange-star"
           },
-          "terrain": 37
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 35
         }
       ]
     ],
@@ -26,7 +33,7 @@
       {
         "armyType": "orange-star",
         "co": "Andy",
-        "funds": 100000,
+        "funds": 0,
         "power-meter": {
           "charge": 0,
           "cop-stars": 3,
@@ -60,8 +67,8 @@
       "incomePerProperty": 1000,
       "unitCap": 50,
       "captureLimit": 21,
-      "dayLimit": null,
-      "bannedUnits": [],
+      "dayLimit": 1,
+      "bannedUnits": [ "blackbomb" ],
       "heuristicAutoResign": false
     },
     "turn-count": 1,
@@ -70,21 +77,14 @@
   },
   "actions": [
     {
-      "type": "buy",
-      "source": [ 0, 0 ],
-      "unit": "blackbomb"
-    },
-    {
-      "type": "buy",
-      "source": [ 1, 0 ],
-      "unit": "carrier"
+      "type": "end-turn"
     }
   ],
   "final-game-state": {
     "activePlayer": 0,
     "cap-limit": 21,
-    "game-over": false,
-    "gameId": "airport-port-buy-actions",
+    "game-over": true,
+    "gameId": "day-limit-property-count-winner",
     "map": [
       [
         {
@@ -92,32 +92,21 @@
             "capture-points": 20,
             "owner": "orange-star"
           },
-          "terrain": 36,
-          "unit": {
-            "ammo": 0,
-            "fuel": 45,
-            "health": 100,
-            "hidden": false,
-            "moved": true,
-            "owner": "orange-star",
-            "type": "blackbomb"
-          }
+          "terrain": 34
         },
         {
           "property": {
             "capture-points": 20,
             "owner": "orange-star"
           },
-          "terrain": 37,
-          "unit": {
-            "ammo": 9,
-            "fuel": 99,
-            "health": 100,
-            "hidden": false,
-            "moved": true,
-            "owner": "orange-star",
-            "type": "carrier"
-          }
+          "terrain": 35
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 35
         }
       ]
     ],
@@ -125,7 +114,7 @@
       {
         "armyType": "orange-star",
         "co": "Andy",
-        "funds": 45000,
+        "funds": 0,
         "power-meter": {
           "charge": 0,
           "cop-stars": 3,
@@ -159,12 +148,12 @@
       "incomePerProperty": 1000,
       "unitCap": 50,
       "captureLimit": 21,
-      "dayLimit": null,
-      "bannedUnits": [],
+      "dayLimit": 1,
+      "bannedUnits": [ "blackbomb" ],
       "heuristicAutoResign": false
     },
-    "turn-count": 1,
+    "turn-count": 2,
     "unit-cap": 50,
-    "winner": -1
+    "winner": 0
   }
 }

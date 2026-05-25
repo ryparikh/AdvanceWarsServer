@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <initializer_list>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -31,7 +32,12 @@ constexpr std::array<MapTemplate, 2> MapTemplates{ {
 	{ "mcts", "res/AWBW/MapSources/MCTS.json" },
 } };
 
-json StandardSettingsJson(bool heuristicAutoResign = false) {
+json StandardSettingsJson(int unitCap = 50, int captureLimit = 21, std::optional<int> dayLimit = std::nullopt, bool heuristicAutoResign = false) {
+	json dayLimitJson = nullptr;
+	if (dayLimit.has_value()) {
+		dayLimitJson = dayLimit.value();
+	}
+
 	return {
 		{ "mode", "standard" },
 		{ "fog", false },
@@ -40,8 +46,9 @@ json StandardSettingsJson(bool heuristicAutoResign = false) {
 		{ "tags", false },
 		{ "startingFunds", 0 },
 		{ "incomePerProperty", 1000 },
-		{ "unitCap", 50 },
-		{ "captureLimit", 21 },
+		{ "unitCap", unitCap },
+		{ "captureLimit", captureLimit },
+		{ "dayLimit", dayLimitJson },
 		{ "bannedUnits", json::array({ "blackbomb" }) },
 		{ "heuristicAutoResign", heuristicAutoResign },
 	};
@@ -162,10 +169,13 @@ ApiResponse ValidateSettings(const json& request) {
 	}
 
 	std::string invalidField;
-	if (!ContainsOnlyFields(settings, { "mode", "fog", "weather", "coPowers", "tags", "startingFunds", "incomePerProperty", "unitCap", "captureLimit", "bannedUnits", "heuristicAutoResign" }, invalidField)) {
+	if (!ContainsOnlyFields(settings, { "mode", "fog", "weather", "coPowers", "tags", "startingFunds", "incomePerProperty", "unitCap", "captureLimit", "dayLimit", "bannedUnits", "heuristicAutoResign" }, invalidField)) {
 		return ErrorResponse(HttpBadRequest, "invalid-field", "Unknown settings field.", { { "field", "settings." + invalidField } });
 	}
 
+	int unitCap = 50;
+	int captureLimit = 21;
+	std::optional<int> dayLimit;
 	try {
 		if (settings.contains("mode") && (!settings.at("mode").is_string() || settings.at("mode").get<std::string>() != "standard")) {
 			return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "Only standard mode is supported.", { { "field", "settings.mode" }, { "value", settings.at("mode") } });
@@ -188,11 +198,38 @@ ApiResponse ValidateSettings(const json& request) {
 		if (settings.contains("incomePerProperty") && (!settings.at("incomePerProperty").is_number_integer() || settings.at("incomePerProperty").get<int>() != 1000)) {
 			return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "Only 1000 income per property is supported for standard games.", { { "field", "settings.incomePerProperty" }, { "value", settings.at("incomePerProperty") } });
 		}
-		if (settings.contains("unitCap") && (!settings.at("unitCap").is_number_integer() || settings.at("unitCap").get<int>() != 50)) {
-			return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "Only unit cap 50 is supported for standard games.", { { "field", "settings.unitCap" }, { "value", settings.at("unitCap") } });
+		if (settings.contains("unitCap")) {
+			if (!settings.at("unitCap").is_number_integer()) {
+				return ErrorResponse(HttpBadRequest, "invalid-field", "unitCap must be an integer.", { { "field", "settings.unitCap" } });
+			}
+			unitCap = settings.at("unitCap").get<int>();
+			if (unitCap <= 0) {
+				return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "unitCap must be positive for standard games.", { { "field", "settings.unitCap" }, { "value", settings.at("unitCap") } });
+			}
 		}
-		if (settings.contains("captureLimit") && (!settings.at("captureLimit").is_number_integer() || settings.at("captureLimit").get<int>() != 21)) {
-			return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "Only capture limit 21 is supported for standard games.", { { "field", "settings.captureLimit" }, { "value", settings.at("captureLimit") } });
+		if (settings.contains("captureLimit")) {
+			if (!settings.at("captureLimit").is_number_integer()) {
+				return ErrorResponse(HttpBadRequest, "invalid-field", "captureLimit must be an integer.", { { "field", "settings.captureLimit" } });
+			}
+			captureLimit = settings.at("captureLimit").get<int>();
+			if (captureLimit <= 0) {
+				return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "captureLimit must be positive for standard games.", { { "field", "settings.captureLimit" }, { "value", settings.at("captureLimit") } });
+			}
+		}
+		if (settings.contains("dayLimit")) {
+			if (settings.at("dayLimit").is_null()) {
+				dayLimit.reset();
+			}
+			else if (!settings.at("dayLimit").is_number_integer()) {
+				return ErrorResponse(HttpBadRequest, "invalid-field", "dayLimit must be an integer or null.", { { "field", "settings.dayLimit" } });
+			}
+			else {
+				const int parsedDayLimit = settings.at("dayLimit").get<int>();
+				if (parsedDayLimit <= 0) {
+					return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "dayLimit must be positive for standard games.", { { "field", "settings.dayLimit" }, { "value", settings.at("dayLimit") } });
+				}
+				dayLimit = parsedDayLimit;
+			}
 		}
 		if (settings.contains("bannedUnits") && !IsStandardBannedUnits(settings.at("bannedUnits"))) {
 			return ErrorResponse(HttpUnprocessableEntity, "unsupported-setting", "Only the standard blackbomb ban is supported.", { { "field", "settings.bannedUnits" }, { "value", settings.at("bannedUnits") } });
@@ -206,7 +243,7 @@ ApiResponse ValidateSettings(const json& request) {
 	}
 
 	const bool heuristicAutoResign = settings.contains("heuristicAutoResign") && settings.at("heuristicAutoResign").get<bool>();
-	return JsonResponse(HttpOk, StandardSettingsJson(heuristicAutoResign));
+	return JsonResponse(HttpOk, StandardSettingsJson(unitCap, captureLimit, dayLimit, heuristicAutoResign));
 }
 
 json SerializeGameForApi(const GameState& gameState) {
@@ -214,7 +251,6 @@ json SerializeGameForApi(const GameState& gameState) {
 	GameState::to_json(game, gameState);
 	game.erase("combat-rng-seed");
 	game.erase("heuristic-auto-resign");
-	game["settings"] = StandardSettingsJson(gameState.FHeuristicAutoResign());
 	if (gameState.GetTerminalReason().has_value()) {
 		game["terminalReason"] = gameState.GetTerminalReason().value();
 	}
@@ -420,8 +456,9 @@ ApiResponse RestGameService::CreateGame(const std::string& requestBody) {
 	json templateJson;
 	filestream >> templateJson;
 	templateJson["gameId"] = Platform::createUuid();
-	templateJson["unit-cap"] = 50;
-	templateJson["cap-limit"] = 21;
+	templateJson["settings"] = settingsValidation.body;
+	templateJson["unit-cap"] = settingsValidation.body.at("unitCap").get<int>();
+	templateJson["cap-limit"] = settingsValidation.body.at("captureLimit").get<int>();
 	templateJson["activePlayer"] = 0;
 	templateJson["turn-count"] = 0;
 	templateJson.erase("combat-rng-seed");
@@ -461,7 +498,7 @@ ApiResponse RestGameService::CreateGame(const std::string& requestBody) {
 		}
 
 		Player player(co.m_type, Player::armyTypefromString(armyType));
-		player.m_funds = 0;
+		player.m_funds = settingsValidation.body.at("startingFunds").get<int>();
 		json playerJson;
 		to_json(playerJson, player);
 		templateJson["players"][i] = std::move(playerJson);

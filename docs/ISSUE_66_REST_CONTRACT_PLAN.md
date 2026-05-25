@@ -12,7 +12,7 @@ This file captures the issue #66 REST contract decisions from the design intervi
 - No `startingPlayer` override in v1; use the template/default initial active player.
 - Create CO ids use lowercase kebab-case, while existing state/action serialization stays as-is for now.
 - V1 accepts any CO id the engine can parse; remaining CO mechanic gaps stay tracked in focused follow-up issues.
-- Settings may be omitted; server fills strict Standard defaults and rejects unsupported non-Standard settings.
+- Settings may be omitted; server fills Standard defaults and rejects unsupported non-Standard modes/settings.
 - Resolved settings are serialized inside every returned `GameState`, including create, get, and step responses.
 - Optional `seed` is accepted for reproducible combat RNG; when omitted, combat RNG may be nondeterministic.
 - `seed` is request-only/debug metadata and is not serialized in normal state responses.
@@ -69,7 +69,7 @@ Minimal v1 request:
 }
 ```
 
-Settings may be omitted. If provided, `mode` belongs inside `settings`, not at the top level. The server resolves strict Standard defaults and serializes the resolved settings in returned game state.
+Settings may be omitted. If provided, `mode` belongs inside `settings`, not at the top level. The server resolves Standard defaults and serializes the resolved settings in returned game state.
 
 Resolved v1 settings:
 
@@ -85,19 +85,21 @@ Resolved v1 settings:
     "incomePerProperty": 1000,
     "unitCap": 50,
     "captureLimit": 21,
+    "dayLimit": null,
     "bannedUnits": ["blackbomb"],
     "heuristicAutoResign": false
   }
 }
 ```
 
+`unitCap`, `captureLimit`, and `dayLimit` may be configured for Standard setup. `dayLimit` accepts `null` or a positive integer.
+
 `heuristicAutoResign` defaults to `false`. It may be set to `true` for training/early-stop runs that intentionally want the army-value heuristic to produce `terminalReason: "heuristic-resign"` after legal steps.
 
-Do not include day limit, timer/live settings, lab units, High Funds, tag COs, random weather, or fog metadata in v1. Reject those if submitted.
+Do not include timer/live settings, lab units, High Funds, tag COs, random weather, or fog metadata in v1. Reject those if submitted.
 
 Deferred settings are already tracked by follow-up issues:
 
-- Day-limit terminal rules: #74.
 - Lab-unit production requirements: #76.
 - Timer/live enforcement and timeout metadata: #82.
 - Fog of War, visibility, and fog-only metadata: #90.

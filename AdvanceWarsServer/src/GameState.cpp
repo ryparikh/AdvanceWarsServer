@@ -44,6 +44,104 @@ GameState::WeatherType WeatherTypeFromString(const std::string& weather) {
 	throw std::invalid_argument("Unknown weather: " + weather);
 }
 
+json GameSettingsToJson(const GameState::GameSettings& settings) {
+	json bannedUnits = json::array();
+	for (UnitProperties::Type unitType : settings.m_bannedUnits) {
+		bannedUnits.push_back(UnitProperties::getTypename(unitType));
+	}
+
+	json dayLimit = nullptr;
+	if (settings.m_dayLimit.has_value()) {
+		dayLimit = settings.m_dayLimit.value();
+	}
+
+	return {
+		{ "mode", settings.m_mode },
+		{ "fog", settings.m_fog },
+		{ "weather", WeatherTypeToString(settings.m_weather) },
+		{ "coPowers", settings.m_coPowers },
+		{ "tags", settings.m_tags },
+		{ "startingFunds", settings.m_startingFunds },
+		{ "incomePerProperty", settings.m_incomePerProperty },
+		{ "unitCap", settings.m_unitCap },
+		{ "captureLimit", settings.m_captureLimit },
+		{ "dayLimit", dayLimit },
+		{ "bannedUnits", bannedUnits },
+		{ "heuristicAutoResign", settings.m_heuristicAutoResign },
+	};
+}
+
+GameState::GameSettings GameSettingsFromJson(const json& settingsJson) {
+	GameState::GameSettings settings;
+	if (!settingsJson.is_object()) {
+		throw std::invalid_argument("settings must be an object");
+	}
+
+	if (settingsJson.contains("mode")) {
+		settingsJson.at("mode").get_to(settings.m_mode);
+	}
+	if (settingsJson.contains("fog")) {
+		settingsJson.at("fog").get_to(settings.m_fog);
+	}
+	if (settingsJson.contains("weather")) {
+		std::string weather;
+		settingsJson.at("weather").get_to(weather);
+		settings.m_weather = WeatherTypeFromString(weather);
+	}
+	if (settingsJson.contains("coPowers")) {
+		settingsJson.at("coPowers").get_to(settings.m_coPowers);
+	}
+	if (settingsJson.contains("tags")) {
+		settingsJson.at("tags").get_to(settings.m_tags);
+	}
+	if (settingsJson.contains("startingFunds")) {
+		settingsJson.at("startingFunds").get_to(settings.m_startingFunds);
+	}
+	if (settingsJson.contains("incomePerProperty")) {
+		settingsJson.at("incomePerProperty").get_to(settings.m_incomePerProperty);
+	}
+	if (settingsJson.contains("unitCap")) {
+		settingsJson.at("unitCap").get_to(settings.m_unitCap);
+	}
+	if (settingsJson.contains("captureLimit")) {
+		settingsJson.at("captureLimit").get_to(settings.m_captureLimit);
+	}
+	if (settingsJson.contains("dayLimit")) {
+		if (settingsJson.at("dayLimit").is_null()) {
+			settings.m_dayLimit.reset();
+		}
+		else {
+			int dayLimit = 0;
+			settingsJson.at("dayLimit").get_to(dayLimit);
+			if (dayLimit <= 0) {
+				throw std::invalid_argument("dayLimit must be positive or null");
+			}
+			settings.m_dayLimit = dayLimit;
+		}
+	}
+	if (settingsJson.contains("bannedUnits")) {
+		if (!settingsJson.at("bannedUnits").is_array()) {
+			throw std::invalid_argument("bannedUnits must be an array");
+		}
+
+		settings.m_bannedUnits.clear();
+		for (const json& bannedUnitJson : settingsJson.at("bannedUnits")) {
+			std::string bannedUnit;
+			bannedUnitJson.get_to(bannedUnit);
+			UnitProperties::Type bannedUnitType = UnitProperties::unitTypeFromString(bannedUnit);
+			if (bannedUnitType == UnitProperties::Type::Invalid) {
+				throw std::invalid_argument("Unknown banned unit: " + bannedUnit);
+			}
+			settings.m_bannedUnits.push_back(bannedUnitType);
+		}
+	}
+	if (settingsJson.contains("heuristicAutoResign")) {
+		settingsJson.at("heuristicAutoResign").get_to(settings.m_heuristicAutoResign);
+	}
+
+	return settings;
+}
+
 bool FProducesIncome(Terrain::Type terrainType) noexcept {
 	return MapTile::IsProperty(terrainType) &&
 		terrainType != Terrain::Type::ComTower &&
@@ -181,6 +279,10 @@ Result GameState::BeginTurn() noexcept {
 	// TODO Refactor to get rid of 4O(n^2)
 	if (m_isFirstPlayerTurn) {
 		++m_nTurnCount;
+		if (m_settings.m_dayLimit.has_value() && m_nTurnCount > m_settings.m_dayLimit.value()) {
+			IfFailedReturn(ResolveDayLimit());
+			return Result::Succeeded;
+		}
 	}
 
 	TickTemporaryWeather();
@@ -288,6 +390,28 @@ Result GameState::BeginTurn() noexcept {
 			}
 		}
 	}
+	return Result::Succeeded;
+}
+
+Result GameState::ResolveDayLimit() noexcept {
+	if (m_fGameOver) {
+		return Result::Succeeded;
+	}
+
+	const int firstPlayerProperties = CountOwnedProperties(m_arrPlayers[0]);
+	const int secondPlayerProperties = CountOwnedProperties(m_arrPlayers[1]);
+	if (firstPlayerProperties > secondPlayerProperties) {
+		m_winningPlayer = 0;
+	}
+	else if (secondPlayerProperties > firstPlayerProperties) {
+		m_winningPlayer = 1;
+	}
+	else {
+		m_winningPlayer = 2;
+	}
+
+	m_fGameOver = true;
+	m_terminalReason = "day-limit";
 	return Result::Succeeded;
 }
 
@@ -642,7 +766,7 @@ bool GameState::FAtUnitCap() const noexcept {
 	//	}
 	//}
 
-	return GetCurrentPlayer().m_unitsCached >= m_nUnitCap;
+	return GetCurrentPlayer().m_unitsCached >= m_settings.m_unitCap;
 }
 
 int GameState::GetFuelAfterMove(int xSrc, int ySrc, int xDest, int yDest) {
@@ -1252,7 +1376,7 @@ Result GameState::DoCaptureAction(int x, int y, const Action& action) {
 				}
 			}
 		}
-		if (totalProperties >= m_nCaptureLimit) {
+		if (totalProperties >= m_settings.m_captureLimit) {
 			m_fGameOver = true;
 			m_winningPlayer = m_isFirstPlayerTurn ? 0 : 1;
 			m_terminalReason = "capture-limit";
@@ -1671,6 +1795,10 @@ int GameState::GetCOBuildCost(const Player& player, UnitProperties::Type unitTyp
 }
 
 bool GameState::FCanProduceUnitFromTerrain(const Player& player, Terrain::Type terrainType, UnitProperties::Type unitType) const noexcept {
+	if (FUnitBanned(unitType)) {
+		return false;
+	}
+
 	switch (terrainType) {
 	case Terrain::Type::Airport:
 		return UnitProperties::IsAirUnit(unitType);
@@ -1688,11 +1816,19 @@ bool GameState::FCanProduceUnitFromTerrain(const Player& player, Terrain::Type t
 }
 
 int GameState::GetCOIncomeForProperty(const Player& player, Terrain::Type) const noexcept {
-	if (player.m_co.m_type == CommandingOfficier::Type::Sasha) {
-		return 1100;
+	if (m_settings.m_incomePerProperty == 0) {
+		return 0;
 	}
 
-	return 1000;
+	if (player.m_co.m_type == CommandingOfficier::Type::Sasha) {
+		return m_settings.m_incomePerProperty + 100;
+	}
+
+	return m_settings.m_incomePerProperty;
+}
+
+bool GameState::FUnitBanned(UnitProperties::Type unitType) const noexcept {
+	return std::find(m_settings.m_bannedUnits.begin(), m_settings.m_bannedUnits.end(), unitType) != m_settings.m_bannedUnits.end();
 }
 
 int GameState::GetCOFundsAttackModifier(const Player& player, const CommandingOfficier::Type& co) const noexcept {
@@ -2346,8 +2482,7 @@ GameState::GameState(const GameState& other) noexcept :
 {
 	m_guid = other.m_guid;
 	m_spmap.reset(other.m_spmap->Clone(m_arrPlayers));
-	m_nUnitCap = other.m_nUnitCap;
-	m_nCaptureLimit = other.m_nCaptureLimit;
+	m_settings = other.m_settings;
 	m_nTurnCount = other.m_nTurnCount;
 	m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
 	m_fGameOver = other.m_fGameOver;
@@ -2355,7 +2490,6 @@ GameState::GameState(const GameState& other) noexcept :
 	m_terminalReason = other.m_terminalReason;
 	m_combatRngSeed = other.m_combatRngSeed;
 	m_combatRng = other.m_combatRng;
-	m_fHeuristicAutoResign = other.m_fHeuristicAutoResign;
 	m_weather = other.m_weather;
 	m_weatherTurnsRemaining = other.m_weatherTurnsRemaining;
 }
@@ -2373,8 +2507,7 @@ GameState& GameState::operator=(const GameState& other) noexcept {
 		m_arrPlayers = other.m_arrPlayers;
 		m_guid = other.m_guid;
 		m_spmap.reset(other.m_spmap->Clone(m_arrPlayers));
-		m_nUnitCap = other.m_nUnitCap;
-		m_nCaptureLimit = other.m_nCaptureLimit;
+		m_settings = other.m_settings;
 		m_nTurnCount = other.m_nTurnCount;
 		m_isFirstPlayerTurn = other.m_isFirstPlayerTurn;
 		m_fGameOver = other.m_fGameOver;
@@ -2382,7 +2515,6 @@ GameState& GameState::operator=(const GameState& other) noexcept {
 		m_terminalReason = other.m_terminalReason;
 		m_combatRngSeed = other.m_combatRngSeed;
 		m_combatRng = other.m_combatRng;
-		m_fHeuristicAutoResign = other.m_fHeuristicAutoResign;
 		m_weather = other.m_weather;
 		m_weatherTurnsRemaining = other.m_weatherTurnsRemaining;
 	}
@@ -2394,8 +2526,9 @@ void GameState::to_json(json& j, const GameState& gameState) {
 		{ "gameId", gameState.GetId()},
 		  { "map", *gameState.TryGetMap()},
 		  { "players", gameState.GetPlayers()},
-		  { "unit-cap", gameState.m_nUnitCap },
-		  { "cap-limit", gameState.m_nCaptureLimit},
+		  { "settings", GameSettingsToJson(gameState.m_settings) },
+		  { "unit-cap", gameState.m_settings.m_unitCap },
+		  { "cap-limit", gameState.m_settings.m_captureLimit},
 		  { "turn-count", gameState.m_nTurnCount},
 		  { "activePlayer", gameState.IsFirstPlayerTurn() ? 0 : 1 },
 		  { "game-over", gameState.m_fGameOver },
@@ -2406,7 +2539,7 @@ void GameState::to_json(json& j, const GameState& gameState) {
 		j["combat-rng-seed"] = gameState.m_combatRngSeed.value();
 	}
 
-	if (gameState.m_fHeuristicAutoResign) {
+	if (gameState.m_settings.m_heuristicAutoResign) {
 		j["heuristic-auto-resign"] = true;
 	}
 
@@ -2558,8 +2691,16 @@ void GameState::from_json(json& j, GameState& gameState) {
 	gameState.m_spmap.reset(new Map());
 	Map::from_test_json(gameState.m_arrPlayers, j.at("map"), *gameState.m_spmap);
 
-	j.at("unit-cap").get_to(gameState.m_nUnitCap);
-	j.at("cap-limit").get_to(gameState.m_nCaptureLimit);
+	gameState.m_settings = GameSettings{};
+	if (j.contains("settings")) {
+		gameState.m_settings = GameSettingsFromJson(j.at("settings"));
+	}
+	if (j.contains("unit-cap")) {
+		j.at("unit-cap").get_to(gameState.m_settings.m_unitCap);
+	}
+	if (j.contains("cap-limit")) {
+		j.at("cap-limit").get_to(gameState.m_settings.m_captureLimit);
+	}
 	j.at("turn-count").get_to(gameState.m_nTurnCount);
 	j.at("game-over").get_to(gameState.m_fGameOver);
 	j.at("winner").get_to(gameState.m_winningPlayer);
@@ -2583,10 +2724,7 @@ void GameState::from_json(json& j, GameState& gameState) {
 	}
 
 	if (j.contains("heuristic-auto-resign")) {
-		j.at("heuristic-auto-resign").get_to(gameState.m_fHeuristicAutoResign);
-	}
-	else {
-		gameState.m_fHeuristicAutoResign = false;
+		j.at("heuristic-auto-resign").get_to(gameState.m_settings.m_heuristicAutoResign);
 	}
 
 	if (j.contains("weather")) {

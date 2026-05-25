@@ -5,6 +5,8 @@
 #include <memory>
 #include <optional>
 #include <random>
+#include <string>
+#include <vector>
 
 #include "Map.h"
 #include "Player.h"
@@ -159,6 +161,21 @@ public:
 		Snow,
 	};
 
+	struct GameSettings {
+		std::string m_mode{ "standard" };
+		bool m_fog{ false };
+		WeatherType m_weather{ WeatherType::Clear };
+		bool m_coPowers{ true };
+		bool m_tags{ false };
+		int m_startingFunds{ 0 };
+		int m_incomePerProperty{ 1000 };
+		int m_unitCap{ 50 };
+		int m_captureLimit{ 21 };
+		std::optional<int> m_dayLimit;
+		std::vector<UnitProperties::Type> m_bannedUnits{ UnitProperties::Type::BlackBomb };
+		bool m_heuristicAutoResign{ false };
+	};
+
 	GameState() noexcept;
 	GameState(std::string guid, std::array<Player, 2>&& arrPlayers) noexcept;
 	GameState(const GameState& other) noexcept;
@@ -242,10 +259,10 @@ public:
 	Result EndTurn() noexcept;
 	bool CheckPlayerResigns() noexcept;
 	bool FHeuristicAutoResign() const noexcept {
-		return m_fHeuristicAutoResign;
+		return m_settings.m_heuristicAutoResign;
 	}
 	void SetHeuristicAutoResign(bool enabled) noexcept {
-		m_fHeuristicAutoResign = enabled;
+		m_settings.m_heuristicAutoResign = enabled;
 	}
 	bool FGameOver() const noexcept {
 		return m_fGameOver;
@@ -258,6 +275,12 @@ public:
 	bool FEnemyHasLabs() const noexcept;
 	void SetCombatRngSeed(std::uint32_t seed);
 	void ClearCombatRngSeed() noexcept;
+	const GameSettings& GetSettings() const noexcept {
+		return m_settings;
+	}
+	void SetSettings(const GameSettings& settings) noexcept {
+		m_settings = settings;
+	}
 	static void to_json(json& j, const GameState& gameState);
 	static void from_json(json& j, GameState& gameState);
 private:
@@ -308,7 +331,9 @@ private:
 	int CountOwnedComTowers(const Player& player) const noexcept;
 	int CountOwnedProperties(const Player& player) const noexcept;
 	bool FCanProduceUnitFromTerrain(const Player& player, Terrain::Type terrainType, UnitProperties::Type unitType) const noexcept;
+	bool FUnitBanned(UnitProperties::Type unitType) const noexcept;
 	int PlayerIndex(const Player& player) const noexcept;
+	Result ResolveDayLimit() noexcept;
 
 	int GetMaxGoodLuck(const Player& player) noexcept;
 	int GetMaxBadLuck(const Player& player) noexcept;
@@ -336,8 +361,7 @@ private:
 	std::string m_guid;
 	std::unique_ptr<Map> m_spmap;
 	std::array<Player, 2> m_arrPlayers;
-	int m_nUnitCap = 50;
-	int m_nCaptureLimit = 21;
+	GameSettings m_settings;
 	int m_nTurnCount = 0;
 	bool m_isFirstPlayerTurn{ true };
 	bool m_fGameOver = false;
@@ -345,7 +369,6 @@ private:
 	std::optional<std::string> m_terminalReason;
 	std::optional<std::uint32_t> m_combatRngSeed;
 	std::optional<std::mt19937> m_combatRng;
-	bool m_fHeuristicAutoResign = false;
 	WeatherType m_weather{ WeatherType::Clear };
 	std::optional<int> m_weatherTurnsRemaining;
 };

@@ -1527,23 +1527,14 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 		badLuckRoll = RollCombatLuck(badLuckDistribution.min(), badLuckDistribution.max());
 	}
 
-	int nComTowers = 0;
-	for (int x = 0; x < m_spmap->GetCols(); ++x) {
-		for (int y = 0; y < m_spmap->GetRows(); ++y) {
-			const MapTile* pTile = nullptr;
-			m_spmap->TryGetTile(x, y, &pTile);
-			const Terrain& terrain = pTile->GetTerrain();
-			if (MapTile::IsProperty(terrain.m_type) && terrain.m_type == Terrain::Type::ComTower  && pTile->m_spPropertyInfo->m_owner == pattackingplayer) {
-				++nComTowers;
-			}
-		}
-	}
+	int nComTowers = CountOwnedComTowers(*pattackingplayer);
 
 	int attackValue = rgCharts[static_cast<int>(attackerCO)][pattackingplayer->PowerStatus()][static_cast<int>(attacker.m_properties.m_type)].first + 10 * nComTowers;
 	int defenceValue = rgCharts[static_cast<int>(defenderCO)][pdefendingplayer->PowerStatus()][static_cast<int>(defender.m_properties.m_type)].second;
 
 	attackValue += GetCOFundsAttackModifier(*pattackingplayer, attackerCO);
 	attackValue += GetCOTerrainModifier(*pattackingplayer, attackerCO, attacker, attackerTerrain);
+	defenceValue += GetCOCombatDefenseModifier(*pdefendingplayer, defenderCO, attacker);
 	if (defender.IsAirUnit()) {
 		defenderTerrainStars = 0;
 	}
@@ -1702,6 +1693,43 @@ int GameState::GetCOFundsAttackModifier(const Player& player, const CommandingOf
 	}
 
 	return 0;
+}
+
+int GameState::GetCOCombatDefenseModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& attacker) const noexcept {
+	if (co != CommandingOfficier::Type::Javier) {
+		return 0;
+	}
+
+	int modifier = CountOwnedComTowers(player) * 10 * (player.PowerStatus() + 1);
+	if (UnitProperties::IsIndirectAttack(attacker.m_properties.m_type)) {
+		if (player.PowerStatus() == 2) {
+			modifier += 80;
+		}
+		else if (player.PowerStatus() == 1) {
+			modifier += 40;
+		}
+		else {
+			modifier += 20;
+		}
+	}
+
+	return modifier;
+}
+
+int GameState::CountOwnedComTowers(const Player& player) const noexcept {
+	int towers = 0;
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			const MapTile* pTile = nullptr;
+			m_spmap->TryGetTile(x, y, &pTile);
+			const Terrain& terrain = pTile->GetTerrain();
+			if (MapTile::IsProperty(terrain.m_type) && terrain.m_type == Terrain::Type::ComTower && pTile->m_spPropertyInfo->m_owner == &player) {
+				++towers;
+			}
+		}
+	}
+
+	return towers;
 }
 
 int GameState::CountOwnedProperties(const Player& player) const noexcept {

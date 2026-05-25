@@ -20,7 +20,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented fuel-upkeep modifiers: Eagle air units consume 2 less fuel per day.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
-- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Lash terrain-star attack and Prime Tactics terrain-star defense, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
+- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Lash terrain-star attack and Prime Tactics terrain-star defense, Javier indirect-defense and Comm Tower defense modifiers, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
 ## Luck Notes
 
@@ -62,6 +62,11 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Lash receives +10 attack per attacker terrain star during day-to-day and Terrain Tactics, while Prime Tactics doubles the terrain-star attack bonus to +20 per star and doubles terrain-star defense for Lash defenders. Air units do not receive Lash's terrain-star attack or defense benefits.
 - Lash's Terrain Tactics and Prime Tactics make legal terrain movement cost 1 fuel/move point outside snow. Snow uses normal weather movement costs, and illegal terrain remains illegal.
 
+## Defense Notes
+
+- Javier receives +20 defense against indirect attacks day-to-day, +40 during Tower Shield, and +80 during Tower of Power. Owned Comm Towers add +10 defense per tower day-to-day, +20 during Tower Shield, and +30 during Tower of Power. These bonuses compose with normal terrain defense.
+- Javier's fog-only vision effects remain deferred to [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90).
+
 ## Economy Notes
 
 - Colin, Hachi, and Kanbei cost modifiers apply to unit construction. Hachi's Merchant Union uses the simulator's standard ground-production list for city deployment, matching the AWBW wiki's Piperunner note that Piperunners can be built at Bases or spawned from Cities during Hachi's SCOP.
@@ -92,7 +97,6 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#87](https://github.com/ryparikh/AdvanceWarsServer/issues/87): Javier indirect-defense and Comm Tower defense bonuses.
 - [#88](https://github.com/ryparikh/AdvanceWarsServer/issues/88): Kanbei Samurai Spirit counterattack bonus.
 - [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89): Sonja counterattack bonus and hidden-HP API redaction.
 - [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90): fog, vision, hiding visibility, and fog-only CO effects.

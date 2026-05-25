@@ -294,7 +294,9 @@ private:
 	int GetCOBuildCost(const Player& player, UnitProperties::Type unitType) const noexcept;
 	int GetCOIncomeForProperty(const Player& player, Terrain::Type terrainType) const noexcept;
 	int GetCOFundsAttackModifier(const Player& player, const CommandingOfficier::Type& co) const noexcept;
+	int GetCOCombatDefenseModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& attacker) const noexcept;
 	int GetCOCaptureProgress(const Player& player, const Unit& unit) const noexcept;
+	int CountOwnedComTowers(const Player& player) const noexcept;
 	int CountOwnedProperties(const Player& player) const noexcept;
 	bool FCanProduceUnitFromTerrain(const Player& player, Terrain::Type terrainType, UnitProperties::Type unitType) const noexcept;
 

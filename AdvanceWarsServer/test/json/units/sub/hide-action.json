@@ -1,0 +1,41 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "sub-hide-action",
+    "map": [
+      [
+        { "terrain": 28, "unit": { "ammo": 6, "fuel": 60, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "sub" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    { "type": "move-hide", "source": [0, 0], "target": [0, 0] }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "sub-hide-action",
+    "map": [
+      [
+        { "terrain": 28, "unit": { "ammo": 6, "fuel": 60, "health": 100, "hidden": true, "moved": true, "owner": "orange-star", "type": "sub" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

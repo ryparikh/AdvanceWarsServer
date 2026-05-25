@@ -77,6 +77,23 @@ describe("actionPreviewForTile", () => {
     });
   });
 
+  it("creates movement previews for hidden-state actions", () => {
+    expect(
+      actionPreviewForTile(
+        [{ type: "move-hide", source: [1, 4], target: [4, 2] }],
+        [1, 4],
+        [4, 2]
+      )
+    ).toEqual({
+      kind: "move",
+      path: [
+        [1, 4],
+        [1, 2],
+        [4, 2]
+      ]
+    });
+  });
+
   it("creates an attack preview for direct attacks", () => {
     expect(
       actionPreviewForTile(
@@ -200,6 +217,7 @@ describe("actionHighlightsForSource", () => {
     const highlights = actionHighlightsForSource(
       [
         { type: "move-wait", source: [1, 1], target: [2, 1] },
+        { type: "move-hide", source: [1, 1], target: [2, 1] },
         { type: "move-capture", source: [1, 1], target: [1, 2] },
         { type: "attack", source: [1, 1], target: [4, 1] },
         { type: "move-attack", source: [1, 1], target: [3, 1], direction: "east" },
@@ -208,7 +226,7 @@ describe("actionHighlightsForSource", () => {
       [1, 1]
     );
 
-    expect(highlights.moves.map((tile) => tile.key)).toEqual(["2,1", "1,2", "3,1"]);
+    expect(highlights.moves.map((tile) => tile.key)).toEqual(["2,1", "2,1", "1,2", "3,1"]);
     expect(highlights.attacks.map((tile) => tile.key)).toEqual(["4,1", "4,1"]);
     expect(highlights.actionsByTile.get("4,1")?.map((action) => action.type)).toEqual([
       "attack",

@@ -17,12 +17,13 @@ class Map;
 
 struct Action {
 	enum class Type {
-		// TODO: Need action for "hide"/"unhide" unit
 		Invalid = -1,
 		Attack,
 		EndTurn,
 		MoveWait,
 		MoveAttack, // Requires direction
+		MoveHide,
+		MoveUnhide,
 		Unload, // Requires direction
 		MoveLoad,
 		MoveCapture,
@@ -74,6 +75,10 @@ struct Action {
 			return "end-turn";
 		case Type::MoveAttack:
 			return "move-attack";
+		case Type::MoveHide:
+			return "move-hide";
+		case Type::MoveUnhide:
+			return "move-unhide";
 		case Type::MoveCapture:
 			return "move-capture";
 		case Type::MoveCombine:
@@ -311,6 +316,7 @@ private:
 	Result DoAttackAction(int x, int y, const Action& action);
 	Result DoBuyAction(int x, int y, const Action& action);
 	Result DoMoveAction(int& x, int& y, const Action& action);
+	Result DoHideAction(int x, int y, bool hidden);
 	Result DoMoveCombineAction(int x, int y, const Action& action);
 	Result DoMoveLoadAction(int x, int y, const Action& action);
 	Result DoCaptureAction(int x, int y, const Action& action);
@@ -341,6 +347,7 @@ private:
 	int GetCOMovementBonus(const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 	int GetWeatherMovementCost(const Terrain& terrain, const Player& player, const Unit& unit) const noexcept;
 	int GetFuelCostPerDay(const Player& player, const Unit& unit) const noexcept;
+	bool FCanHideUnit(const Unit& unit) const noexcept;
 	void SetTemporaryWeather(WeatherType weather) noexcept;
 	void TickTemporaryWeather() noexcept;
 	void HealUnits(const Player& player, int health);

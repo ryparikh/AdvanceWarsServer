@@ -510,6 +510,20 @@ MoveNode* GameState::AddNewNodeToGraph(std::vector<Action>& vecActions, std::vec
 }
 
 bool GameState::CanUnitAttack(const Unit& attacker, const Unit& defender) const noexcept {
+	if (defender.IsHidden()) {
+		if (defender.m_properties.m_type == UnitProperties::Type::Stealth &&
+			attacker.m_properties.m_type != UnitProperties::Type::Fighter &&
+			attacker.m_properties.m_type != UnitProperties::Type::Stealth) {
+			return false;
+		}
+
+		if (defender.m_properties.m_type == UnitProperties::Type::Sub &&
+			attacker.m_properties.m_type != UnitProperties::Type::Crusier &&
+			attacker.m_properties.m_type != UnitProperties::Type::Sub) {
+			return false;
+		}
+	}
+
 	int baseDamage = -1;
 	if (defender.IsFootsoldier()) {
 		if (attacker.m_properties.m_primaryWeapon == UnitProperties::Weapon::MachineGun) {
@@ -707,6 +721,11 @@ int GameState::GetFuelCostPerDay(const Player& player, const Unit& unit) const n
 	}
 
 	return fuelCost;
+}
+
+bool GameState::FCanHideUnit(const Unit& unit) const noexcept {
+	return unit.m_properties.m_type == UnitProperties::Type::Stealth ||
+		unit.m_properties.m_type == UnitProperties::Type::Sub;
 }
 
 void GameState::SetTemporaryWeather(WeatherType weather) noexcept {
@@ -967,6 +986,10 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 				if (MapTile::IsProperty(pCurrentTile->GetTerrain().m_type) && pCurrentTile->m_spPropertyInfo->m_owner != &GetCurrentPlayer() && (pUnit->m_properties.m_type == UnitProperties::Type::Infantry || pUnit->m_properties.m_type == UnitProperties::Type::Mech)) {
 					vecActions.emplace_back(Action::Type::MoveCapture, x, y, pTop->m_x, pTop->m_y);
 				}
+
+				if (FCanHideUnit(*pUnit)) {
+					vecActions.emplace_back(pUnit->m_hidden ? Action::Type::MoveUnhide : Action::Type::MoveHide, x, y, pTop->m_x, pTop->m_y);
+				}
 			}
 			else {
 				// this should be true always.  If the unit wasn't owned by the same player we don't expect to visit
@@ -1132,6 +1155,12 @@ Result GameState::ExecuteAction(const Action& action) noexcept {
 	case Action::Type::MoveAttack:
 		IfFailedReturn(DoMoveAction(x, y, action));
 		return DoAttackAction(x, y, action);
+	case Action::Type::MoveHide:
+		IfFailedReturn(DoMoveAction(x, y, action));
+		return DoHideAction(x, y, true);
+	case Action::Type::MoveUnhide:
+		IfFailedReturn(DoMoveAction(x, y, action));
+		return DoHideAction(x, y, false);
 	case Action::Type::MoveCapture:
 		IfFailedReturn(DoMoveAction(x, y, action));
 		return DoCaptureAction(x, y, action);
@@ -2029,6 +2058,22 @@ Result GameState::DoMoveAction(int& x, int& y, const Action& action) {
 	return Result::Succeeded;
 }
 
+Result GameState::DoHideAction(int x, int y, bool hidden) {
+	MapTile* pTile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pTile));
+
+	Unit* pUnit = pTile->TryGetUnit();
+	if (pUnit == nullptr ||
+		pUnit->m_owner != &GetCurrentPlayer() ||
+		!FCanHideUnit(*pUnit) ||
+		pUnit->m_hidden == hidden) {
+		return Result::Failed;
+	}
+
+	pUnit->m_hidden = hidden;
+	return Result::Succeeded;
+}
+
 void GameState::HealUnits(const Player& player, int health) {
 	for (int x = 0; x < m_spmap->GetCols(); ++x) {
 		for (int y = 0; y < m_spmap->GetRows(); ++y) {
@@ -2599,6 +2644,14 @@ void to_json(json& j, const Action& action) {
 
 	if (strType == "move-attack") {
 		return Action::Type::MoveAttack;
+	}
+
+	if (strType == "move-hide") {
+		return Action::Type::MoveHide;
+	}
+
+	if (strType == "move-unhide") {
+		return Action::Type::MoveUnhide;
 	}
 
 	if (strType == "move-capture") {

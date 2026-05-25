@@ -28,6 +28,8 @@ export type ActionPreview =
 
 const moveActionTypes = new Set([
   "move-wait",
+  "move-hide",
+  "move-unhide",
   "move-capture",
   "move-load",
   "move-combine",
@@ -36,6 +38,8 @@ const moveActionTypes = new Set([
 
 const movementPreviewTypes = new Set([
   "move-wait",
+  "move-hide",
+  "move-unhide",
   "move-capture",
   "move-load",
   "move-combine"

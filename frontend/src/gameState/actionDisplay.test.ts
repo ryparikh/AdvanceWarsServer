@@ -59,6 +59,14 @@ describe("actionToSubmitFromBoardTarget", () => {
     expect(actionToSubmitFromBoardTarget([move])).toBe(move);
   });
 
+  it("confirms hidden-state move actions from a board target click", () => {
+    const hide: Action = { type: "move-hide", source: [1, 1], target: [2, 1] };
+    const unhide: Action = { type: "move-unhide", source: [1, 1], target: [1, 1] };
+
+    expect(actionToSubmitFromBoardTarget([hide])).toBe(hide);
+    expect(actionToSubmitFromBoardTarget([unhide])).toBe(unhide);
+  });
+
   it("leaves attack target clicks for the inspector", () => {
     const attack: Action = { type: "attack", source: [1, 1], target: [3, 1] };
 

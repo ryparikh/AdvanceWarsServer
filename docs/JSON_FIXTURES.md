@@ -55,9 +55,7 @@ Use `failedActions` to assert that actions are rejected from the initial state.
 }
 ```
 
-Each action must return `Result::Failed`.
-
-Important: current invalid-action behavior is not fully atomic in all paths. If a fixture checks multiple `failedActions`, keep them independent from the same initial state and watch #67 for the broader validation cleanup.
+Each action must return `Result::Failed` and leave the serialized game state unchanged.
 
 ### Valid Actions Fixture
 

@@ -228,6 +228,179 @@ json LowArmyValueNonTerminalGameState() {
 	};
 }
 
+json InvalidActionRejectionGameState() {
+	json map = json::array({
+		json::array({
+			{
+				{ "terrain", 15 },
+				{ "unit", {
+					{ "ammo", 0 },
+					{ "fuel", 99 },
+					{ "health", 100 },
+					{ "hidden", false },
+					{ "moved", false },
+					{ "owner", "orange-star" },
+					{ "type", "infantry" },
+				} },
+			},
+			{ { "terrain", 15 } },
+			{ { "terrain", 15 } },
+			{ { "terrain", 15 } },
+			{ { "terrain", 15 } },
+		}),
+		json::array({
+			{
+				{ "terrain", 15 },
+				{ "unit", {
+					{ "ammo", 9 },
+					{ "fuel", 50 },
+					{ "health", 100 },
+					{ "hidden", false },
+					{ "moved", false },
+					{ "owner", "orange-star" },
+					{ "type", "artillery" },
+				} },
+			},
+			{ { "terrain", 15 } },
+			{
+				{ "terrain", 15 },
+				{ "unit", {
+					{ "ammo", 0 },
+					{ "fuel", 60 },
+					{ "health", 100 },
+					{ "hidden", false },
+					{ "loaded-units", json::array({
+						{
+							{ "ammo", 0 },
+							{ "fuel", 99 },
+							{ "health", 100 },
+							{ "hidden", false },
+							{ "moved", true },
+							{ "owner", "orange-star" },
+							{ "type", "infantry" },
+						},
+					}) },
+					{ "moved", false },
+					{ "owner", "orange-star" },
+					{ "type", "apc" },
+				} },
+			},
+			{
+				{ "terrain", 15 },
+				{ "unit", {
+					{ "ammo", 0 },
+					{ "fuel", 99 },
+					{ "health", 100 },
+					{ "hidden", false },
+					{ "moved", false },
+					{ "owner", "orange-star" },
+					{ "type", "infantry" },
+				} },
+			},
+			{ { "terrain", 15 } },
+		}),
+		json::array({
+			{
+				{ "terrain", 34 },
+				{ "property", {
+					{ "capture-points", 20 },
+					{ "owner", "blue-moon" },
+				} },
+				{ "unit", {
+					{ "ammo", 9 },
+					{ "fuel", 70 },
+					{ "health", 100 },
+					{ "hidden", false },
+					{ "moved", false },
+					{ "owner", "orange-star" },
+					{ "type", "tank" },
+				} },
+			},
+			{ { "terrain", 15 } },
+			{ { "terrain", 15 } },
+			{ { "terrain", 15 } },
+			{
+				{ "terrain", 35 },
+				{ "property", {
+					{ "capture-points", 20 },
+					{ "owner", "orange-star" },
+				} },
+			},
+		}),
+	});
+
+	return {
+		{ "activePlayer", 0 },
+		{ "cap-limit", 21 },
+		{ "game-over", false },
+		{ "gameId", "rest-invalid-action-rejection" },
+		{ "map", map },
+		{ "players", json::array({
+			{
+				{ "armyType", "orange-star" },
+				{ "co", "Andy" },
+				{ "funds", 5000 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 3 },
+					{ "scop-stars", 3 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 1 },
+			},
+			{
+				{ "armyType", "blue-moon" },
+				{ "co", "Adder" },
+				{ "funds", 0 },
+				{ "power-meter", {
+					{ "charge", 0 },
+					{ "cop-stars", 2 },
+					{ "scop-stars", 3 },
+					{ "star-value", 9000 },
+				} },
+				{ "power-status", 0 },
+				{ "luck-policy", 1 },
+			},
+		}) },
+		{ "turn-count", 1 },
+		{ "unit-cap", 50 },
+		{ "winner", -1 },
+	};
+}
+
+bool ExpectIllegalActionRejectedAtomically(RestGameService& service, const std::string& gameId, const json& action, const std::string& description) {
+	ApiResponse before = service.GetGame(gameId);
+	if (!Expect(before.status == 200, description + " setup should be retrievable")) {
+		return false;
+	}
+
+	const std::string beforeDump = before.body.dump();
+	ApiResponse illegal = service.SubmitAction(gameId, action.dump());
+	if (!Expect(illegal.status == 422, description + " should return 422")) {
+		return false;
+	}
+	if (!Expect(illegal.body.at("error").at("code") == "illegal-action", description + " should use illegal-action code")) {
+		return false;
+	}
+	if (!Expect(illegal.body.contains("game"), description + " should return the current game")) {
+		return false;
+	}
+	if (!Expect(illegal.body.at("game").dump() == beforeDump, description + " response game should be unchanged")) {
+		return false;
+	}
+
+	ApiResponse after = service.GetGame(gameId);
+	if (!Expect(after.status == 200, description + " post-check should be retrievable")) {
+		return false;
+	}
+	if (!Expect(after.body.dump() == beforeDump, description + " should not mutate stored game state")) {
+		return false;
+	}
+
+	return true;
+}
+
 bool RunCreateGetAndLegalActionContract() {
 	RestGameService service;
 	ApiResponse create = service.CreateGame(StandardCreatePayload("mcts").dump());
@@ -427,6 +600,65 @@ bool RunStepAndErrorContract() {
 
 	ApiResponse invalidPayload = service.SubmitAction(gameId, R"({"type":"end-turn","unexpected":true})");
 	if (!Expect(invalidPayload.status == 400, "unknown action field should return 400")) {
+		return false;
+	}
+
+	return true;
+}
+
+bool RunInvalidActionAtomicRejectionContract() {
+	RestGameService service;
+	json fixture = InvalidActionRejectionGameState();
+	GameState gameState;
+	GameState::from_json(fixture, gameState);
+	service.StoreGameForTesting(std::move(gameState));
+
+	const std::string gameId = fixture.at("gameId").get<std::string>();
+
+	if (!ExpectIllegalActionRejectedAtomically(service, gameId, {
+		{ "type", "move-wait" },
+		{ "source", json::array({ 0, 0 }) },
+		{ "target", json::array({ 4, 0 }) },
+	}, "invalid move")) {
+		return false;
+	}
+
+	if (!ExpectIllegalActionRejectedAtomically(service, gameId, {
+		{ "type", "attack" },
+		{ "source", json::array({ 0, 1 }) },
+		{ "target", json::array({ 1, 1 }) },
+	}, "invalid attack")) {
+		return false;
+	}
+
+	if (!ExpectIllegalActionRejectedAtomically(service, gameId, {
+		{ "type", "unload" },
+		{ "source", json::array({ 2, 1 }) },
+		{ "direction", "east" },
+		{ "unloadIndex", 0 },
+	}, "invalid unload")) {
+		return false;
+	}
+
+	if (!ExpectIllegalActionRejectedAtomically(service, gameId, {
+		{ "type", "buy" },
+		{ "source", json::array({ 4, 2 }) },
+		{ "unit", "tank" },
+	}, "invalid buy")) {
+		return false;
+	}
+
+	if (!ExpectIllegalActionRejectedAtomically(service, gameId, {
+		{ "type", "move-capture" },
+		{ "source", json::array({ 0, 2 }) },
+		{ "target", json::array({ 0, 2 }) },
+	}, "invalid capture")) {
+		return false;
+	}
+
+	if (!ExpectIllegalActionRejectedAtomically(service, gameId, {
+		{ "type", "co-power" },
+	}, "invalid power")) {
 		return false;
 	}
 
@@ -649,6 +881,9 @@ int RunRestApiContractTests() {
 		return 1;
 	}
 	if (!RunStepAndErrorContract()) {
+		return 1;
+	}
+	if (!RunInvalidActionAtomicRejectionContract()) {
 		return 1;
 	}
 	if (!RunExplicitEndTurnStepContract()) {

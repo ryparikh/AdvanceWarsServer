@@ -295,6 +295,7 @@ private:
 	Result DoRepairAction(int x, int y, const Action& action);
 	Result DoCOPowerAction();
 	Result DoSCOPowerAction();
+	Result ExecuteAction(const Action& action) noexcept;
 	Result ResupplyPlayersUnits(const Player* player);
 	int calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, const Terrain& attackerTerrain, const Terrain& defenderTerrain, bool fCounterAttack);
 	int GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& unit, const Terrain& terrain) const noexcept;

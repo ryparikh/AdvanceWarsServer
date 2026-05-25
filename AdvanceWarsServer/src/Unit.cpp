@@ -66,6 +66,7 @@ Unit::Unit(const UnitProperties::Type& type, const Player* owner): m_owner(owner
 
 Unit* Unit::Clone(const Player* pNewOwner) const {
 	std::unique_ptr<Unit> spClone(new Unit(m_properties.m_type, pNewOwner));
+	spClone->m_properties = m_properties;
 	spClone->health = health;
 	spClone->m_moved = m_moved;
 	spClone->m_hidden = m_hidden;

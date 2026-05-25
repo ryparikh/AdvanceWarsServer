@@ -139,6 +139,7 @@ Result Map::TryDestroyUnit(unsigned int x, unsigned int y) noexcept {
 
 Map* Map::Clone(const std::array<Player, 2>& arrPlayers) const {
 	std::unique_ptr<Map> spNewMap{ new Map() };
+	spNewMap->m_fHasHeadquarters = m_fHasHeadquarters;
 	spNewMap->m_vecvecMapTile.reserve(GetRows());
 	for (int y = 0; y < GetRows(); ++y) {
 		std::vector<MapTile> vecCloneTiles;

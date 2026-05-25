@@ -289,7 +289,7 @@ private:
 	Result DoSCOPowerAction();
 	Result ResupplyPlayersUnits(const Player* player);
 	int calculateDamage(const Player* pattackingplayer, const Player* pdefendingplayer, const CommandingOfficier::Type& attackerCO, const CommandingOfficier::Type& defenderCO, const Unit& attacker, const Unit& defender, const Terrain& attackerTerrain, const Terrain& defenderTerrain);
-	int GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Terrain::Type& terrainType) const noexcept;
+	int GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& unit, const Terrain& terrain) const noexcept;
 	int GetCOIndirectRangeModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& unit) const noexcept;
 	int GetCOBuildCost(const Player& player, UnitProperties::Type unitType) const noexcept;
 	int GetCOIncomeForProperty(const Player& player, Terrain::Type terrainType) const noexcept;

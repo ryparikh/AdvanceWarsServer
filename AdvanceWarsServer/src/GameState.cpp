@@ -510,6 +510,10 @@ int GameState::GetWeatherMovementCost(const Terrain& terrain, const Player& play
 		return 1;
 	}
 
+	if (player.m_co.m_type == CommandingOfficier::Type::Lash && player.PowerStatus() != 0 && m_weather != WeatherType::Snow) {
+		return 1;
+	}
+
 	if (m_weather == WeatherType::Clear) {
 		return baseCost;
 	}
@@ -1539,9 +1543,12 @@ int GameState::calculateDamage(const Player* pattackingplayer, const Player* pde
 	int defenceValue = rgCharts[static_cast<int>(defenderCO)][pdefendingplayer->PowerStatus()][static_cast<int>(defender.m_properties.m_type)].second;
 
 	attackValue += GetCOFundsAttackModifier(*pattackingplayer, attackerCO);
-	attackValue += GetCOTerrainModifier(*pattackingplayer, attackerCO, attackerTerrain.m_type);
+	attackValue += GetCOTerrainModifier(*pattackingplayer, attackerCO, attacker, attackerTerrain);
 	if (defender.IsAirUnit()) {
 		defenderTerrainStars = 0;
+	}
+	else if (defenderCO == CommandingOfficier::Type::Lash && pdefendingplayer->PowerStatus() == 2) {
+		defenderTerrainStars *= 2;
 	}
 
 	int attackerHealth = (attacker.health + 9) / 10;
@@ -1579,10 +1586,10 @@ int GameState::GetCOIndirectRangeModifier(const Player& player, const Commanding
 	return 0;
 }
 
-int GameState::GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Terrain::Type& terrainType) const noexcept {
+int GameState::GetCOTerrainModifier(const Player& player, const CommandingOfficier::Type& co, const Unit& unit, const Terrain& terrain) const noexcept {
 	switch (co) {
 	case CommandingOfficier::Type::Jake:
-		if (terrainType != Terrain::Type::Plain) {
+		if (terrain.m_type != Terrain::Type::Plain) {
 			break;
 		}
 
@@ -1595,7 +1602,7 @@ int GameState::GetCOTerrainModifier(const Player& player, const CommandingOffici
 		
 		return 10;
 	case CommandingOfficier::Type::Koal:
-		if (terrainType != Terrain::Type::Road) {
+		if (terrain.m_type != Terrain::Type::Road) {
 			break;
 		}
 
@@ -1608,7 +1615,7 @@ int GameState::GetCOTerrainModifier(const Player& player, const CommandingOffici
 		
 		return 10;
 	case CommandingOfficier::Type::Kindle:
-		if (!FKindleUrbanTerrain(terrainType)) {
+		if (!FKindleUrbanTerrain(terrain.m_type)) {
 			break;
 		}
 
@@ -1620,6 +1627,16 @@ int GameState::GetCOTerrainModifier(const Player& player, const CommandingOffici
 		}
 
 		return 40;
+	case CommandingOfficier::Type::Lash:
+		if (unit.IsAirUnit()) {
+			break;
+		}
+
+		if (player.m_powerStatus == 2) {
+			return terrain.m_defense * 20;
+		}
+
+		return terrain.m_defense * 10;
 	default:
 		break;
 	}

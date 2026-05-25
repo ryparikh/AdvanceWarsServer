@@ -20,7 +20,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - Implemented fuel-upkeep modifiers: Eagle air units consume 2 less fuel per day.
 - Implemented capture modifiers: Sami footsoldiers capture at 150% displayed HP rounded down during day-to-day and Double Time, and capture instantly during Victory March.
 - Implemented action-state effects: Eagle Lightning Strike refreshes map-present non-footsoldier units for an extra action.
-- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
+- Implemented terrain/range/luck helpers: Jake plains attack, Koal road attack, Lash terrain-star attack and Prime Tactics terrain-star defense, Grit day-to-day/COP/SCOP indirect range, Jake COP/SCOP indirect range for vehicles, Max indirect range penalty, Nell/Rachel/Flak/Jugger/Sonja luck bounds, and Sonja SCOP counter-break combat ordering.
 
 ## Luck Notes
 
@@ -57,6 +57,11 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 - Indirect range modifiers adjust maximum range only; minimum range is unchanged. Grit applies to all indirect units, Jake applies to vehicle indirects during COP/SCOP, and Max applies his -1 maximum-range penalty to indirect units without changing adjacent direct attacks.
 
+## Terrain Notes
+
+- Lash receives +10 attack per attacker terrain star during day-to-day and Terrain Tactics, while Prime Tactics doubles the terrain-star attack bonus to +20 per star and doubles terrain-star defense for Lash defenders. Air units do not receive Lash's terrain-star attack or defense benefits.
+- Lash's Terrain Tactics and Prime Tactics make legal terrain movement cost 1 fuel/move point outside snow. Snow uses normal weather movement costs, and illegal terrain remains illegal.
+
 ## Economy Notes
 
 - Colin, Hachi, and Kanbei cost modifiers apply to unit construction. Hachi's Merchant Union uses the simulator's standard ground-production list for city deployment, matching the AWBW wiki's Piperunner note that Piperunners can be built at Bases or spawned from Cities during Hachi's SCOP.
@@ -87,7 +92,6 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#86](https://github.com/ryparikh/AdvanceWarsServer/issues/86): Lash terrain-star attack and movement effects.
 - [#87](https://github.com/ryparikh/AdvanceWarsServer/issues/87): Javier indirect-defense and Comm Tower defense bonuses.
 - [#88](https://github.com/ryparikh/AdvanceWarsServer/issues/88): Kanbei Samurai Spirit counterattack bonus.
 - [#89](https://github.com/ryparikh/AdvanceWarsServer/issues/89): Sonja counterattack bonus and hidden-HP API redaction.

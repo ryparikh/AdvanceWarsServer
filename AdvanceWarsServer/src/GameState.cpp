@@ -2048,6 +2048,9 @@ Result GameState::DoCOPowerAction() {
 			HealUnits(currentPlayer, 1);
 			DamageUnits(GetEnemyPlayer(), 1);
 			return Result::Succeeded;
+		case CommandingOfficier::Type::Jess:
+			IfFailedReturn(ResupplyPlayersUnits(&GetCurrentPlayer()));
+			return Result::Succeeded;
 		case CommandingOfficier::Type::Kindle:
 			DamageUnitsOnUrbanTerrain(GetEnemyPlayer(), 3);
 			return Result::Succeeded;

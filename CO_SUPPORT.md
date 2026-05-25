@@ -10,7 +10,7 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 - COP and SCOP action charge gates, power-status transitions, star-cost increase, and meter spending.
 - All checked-in normal/COP/SCOP attack and defense chart values.
 - Andy COP/SCOP healing.
-- Jess SCOP resupply.
+- Jess COP/SCOP resupply.
 - Active weather JSON parsing/serialization, weather movement/fuel costs, and Drake/Olaf weather-changing powers.
 - Drake, Hawke, Kindle, Olaf, Rachel, Sturm, and Von Bolt COP/SCOP HP effects, including Drake fuel drain and Von Bolt next-turn stun.
 - Implemented economy and unit-cost effects: Colin, Hachi, and Kanbei build-cost modifiers; Colin Gold Rush and Power of Money; Sasha income, Market Crash, and War Bonds; and Kindle property-based attack bonuses including High Society's owned-property scaling.
@@ -86,7 +86,6 @@ The gameplay reference for CO mechanics is the [Advance Wars By Web Wiki CO page
 
 These AWBW mechanics are not implemented yet. They are tracked as GitHub issues so the markdown is only a summary, not the source of truth.
 
-- [#83](https://github.com/ryparikh/AdvanceWarsServer/issues/83): Jess Turbo Charge COP resupply side effect.
 - [#85](https://github.com/ryparikh/AdvanceWarsServer/issues/85): Sturm all-terrain movement rules.
 - [#86](https://github.com/ryparikh/AdvanceWarsServer/issues/86): Lash terrain-star attack and movement effects.
 - [#87](https://github.com/ryparikh/AdvanceWarsServer/issues/87): Javier indirect-defense and Comm Tower defense bonuses.

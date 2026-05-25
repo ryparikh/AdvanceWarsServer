@@ -226,7 +226,16 @@ Result JsonTestRunner::run() {
 
 	if (!test.vecFailedActions.empty()) {
 		for (const Action& action : test.vecFailedActions) {
+			json beforeState;
+			GameState::to_json(beforeState, test.initialGameState);
 			if (test.initialGameState.DoAction(action) == Result::Succeeded) {
+				return Result::Failed;
+			}
+			json afterState;
+			GameState::to_json(afterState, test.initialGameState);
+			m_strExpected = beforeState.dump();
+			m_strActual = afterState.dump();
+			if (m_strActual != m_strExpected) {
 				return Result::Failed;
 			}
 		}

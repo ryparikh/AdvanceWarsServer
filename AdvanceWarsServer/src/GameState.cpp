@@ -720,8 +720,8 @@ Result GameState::GetValidActions(int x, int y, std::vector<Action>& vecActions)
 		return Result::Succeeded;
 	}
 
-	const MapTile* pmaptile;
-	m_spmap->TryGetTile(x, y, &pmaptile);
+	const MapTile* pmaptile = nullptr;
+	IfFailedReturn(m_spmap->TryGetTile(x, y, &pmaptile));
 	const Unit* pUnit = pmaptile->TryGetUnit();
 	const Terrain& terrain = pmaptile->GetTerrain();
 
@@ -957,6 +957,26 @@ bool GameState::AnyValidActions() const noexcept {
 }
 
 Result GameState::DoAction(const Action& action) noexcept {
+	std::vector<Action> vecActions;
+	if (!action.m_optSource.has_value()) {
+		IfFailedReturn(GetValidActions(vecActions));
+	}
+	else {
+		const std::pair<int, int>& source = action.m_optSource.value();
+		IfFailedReturn(GetValidActions(source.first, source.second, vecActions));
+	}
+
+	if (std::find(vecActions.begin(), vecActions.end(), action) == vecActions.end()) {
+		return Result::Failed;
+	}
+
+	GameState actedGameState{ Clone() };
+	IfFailedReturn(actedGameState.ExecuteAction(action));
+	*this = actedGameState;
+	return Result::Succeeded;
+}
+
+Result GameState::ExecuteAction(const Action& action) noexcept {
 	if (m_fGameOver) {
 		return Result::Failed;
 	}
@@ -975,20 +995,8 @@ Result GameState::DoAction(const Action& action) noexcept {
 	}
 
 	const std::pair<int, int>& source = action.m_optSource.value();
-	std::vector<Action> vecActions;
 	int x = source.first;
 	int y = source.second;
-	GetValidActions(x, y, vecActions);
-	bool fValid = false;
-	for (const Action& validAction : vecActions) {
-		if (validAction == action) {
-			fValid = true;
-		}
-	}
-
-	if (!fValid) {
-		return Result::Failed;
-	}
 
 	switch (action.m_type) {
 	default:
@@ -998,10 +1006,10 @@ Result GameState::DoAction(const Action& action) noexcept {
 	case Action::Type::Buy:
 		return DoBuyAction(x, y, action);
 	case Action::Type::MoveAttack:
-		DoMoveAction(x, y, action);
+		IfFailedReturn(DoMoveAction(x, y, action));
 		return DoAttackAction(x, y, action);
 	case Action::Type::MoveCapture:
-		DoMoveAction(x, y, action);
+		IfFailedReturn(DoMoveAction(x, y, action));
 		return DoCaptureAction(x, y, action);
 	case Action::Type::MoveCombine:
 		return DoMoveCombineAction(x, y, action);

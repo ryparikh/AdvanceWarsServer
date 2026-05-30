@@ -4,7 +4,7 @@
 
 Existing JSON fixtures stay in their current feature folders for now to avoid path churn. Move them into the unit home when a follow-up is already changing that behavior, or cross-link them here when keeping a feature folder is clearer.
 
-The source-backed unit data audit lives in `docs/AWBW_UNIT_DATA_AUDIT.md`. It verifies all unit stat rows against the AWBW Units table and tracks current damage/targeting mismatches in #147, #148, and #149.
+The source-backed unit data audit lives in `docs/AWBW_UNIT_DATA_AUDIT.md`. It verifies all unit stat rows against the AWBW Units table and tracks current damage/targeting mismatches in #147 and #149.
 
 The JSON suite discovers tests recursively under `test/json`; non-`.json` files in this manifest tree are documentation or placeholders.
 
@@ -25,7 +25,7 @@ Coverage key:
 | BlackBomb | `blackbomb` | `units/blackbomb/` | yes | yes | `units/blackbomb/` covers air movement over mixed terrain, begin-turn fuel drain, fuel-out crash, and no-weapon attack rejection. Explode-command behavior is not implemented yet. |
 | Bomber | `bomber` | `units/bomber/` | yes | yes | `units/bomber/` covers air movement over mixed terrain, begin-turn fuel drain, ammo consumption against ground targets, and invalid air targets. |
 | Carrier | `carrier` | `units/carrier/` | yes | yes | `units/carrier/` covers indirect anti-air range, ammo, invalid ground target, move-fire rejection, Sea/Reef/Port movement, Shoal rejection, and begin-turn fuel/Port resupply. `transport/carrier/` covers loading and loaded resupply. |
-| Crusier | `crusier` | `units/crusier/` | yes | yes | Enum and JSON spelling are `crusier`; `units/crusier/` covers primary anti-sub ammo use, secondary anti-air with no ammo, Sea/Reef/Port movement, Shoal rejection, invalid naval targets, no-ammo sub boundary, and begin-turn fuel/Port resupply. `transport/crusier/` covers copter loading and loaded resupply. Cruiser anti-air gun targeting against B-Copter/T-Copter is tracked by [#148](https://github.com/ryparikh/AdvanceWarsServer/issues/148). |
+| Crusier | `crusier` | `units/crusier/` | yes | yes | Enum and JSON spelling are `crusier`; `units/crusier/` covers primary anti-sub ammo use, secondary anti-air with and without primary ammo, Sea/Reef/Port movement, Shoal rejection, invalid naval targets, no-ammo sub boundary, and begin-turn fuel/Port resupply. `transport/crusier/` covers copter loading and loaded resupply. |
 | Fighter | `fighter` | `units/fighter/` | yes | yes | `units/fighter/` covers air movement over mixed terrain, begin-turn fuel drain, ammo consumption against air targets, and invalid land/sea targets. |
 | Infantry | `infantry` | `units/infantry/` | yes | yes | `units/infantry/` covers Foot movement over every clear-weather terrain category, Sea/Reef/Pipe movement rejection, Infantry-owned direct combat including the moved legacy matrix plus Tank, target-forest defense, source-terrain defense across every legal Foot terrain, and unsupported/friendly/empty target rejection. Capture, joining, and transport cargo scenarios remain in their feature folders. |
 | Lander | `lander` | `units/lander/` | yes | yes | `units/lander/` covers vehicle loading, unload, Sea/Shoal/Reef/Port movement, Road rejection, sea unload boundary, no-weapon attack rejection, capacity boundary, and begin-turn fuel/Port resupply. Legacy transport fixtures also cover multi-load and unload-index examples. |

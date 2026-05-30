@@ -25,7 +25,7 @@ the [AWBW Units wiki page](https://awbw.fandom.com/wiki/Units), the
 | Area | Result | Follow-up |
 | --- | --- | --- |
 | Unit stat rows | All 25 units match the AWBW Units table. | none |
-| Effective base-damage chart | 620 of 625 attacker/defender cells match the official AWBW damage chart. | #147, #148, #149 |
+| Effective base-damage chart | 622 of 625 attacker/defender cells match the official AWBW damage chart. | #147, #149 |
 | Unit behavior gaps outside stat/damage data | Existing behavior gaps remain tracked separately. | #33, #34, #35 |
 | Piperunner production | Verified and implemented by the completed production work. | #79 closed |
 
@@ -42,7 +42,7 @@ the [AWBW Units wiki page](https://awbw.fandom.com/wiki/Units), the
 | Black Bomb | AWBW Units table: verified | Official AWBW damage chart: verified no-weapon row | #33 for explosion behavior |
 | Bomber | AWBW Units table: verified | Official AWBW damage chart: verified | none |
 | Carrier | AWBW Units table: verified | Official AWBW damage chart: verified | none |
-| Cruiser | AWBW Units table: verified | Mismatch found: Cruiser anti-air gun secondary damage is present locally but not selected against B-Copter or T-Copter | #148 |
+| Cruiser | AWBW Units table: verified | Official AWBW damage chart: verified through secondary anti-air gun targeting | none |
 | Fighter | AWBW Units table: verified | Official AWBW damage chart: verified | none |
 | Infantry | AWBW Units table: verified | Official AWBW damage chart: verified | none |
 | Lander | AWBW Units table: verified | Official AWBW damage chart: verified no-weapon row | none |
@@ -64,7 +64,6 @@ the [AWBW Units wiki page](https://awbw.fandom.com/wiki/Units), the
 | Finding | Current implementation | AWBW reference | Tracking issue |
 | --- | --- | --- | --- |
 | Artillery damage to Recon and Rocket | `vrgPrimaryWeaponDamage` stores 40 for both defenders. | Official AWBW chart lists 80 for both defenders. | #147 |
-| Cruiser damage to B-Copter and T-Copter | `vrgSecondaryWeaponDamage` stores 115, but the combat selection branch does not use Cruiser's non-machine-gun secondary weapon for copter targets. | Official AWBW chart lists 115 for both defenders. | #148 |
 | Neotank damage to Infantry | `vrgSecondaryWeaponDamage` stores 155. | Official AWBW chart lists 125. | #149 |
 
 ## Existing Non-Data Unit Gaps

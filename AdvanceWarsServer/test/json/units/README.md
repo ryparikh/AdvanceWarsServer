@@ -4,7 +4,7 @@
 
 Existing JSON fixtures stay in their current feature folders for now to avoid path churn. Move them into the unit home when a follow-up is already changing that behavior, or cross-link them here when keeping a feature folder is clearer.
 
-The source-backed unit data audit lives in `docs/AWBW_UNIT_DATA_AUDIT.md`. It verifies all unit stat rows against the AWBW Units table and tracks current damage/targeting mismatches in #147, #148, and #149.
+The source-backed unit data audit lives in `docs/AWBW_UNIT_DATA_AUDIT.md`. It verifies all unit stat rows against the AWBW Units table and tracks current damage/targeting mismatches in #147 and #148.
 
 The JSON suite discovers tests recursively under `test/json`; non-`.json` files in this manifest tree are documentation or placeholders.
 
@@ -33,7 +33,7 @@ Coverage key:
 | Mech | `mech` | `units/mech/` | yes | yes | Covered through capture, combat, joining, and transport cargo scenarios. Dedicated `units/mech/` organization can happen with a future behavior change, but current Standard behavior has coverage. |
 | MegaTank | `megatank` | `units/megatank/` | partial | partial | Present as production option and infantry combat target/opponent. Owner-side combat coverage is tracked by [#107](https://github.com/ryparikh/AdvanceWarsServer/issues/107). |
 | Missile | `missile` | `units/missile/` | yes | yes | `units/missile/` covers indirect anti-air min/max range, ammo consumption, no ammo, invalid ground target, and move-fire rejection. |
-| Neotank | `neotank` | `units/neotank/` | partial | partial | Present as production option and infantry combat target/opponent. Owner-side combat coverage is tracked by [#108](https://github.com/ryparikh/AdvanceWarsServer/issues/108), and the Neotank-vs-Infantry damage-data mismatch is tracked by [#149](https://github.com/ryparikh/AdvanceWarsServer/issues/149). |
+| Neotank | `neotank` | `units/neotank/` | partial | partial | Present as production option, infantry combat target/opponent, and corrected machine-gun damage against Infantry. Owner-side combat coverage is tracked by [#108](https://github.com/ryparikh/AdvanceWarsServer/issues/108). |
 | Piperunner | `piperunner` | `units/piperunner/` | partial | partial | `units/piperunner/` covers indirect min/max range, ammo consumption, no ammo, empty target, and move-fire rejection. Production fixtures cover Base and Hachi Merchant Union city creation; that production gap was completed in [#79](https://github.com/ryparikh/AdvanceWarsServer/issues/79). Pipe movement and remaining attack coverage are tracked by [#35](https://github.com/ryparikh/AdvanceWarsServer/issues/35). |
 | Recon | `recon` | `units/recon/` | yes | yes | `units/recon/` uses one focused JSON fixture per movement terrain, invalid movement terrain, legal target/terrain combat case, source-terrain defense case, and invalid target/terrain case. These cover Tires movement over every clear-weather terrain category, fuel use, ammo-zero valid actions, Recon's legal/unsupported attacks, and counterattack damage against Recon across its legal terrains. Fog-specific vision behavior remains deferred to [#90](https://github.com/ryparikh/AdvanceWarsServer/issues/90). |
 | Rocket | `rocket` | `units/rocket/` | yes | yes | `units/rocket/` covers indirect min/max range, ammo consumption, no ammo, invalid air target, and move-fire rejection. |

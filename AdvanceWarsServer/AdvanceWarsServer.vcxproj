@@ -162,6 +162,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\ActionSpace.cpp" />
     <ClCompile Include="src\AdvanceWarsServer.cpp" />
     <ClCompile Include="src\CommandingOfficier.cpp" />
     <ClCompile Include="src\GameState.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="D:\Projects\via-httplib-main\via-httplib-main\include\via\http\request_router.hpp" />
     <ClInclude Include="D:\Projects\via-httplib-main\via-httplib-main\include\via\http_server.hpp" />
     <ClInclude Include="deps\json-develop\single_include\nlohmann\json.hpp" />
+    <ClInclude Include="inc\ActionSpace.h" />
     <ClInclude Include="inc\AdvanceWarsServer.h" />
     <ClInclude Include="inc\CommandingOfficier.h" />
     <ClInclude Include="inc\GameState.h" />

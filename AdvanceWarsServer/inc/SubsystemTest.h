@@ -12,6 +12,11 @@ struct JsonSubsystemTest {
 	std::vector<std::pair<std::pair<int, int>, std::vector<Action>>> vecValidActions;
 	bool fHasFinalGameState{ false };
 	bool fDeterministicReplay{ false };
+	json actionSpace;
+	json legalActionMask;
+	bool fHasActionSpace{ false };
+	bool fHasLegalActionMask{ false };
+	bool fLegalActionMaskShouldFail{ false };
 };
 
 void from_json(json& j, JsonSubsystemTest& test);

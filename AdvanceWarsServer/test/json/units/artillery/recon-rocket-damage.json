@@ -1,0 +1,60 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "artillery-recon-rocket-damage",
+    "map": [
+      [
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 50, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "artillery" } },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 80, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "recon" } },
+        { "terrain": 15 }
+      ],
+      [
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 50, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "artillery" } },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 6, "fuel": 50, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "rocket" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 0, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actions": [
+    { "type": "attack", "source": [0, 0], "target": [2, 0] },
+    { "type": "attack", "source": [0, 1], "target": [3, 1] }
+  ],
+  "final-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "artillery-recon-rocket-damage",
+    "map": [
+      [
+        { "terrain": 15, "unit": { "ammo": 8, "fuel": 50, "health": 100, "hidden": false, "moved": true, "owner": "orange-star", "type": "artillery" } },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 80, "health": 20, "hidden": false, "moved": false, "owner": "blue-moon", "type": "recon" } },
+        { "terrain": 15 }
+      ],
+      [
+        { "terrain": 15, "unit": { "ammo": 8, "fuel": 50, "health": 100, "hidden": false, "moved": true, "owner": "orange-star", "type": "artillery" } },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 6, "fuel": 50, "health": 20, "hidden": false, "moved": false, "owner": "blue-moon", "type": "rocket" } }
+      ]
+    ],
+    "players": [
+      { "armyType": "orange-star", "co": "Andy", "funds": 0, "power-meter": { "charge": 7600, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 1 },
+      { "armyType": "blue-moon", "co": "Adder", "funds": 0, "power-meter": { "charge": 15200, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 }, "power-status": 0, "luck-policy": 2 }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  }
+}

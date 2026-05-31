@@ -36,6 +36,7 @@ See [STANDARD_ENGINE_COMPLETENESS.md](STANDARD_ENGINE_COMPLETENESS.md) for the c
 | `CO_SUPPORT.md` | Implemented CO behavior and focused CO follow-up issues. |
 | `TRAINING_LOOP_WORK_ITEMS.md` | Self-play, MCTS, tensor, model, and training-loop roadmap. |
 | `docs/API.md` | Current and target REST/API contract notes. |
+| `docs/TRAINING_DESIGN.md` | Recommended self-play training architecture and data flow. |
 | `docs/JSON_FIXTURES.md` | JSON regression fixture format and authoring guide. |
 
 ## Quick Start

@@ -3,7 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unordered_set>
 
+#include "ActionSpace.h"
 #include "GameState.h"
 
 namespace {
@@ -114,6 +116,211 @@ Result BuildActionTrace(GameState gameState, const std::vector<Action>& actions,
 	traceDump = trace.dump();
 	return Result::Succeeded;
 }
+
+Result ExpectJsonValue(const json& actualJson, const json& expectedJson, const std::string& label, std::string& expected, std::string& actual) {
+	expected = label + ": " + expectedJson.dump();
+	actual = actualJson.dump();
+	if (actualJson != expectedJson) {
+		return Result::Failed;
+	}
+
+	return Result::Succeeded;
+}
+
+Result RunActionSpaceAssertions(const json& actionSpace, std::string& expected, std::string& actual) {
+	if (actionSpace.contains("version")) {
+		json actualVersion = ActionSpace::Version();
+		IfFailedReturn(ExpectJsonValue(actualVersion, actionSpace.at("version"), "action-space version", expected, actual));
+	}
+
+	if (actionSpace.contains("width")) {
+		json actualWidth = ActionSpace::BoardWidth();
+		IfFailedReturn(ExpectJsonValue(actualWidth, actionSpace.at("width"), "action-space width", expected, actual));
+	}
+
+	if (actionSpace.contains("height")) {
+		json actualHeight = ActionSpace::BoardHeight();
+		IfFailedReturn(ExpectJsonValue(actualHeight, actionSpace.at("height"), "action-space height", expected, actual));
+	}
+
+	if (actionSpace.contains("action-count")) {
+		json actualActionCount = ActionSpace::ActionCount();
+		IfFailedReturn(ExpectJsonValue(actualActionCount, actionSpace.at("action-count"), "action-space action-count", expected, actual));
+	}
+
+	if (actionSpace.contains("encodedActions")) {
+		for (const json& encodedActionJson : actionSpace.at("encodedActions")) {
+			Action action;
+			json actionJson = encodedActionJson.at("action");
+			from_json(actionJson, action);
+
+			int encodedAction = -1;
+			if (ActionSpace::EncodeAction(action, encodedAction) == Result::Failed) {
+				json jAction;
+				to_json(jAction, action);
+				SetMismatch(expected, actual, "action should encode", jAction.dump(), "encode failed");
+				return Result::Failed;
+			}
+
+			if (encodedActionJson.contains("index") && encodedAction != encodedActionJson.at("index").get<int>()) {
+				json jAction;
+				to_json(jAction, action);
+				SetMismatch(expected, actual, "encoded index for " + jAction.dump(), encodedActionJson.at("index").dump(), std::to_string(encodedAction));
+				return Result::Failed;
+			}
+
+			Action decodedAction;
+			if (ActionSpace::DecodeAction(encodedAction, decodedAction) == Result::Failed) {
+				SetMismatch(expected, actual, "encoded action should decode", std::to_string(encodedAction), "decode failed");
+				return Result::Failed;
+			}
+
+			if (!(decodedAction == action)) {
+				json jExpected;
+				json jActual;
+				to_json(jExpected, action);
+				to_json(jActual, decodedAction);
+				expected = jExpected.dump();
+				actual = jActual.dump();
+				return Result::Failed;
+			}
+		}
+	}
+
+	if (actionSpace.contains("invalidEncodedActions")) {
+		for (const json& actionJsonSource : actionSpace.at("invalidEncodedActions")) {
+			Action action;
+			json actionJson = actionJsonSource;
+			from_json(actionJson, action);
+
+			int encodedAction = -1;
+			if (ActionSpace::EncodeAction(action, encodedAction) == Result::Succeeded) {
+				json jAction;
+				to_json(jAction, action);
+				SetMismatch(expected, actual, "action should fail to encode", jAction.dump(), std::to_string(encodedAction));
+				return Result::Failed;
+			}
+		}
+	}
+
+	if (actionSpace.contains("decodedActions")) {
+		for (const json& decodedActionJson : actionSpace.at("decodedActions")) {
+			Action actualAction;
+			int encodedAction = decodedActionJson.at("index").get<int>();
+			if (ActionSpace::DecodeAction(encodedAction, actualAction) == Result::Failed) {
+				SetMismatch(expected, actual, "index should decode", std::to_string(encodedAction), "decode failed");
+				return Result::Failed;
+			}
+
+			Action expectedAction;
+			json expectedActionJson = decodedActionJson.at("action");
+			from_json(expectedActionJson, expectedAction);
+			if (!(actualAction == expectedAction)) {
+				json jExpected;
+				json jActual;
+				to_json(jExpected, expectedAction);
+				to_json(jActual, actualAction);
+				expected = jExpected.dump();
+				actual = jActual.dump();
+				return Result::Failed;
+			}
+		}
+	}
+
+	if (actionSpace.contains("invalidIndices")) {
+		for (const json& indexJson : actionSpace.at("invalidIndices")) {
+			Action action;
+			int encodedAction = indexJson.get<int>();
+			if (ActionSpace::DecodeAction(encodedAction, action) == Result::Succeeded) {
+				json jAction;
+				to_json(jAction, action);
+				SetMismatch(expected, actual, "index should fail to decode", std::to_string(encodedAction), jAction.dump());
+				return Result::Failed;
+			}
+		}
+	}
+
+	return Result::Succeeded;
+}
+
+Result RunLegalActionMaskAssertions(const GameState& gameState, const json& legalActionMask, bool shouldFail, std::string& expected, std::string& actual) {
+	std::vector<std::uint8_t> mask;
+	Result result = ActionSpace::GenerateLegalActionMask(gameState, mask);
+	if (shouldFail) {
+		if (result == Result::Succeeded) {
+			SetMismatch(expected, actual, "legal action mask generation should fail", "failed", "succeeded");
+			return Result::Failed;
+		}
+
+		return Result::Succeeded;
+	}
+
+	if (result == Result::Failed) {
+		SetMismatch(expected, actual, "legal action mask generation should succeed", "succeeded", "failed");
+		return Result::Failed;
+	}
+
+	if (mask.size() != static_cast<std::size_t>(ActionSpace::ActionCount())) {
+		SetMismatch(expected, actual, "mask size", std::to_string(ActionSpace::ActionCount()), std::to_string(mask.size()));
+		return Result::Failed;
+	}
+
+	std::vector<Action> legalActions;
+	IfFailedReturn(gameState.GetValidActions(legalActions));
+
+	std::unordered_set<int> uniqueLegalActionIndices;
+	for (const Action& legalAction : legalActions) {
+		int encodedAction = -1;
+		IfFailedReturn(ActionSpace::EncodeAction(legalAction, encodedAction));
+		uniqueLegalActionIndices.insert(encodedAction);
+	}
+
+	std::size_t actualMaskCount = 0;
+	for (std::uint8_t maskValue : mask) {
+		if (maskValue != 0U) {
+			++actualMaskCount;
+		}
+	}
+
+	if (actualMaskCount != uniqueLegalActionIndices.size()) {
+		SetMismatch(expected, actual, "mask legal action count", std::to_string(uniqueLegalActionIndices.size()), std::to_string(actualMaskCount));
+		return Result::Failed;
+	}
+
+	if (legalActionMask.contains("expectedLegalActions")) {
+		for (const json& actionJsonSource : legalActionMask.at("expectedLegalActions")) {
+			Action action;
+			json actionJson = actionJsonSource;
+			from_json(actionJson, action);
+			int encodedAction = -1;
+			IfFailedReturn(ActionSpace::EncodeAction(action, encodedAction));
+			if (mask[encodedAction] == 0U) {
+				json jAction;
+				to_json(jAction, action);
+				SetMismatch(expected, actual, "expected legal action mask bit", jAction.dump(), "0");
+				return Result::Failed;
+			}
+		}
+	}
+
+	if (legalActionMask.contains("expectedIllegalActions")) {
+		for (const json& actionJsonSource : legalActionMask.at("expectedIllegalActions")) {
+			Action action;
+			json actionJson = actionJsonSource;
+			from_json(actionJson, action);
+			int encodedAction = -1;
+			IfFailedReturn(ActionSpace::EncodeAction(action, encodedAction));
+			if (mask[encodedAction] != 0U) {
+				json jAction;
+				to_json(jAction, action);
+				SetMismatch(expected, actual, "expected illegal action mask bit", jAction.dump(), "1");
+				return Result::Failed;
+			}
+		}
+	}
+
+	return Result::Succeeded;
+}
 }
 
 void from_json(json& j, JsonSubsystemTest& test) {
@@ -157,6 +364,21 @@ void from_json(json& j, JsonSubsystemTest& test) {
 
 	if (j.contains("deterministic-replay")) {
 		j.at("deterministic-replay").get_to(test.fDeterministicReplay);
+	}
+
+	if (j.contains("actionSpace")) {
+		test.actionSpace = j.at("actionSpace");
+		test.fHasActionSpace = true;
+	}
+
+	if (j.contains("legalActionMask")) {
+		test.legalActionMask = j.at("legalActionMask");
+		test.fHasLegalActionMask = true;
+	}
+
+	if (j.contains("legalActionMaskShouldFail")) {
+		j.at("legalActionMaskShouldFail").get_to(test.fLegalActionMaskShouldFail);
+		test.fHasLegalActionMask = true;
 	}
 }
 
@@ -266,6 +488,14 @@ Result JsonTestRunner::run() {
 				return Result::Failed;
 			}
 		}
+	}
+
+	if (test.fHasActionSpace) {
+		IfFailedReturn(RunActionSpaceAssertions(test.actionSpace, m_strExpected, m_strActual));
+	}
+
+	if (test.fHasLegalActionMask) {
+		IfFailedReturn(RunLegalActionMaskAssertions(test.initialGameState, test.legalActionMask, test.fLegalActionMaskShouldFail, m_strExpected, m_strActual));
 	}
 
 

@@ -136,6 +136,41 @@ Use `invalid-co` to assert that an unknown CO string is rejected.
 
 Power-meter expectations are partial in CO contract fixtures: include only the fields relevant to the behavior under test. State-transition fixtures compare the full serialized game state, including `"charge"`, `"star-value"`, `"cop-threshold"`, `"scop-threshold"`, `"can-use-cop"`, and `"can-use-scop"` for each player.
 
+### Action Space Fixture
+
+Use `actionSpace` to assert the stable policy/action encoding contract, and `legalActionMask` to assert mask bits generated from `GameState::GetValidActions`.
+
+```json
+{
+  "initial-game-state": {
+  },
+  "actionSpace": {
+    "version": "standard-gl-v1",
+    "width": 27,
+    "height": 23,
+    "action-count": 1554366,
+    "encodedActions": [
+      {
+        "action": { "type": "end-turn" },
+        "index": 1554363
+      }
+    ],
+    "invalidEncodedActions": [
+    ],
+    "invalidIndices": [
+    ]
+  },
+  "legalActionMask": {
+    "expectedLegalActions": [
+    ],
+    "expectedIllegalActions": [
+    ]
+  }
+}
+```
+
+Use `"legalActionMaskShouldFail": true` for states whose map shape should be rejected by the action-space version.
+
 ## Action JSON
 
 Action JSON is parsed by `from_json(json&, Action&)` in `GameState.cpp`. Existing fixtures are the best source for exact spelling. Common action types include:

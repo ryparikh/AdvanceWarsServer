@@ -1,0 +1,127 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "action-space-encoding-and-mask",
+    "map": [
+      [
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 70, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "tank" } },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "infantry" } },
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 50, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "artillery" } },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 9, "fuel": 70, "health": 100, "hidden": false, "moved": false, "owner": "blue-moon", "type": "tank" } },
+        { "property": { "capture-points": 20, "owner": "neutral" }, "terrain": 34, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "infantry" } },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "infantry" } },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 99, "health": 90, "hidden": false, "moved": false, "owner": "orange-star", "type": "infantry" } },
+        { "terrain": 15 },
+        { "property": { "capture-points": 20, "owner": "orange-star" }, "terrain": 35 },
+        { "terrain": 15 }
+      ],
+      [
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 12, "health": 90, "hidden": false, "moved": false, "owner": "orange-star", "type": "tank" } },
+        { "terrain": 29, "unit": { "ammo": 0, "fuel": 50, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "blackboat" } },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 60, "health": 100, "hidden": false, "loaded-units": [{ "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "infantry" }], "moved": false, "owner": "orange-star", "type": "apc" } },
+        { "terrain": 15 },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "infantry" } },
+        { "terrain": 15, "unit": { "ammo": 0, "fuel": 60, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "apc" } },
+        { "terrain": 15, "unit": { "ammo": 6, "fuel": 60, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "stealth" } },
+        { "terrain": 29, "unit": { "ammo": 6, "fuel": 60, "health": 100, "hidden": true, "moved": false, "owner": "orange-star", "type": "sub" } },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 }
+      ],
+      [
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 },
+        { "terrain": 15 }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 300000,
+        "power-meter": { "charge": 54000, "cop-stars": 3, "scop-stars": 3, "star-value": 9000 },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": { "charge": 0, "cop-stars": 2, "scop-stars": 3, "star-value": 9000 },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "actionSpace": {
+    "version": "standard-gl-v1",
+    "width": 27,
+    "height": 23,
+    "action-count": 1554366,
+    "encodedActions": [
+      { "action": { "type": "move-wait", "source": [0, 11], "target": [0, 0] }, "index": 297 },
+      { "action": { "type": "move-wait", "source": [0, 0], "target": [0, 0] }, "index": 81972 },
+      { "action": { "type": "move-attack", "source": [1, 1], "target": [1, 1], "direction": "east" }, "index": 493102 },
+      { "action": { "type": "attack", "source": [0, 0], "target": [2, 0] }, "index": 903555 },
+      { "action": { "type": "move-capture", "source": [0, 0], "target": [0, 0] }, "index": 1002915 },
+      { "action": { "type": "move-combine", "source": [0, 0], "target": [0, 0] }, "index": 1104138 },
+      { "action": { "type": "move-load", "source": [1, 0], "target": [2, 0] }, "index": 1269325 },
+      { "action": { "type": "move-hide", "source": [0, 0], "target": [0, 0] }, "index": 1396008 },
+      { "action": { "type": "move-unhide", "source": [0, 0], "target": [0, 0] }, "index": 1486053 },
+      { "action": { "type": "repair", "source": [1, 0], "direction": "west" }, "index": 1533250 },
+      { "action": { "type": "unload", "source": [2, 0], "direction": "west", "unloadIndex": 0 }, "index": 1537598 },
+      { "action": { "type": "buy", "source": [0, 0], "unit": "anti-air" }, "index": 1538838 },
+      { "action": { "type": "buy", "source": [26, 22], "unit": "tank" }, "index": 1554362 },
+      { "action": { "type": "end-turn" }, "index": 1554363 },
+      { "action": { "type": "co-power" }, "index": 1554364 },
+      { "action": { "type": "super-co-power" }, "index": 1554365 }
+    ],
+    "invalidEncodedActions": [
+      { "type": "move-wait", "source": [27, 0], "target": [27, 0] },
+      { "type": "move-wait", "source": [0, 0], "target": [12, 0] },
+      { "type": "attack", "source": [0, 0], "target": [1, 0] },
+      { "type": "move-capture", "source": [0, 0], "target": [6, 0] },
+      { "type": "unload", "source": [0, 0], "direction": "north", "unloadIndex": 2 }
+    ],
+    "invalidIndices": [ -1, 0, 1554366 ]
+  },
+  "legalActionMask": {
+    "expectedLegalActions": [
+      { "type": "move-wait", "source": [0, 0], "target": [0, 0] },
+      { "type": "move-attack", "source": [0, 0], "target": [1, 0], "direction": "east" },
+      { "type": "attack", "source": [3, 0], "target": [5, 0] },
+      { "type": "move-capture", "source": [6, 0], "target": [6, 0] },
+      { "type": "move-combine", "source": [7, 0], "target": [8, 0] },
+      { "type": "move-load", "source": [4, 1], "target": [5, 1] },
+      { "type": "move-hide", "source": [6, 1], "target": [6, 1] },
+      { "type": "move-unhide", "source": [7, 1], "target": [7, 1] },
+      { "type": "repair", "source": [1, 1], "direction": "west" },
+      { "type": "unload", "source": [2, 1], "direction": "east", "unloadIndex": 0 },
+      { "type": "buy", "source": [10, 0], "unit": "infantry" },
+      { "type": "co-power" },
+      { "type": "super-co-power" },
+      { "type": "end-turn" }
+    ],
+    "expectedIllegalActions": [
+      { "type": "buy", "source": [11, 0], "unit": "infantry" },
+      { "type": "move-wait", "source": [0, 0], "target": [11, 0] }
+    ]
+  }
+}

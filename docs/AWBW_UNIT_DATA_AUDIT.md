@@ -42,7 +42,7 @@ the [AWBW Units wiki page](https://awbw.fandom.com/wiki/Units), the
 | Black Bomb | AWBW Units table: verified | Official AWBW damage chart: verified no-weapon row | #33 for explosion behavior |
 | Bomber | AWBW Units table: verified | Official AWBW damage chart: verified | none |
 | Carrier | AWBW Units table: verified | Official AWBW damage chart: verified | none |
-| Cruiser | AWBW Units table: verified | Mismatch found: Cruiser anti-air gun secondary damage is present locally but not selected against B-Copter or T-Copter | #148 |
+| Cruiser | AWBW Units table: verified | Official AWBW damage chart: verified through secondary anti-air gun targeting | none |
 | Fighter | AWBW Units table: verified | Official AWBW damage chart: verified | none |
 | Infantry | AWBW Units table: verified | Official AWBW damage chart: verified | none |
 | Lander | AWBW Units table: verified | Official AWBW damage chart: verified no-weapon row | none |

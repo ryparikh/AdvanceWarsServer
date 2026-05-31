@@ -41,14 +41,14 @@ The rules/API completeness target for the initial playable environment is normal
 
 ## Phase 2: MCTS Improvements
 
-- [ ] Separate pure rollout MCTS from neural-network-guided MCTS.
-- [ ] Expand one child at a time or track unexpanded actions to avoid expanding every legal action immediately.
-- [ ] Replace `rand()` rollout action selection with a seeded RNG object.
-- [ ] Add PUCT selection using policy priors once a policy head exists.
-- [ ] Store visit counts per legal action for training targets.
-- [ ] Handle same-player action sequences explicitly in value backup. The player only changes on `EndTurn`.
-- [ ] Add temperature controls for early-game exploration and late-game exploitation.
-- [ ] Add MCTS search limits by simulations, wall-clock time, or node count.
+- [x] Separate pure rollout MCTS from neural-network-guided MCTS. Neural-guided PUCT is tracked by #166.
+- [x] Expand one child at a time or track unexpanded actions to avoid expanding every legal action immediately.
+- [x] Replace `rand()` rollout action selection with a seeded RNG object.
+- [ ] Add PUCT selection using policy priors once a policy head exists (#166).
+- [x] Store visit counts per legal action for training targets.
+- [x] Handle same-player action sequences explicitly in value backup.
+- [x] Add temperature controls for early-game exploration and late-game exploitation.
+- [x] Add MCTS search limits by simulation count, rollout action count, and node count. Wall-clock limits are tracked by #168.
 
 ## Phase 3: Self-Play Data Generation
 
@@ -96,6 +96,9 @@ The rules/API completeness target for the initial playable environment is normal
 - [ ] #7 Add policy/value network scaffold.
 - [ ] #8 Add training command-line entry point.
 - [ ] #9 Add checkpoint evaluation harness.
+- [ ] #166 Add neural-guided MCTS with PUCT.
+- [ ] #167 Add reusable MCTS search tree re-rooting.
+- [ ] #168 Add wall-clock MCTS search limits.
 - [ ] #65 Define and enforce normal Global League Standard game settings.
 - [ ] #66 Add REST game lifecycle and step API contract for self-play.
 - [ ] #67 Validate and atomically reject illegal submitted actions.

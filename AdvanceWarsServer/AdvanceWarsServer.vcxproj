@@ -170,6 +170,7 @@
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\MapParser.cpp" />
     <ClCompile Include="src\MapTile.cpp" />
+    <ClCompile Include="src\MctsTest.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\RestGameService.cpp" />
     <ClCompile Include="src\Tensor.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="inc\Map.h" />
     <ClInclude Include="inc\MapParser.h" />
     <ClInclude Include="inc\MapTile.h" />
+    <ClInclude Include="inc\MctsTest.h" />
     <ClInclude Include="inc\MonteCarloTreeSearch.h" />
     <ClInclude Include="inc\MovementTypes.h" />
     <ClInclude Include="inc\Platform.h" />

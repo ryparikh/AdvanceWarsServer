@@ -7,6 +7,7 @@
 #include <future>
 #include "AdvanceWarsServer.h"
 #include "MonteCarloTreeSearch.h"
+#include "MctsTest.h"
 #include "SubsystemTest.h"
 #include "Platform.h"
 #include <torch/torch.h>
@@ -20,6 +21,7 @@ int main(int argc, char* argv[]) noexcept {
 			std::cerr << "Options:\n";
 			std::cerr << "  -sim-random-move-game [seed] : Simulate a random move game.\n";
 			std::cerr << "  -sim-mcts-game        : Simulate an MCTS game.\n";
+			std::cerr << "  -test-mcts            : Run focused MCTS tests.\n";
 			std::cerr << "  -server               : Act as game server.\n";
 			return 1; // Return an error code
 		}
@@ -214,26 +216,30 @@ int main(int argc, char* argv[]) noexcept {
 			json jstate;
 			GameState::to_json(jstate, rootState);
 			outFile << "Game State: " << jstate.dump() << std::endl;
-			auto root = std::make_shared<MCTSNode<GameState, Action>>(rootState, Action());
 			while (!rootState.isTerminal()) {
 				int player = rootState.IsFirstPlayerTurn() ? 0 : 1;
 				MCTS<GameState, Action> mcts;
+				MCTSOptions options;
+				options.maxSimulations = 50000;
+				options.maxNodes = 100000;
+				options.maxRolloutActions = 100000;
 				time_point startTimeTotalSim = std::chrono::steady_clock::now();
-				auto bestNode = mcts.run(root, 50000);
+				MCTSSearchResult<Action> result = mcts.search(rootState, options);
 				time_point endTimeTotalSim = std::chrono::steady_clock::now();
+				if (!result.selectedAction.has_value()) {
+					std::cerr << "MCTS did not select an action." << std::endl;
+					return -1;
+				}
+
 				std::cout << "\n\n\n\nTook to simulate: " << std::chrono::duration<double, std::milli>(endTimeTotalSim - startTimeTotalSim).count() << std::endl;
 				json jaction;
-				to_json(jaction, bestNode->action);
+				to_json(jaction, result.selectedAction.value());
 				outFile << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
 				std::cout << "Player: " << player << ", Action picked: " << jaction.dump() << std::endl;
-				rootState = rootState.applyAction(bestNode->action);
+				rootState = rootState.applyAction(result.selectedAction.value());
 				GameState::to_json(jstate, rootState);
 				outFile << "Game State: " << jstate.dump() << std::endl;
 				std::cout << "Game State: " << jstate.dump() << std::endl;
-				bestNode->parent->detachNode(bestNode);
-				bestNode->parent->freeMemory();
-				bestNode->parent.reset();
-				root = bestNode;
 			}
 
 			outFile.close();
@@ -256,6 +262,9 @@ int main(int argc, char* argv[]) noexcept {
 		}
 		else if (argument == "-test-api-contract") {
 			return RunRestApiContractTests();
+		}
+		else if (argument == "-test-mcts") {
+			return RunMctsTests();
 		}
 		else if (argument == "-server") {
 			return AdvanceWarsServer::getInstance().run();

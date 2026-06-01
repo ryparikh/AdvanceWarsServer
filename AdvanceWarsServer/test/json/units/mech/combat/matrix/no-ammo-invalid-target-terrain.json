@@ -1,0 +1,3682 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "game-over": false,
+    "gameId": "mech-no-ammo-invalid-target-terrain-matrix",
+    "map": [
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "battleship"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "battleship"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "battleship"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackboat"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 0,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackboat"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 0,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackboat"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 29,
+          "unit": {
+            "ammo": 0,
+            "fuel": 50,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackboat"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 36,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 35,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 26,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 34,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 133,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 3,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 47,
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 145,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 112,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 2,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 1,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 4,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 29,
+          "unit": {
+            "ammo": 0,
+            "fuel": 45,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "blackbomb"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 36,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 35,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 26,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 34,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 133,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 3,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 47,
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 145,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 112,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 2,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 1,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 4,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 29,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "bomber"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "carrier"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "carrier"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "carrier"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "crusier"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "crusier"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "crusier"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 36,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 35,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 26,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 34,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 133,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 3,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 47,
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 145,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 112,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 2,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 1,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 4,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 29,
+          "unit": {
+            "ammo": 9,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "fighter"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "lander"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "lander"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "lander"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 29,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "lander"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 36,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 35,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 26,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 34,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 133,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 3,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 47,
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 145,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 112,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 2,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 1,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 4,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 29,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "stealth"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 37,
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "sub"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 33,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "sub"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 28,
+          "unit": {
+            "ammo": 6,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "sub"
+          }
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15
+        }
+      ],
+      [
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 70,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "mech"
+          }
+        },
+        {
+          "terrain": 15,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 3,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "power-meter": {
+          "charge": 0,
+          "cop-stars": 2,
+          "scop-stars": 3,
+          "star-value": 9000
+        },
+        "power-status": 0,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "failedActions": [
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        0
+      ],
+      "target": [
+        0,
+        0
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        1
+      ],
+      "target": [
+        0,
+        1
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        2
+      ],
+      "target": [
+        0,
+        2
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        3
+      ],
+      "target": [
+        0,
+        3
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        4
+      ],
+      "target": [
+        0,
+        4
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        5
+      ],
+      "target": [
+        0,
+        5
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        6
+      ],
+      "target": [
+        0,
+        6
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        7
+      ],
+      "target": [
+        0,
+        7
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        8
+      ],
+      "target": [
+        0,
+        8
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        9
+      ],
+      "target": [
+        0,
+        9
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        10
+      ],
+      "target": [
+        0,
+        10
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        11
+      ],
+      "target": [
+        0,
+        11
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        12
+      ],
+      "target": [
+        0,
+        12
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        13
+      ],
+      "target": [
+        0,
+        13
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        14
+      ],
+      "target": [
+        0,
+        14
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        15
+      ],
+      "target": [
+        0,
+        15
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        16
+      ],
+      "target": [
+        0,
+        16
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        17
+      ],
+      "target": [
+        0,
+        17
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        18
+      ],
+      "target": [
+        0,
+        18
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        19
+      ],
+      "target": [
+        0,
+        19
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        20
+      ],
+      "target": [
+        0,
+        20
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        21
+      ],
+      "target": [
+        0,
+        21
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        22
+      ],
+      "target": [
+        0,
+        22
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        23
+      ],
+      "target": [
+        0,
+        23
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        24
+      ],
+      "target": [
+        0,
+        24
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        25
+      ],
+      "target": [
+        0,
+        25
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        26
+      ],
+      "target": [
+        0,
+        26
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        27
+      ],
+      "target": [
+        0,
+        27
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        28
+      ],
+      "target": [
+        0,
+        28
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        29
+      ],
+      "target": [
+        0,
+        29
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        30
+      ],
+      "target": [
+        0,
+        30
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        31
+      ],
+      "target": [
+        0,
+        31
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        32
+      ],
+      "target": [
+        0,
+        32
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        33
+      ],
+      "target": [
+        0,
+        33
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        34
+      ],
+      "target": [
+        0,
+        34
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        35
+      ],
+      "target": [
+        0,
+        35
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        36
+      ],
+      "target": [
+        0,
+        36
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        37
+      ],
+      "target": [
+        0,
+        37
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        38
+      ],
+      "target": [
+        0,
+        38
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        39
+      ],
+      "target": [
+        0,
+        39
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        40
+      ],
+      "target": [
+        0,
+        40
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        41
+      ],
+      "target": [
+        0,
+        41
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        42
+      ],
+      "target": [
+        0,
+        42
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        43
+      ],
+      "target": [
+        0,
+        43
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        44
+      ],
+      "target": [
+        0,
+        44
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        45
+      ],
+      "target": [
+        0,
+        45
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        46
+      ],
+      "target": [
+        0,
+        46
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        47
+      ],
+      "target": [
+        0,
+        47
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        48
+      ],
+      "target": [
+        0,
+        48
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        49
+      ],
+      "target": [
+        0,
+        49
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        50
+      ],
+      "target": [
+        0,
+        50
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        51
+      ],
+      "target": [
+        0,
+        51
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        52
+      ],
+      "target": [
+        0,
+        52
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        53
+      ],
+      "target": [
+        0,
+        53
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        54
+      ],
+      "target": [
+        0,
+        54
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        55
+      ],
+      "target": [
+        0,
+        55
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        56
+      ],
+      "target": [
+        0,
+        56
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        57
+      ],
+      "target": [
+        0,
+        57
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        58
+      ],
+      "target": [
+        0,
+        58
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        59
+      ],
+      "target": [
+        0,
+        59
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        60
+      ],
+      "target": [
+        0,
+        60
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        61
+      ],
+      "target": [
+        0,
+        61
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        62
+      ],
+      "target": [
+        0,
+        62
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        63
+      ],
+      "target": [
+        0,
+        63
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        64
+      ],
+      "target": [
+        0,
+        64
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        65
+      ],
+      "target": [
+        0,
+        65
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        66
+      ],
+      "target": [
+        0,
+        66
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        67
+      ],
+      "target": [
+        0,
+        67
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        68
+      ],
+      "target": [
+        0,
+        68
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        69
+      ],
+      "target": [
+        0,
+        69
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        70
+      ],
+      "target": [
+        0,
+        70
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        71
+      ],
+      "target": [
+        0,
+        71
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        72
+      ],
+      "target": [
+        0,
+        72
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        73
+      ],
+      "target": [
+        0,
+        73
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        74
+      ],
+      "target": [
+        0,
+        74
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        75
+      ],
+      "target": [
+        0,
+        75
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        76
+      ],
+      "target": [
+        0,
+        76
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        77
+      ],
+      "target": [
+        0,
+        77
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        78
+      ],
+      "target": [
+        0,
+        78
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        79
+      ],
+      "target": [
+        0,
+        79
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        80
+      ],
+      "target": [
+        0,
+        80
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        81
+      ],
+      "target": [
+        0,
+        81
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        82
+      ],
+      "target": [
+        0,
+        82
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        83
+      ],
+      "target": [
+        0,
+        83
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        84
+      ],
+      "target": [
+        0,
+        84
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        85
+      ],
+      "target": [
+        0,
+        85
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        86
+      ],
+      "target": [
+        0,
+        86
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        87
+      ],
+      "target": [
+        0,
+        87
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        88
+      ],
+      "target": [
+        0,
+        88
+      ],
+      "direction": "east"
+    },
+    {
+      "type": "move-attack",
+      "source": [
+        0,
+        89
+      ],
+      "target": [
+        0,
+        89
+      ],
+      "direction": "east"
+    }
+  ],
+  "matrix-cases": [
+    "mech|no-ammo|invalid|battleship|port",
+    "mech|no-ammo|invalid|battleship|reef",
+    "mech|no-ammo|invalid|battleship|sea",
+    "mech|no-ammo|invalid|blackboat|port",
+    "mech|no-ammo|invalid|blackboat|reef",
+    "mech|no-ammo|invalid|blackboat|sea",
+    "mech|no-ammo|invalid|blackboat|shoal",
+    "mech|no-ammo|invalid|blackbomb|airport",
+    "mech|no-ammo|invalid|blackbomb|base",
+    "mech|no-ammo|invalid|blackbomb|bridge",
+    "mech|no-ammo|invalid|blackbomb|city",
+    "mech|no-ammo|invalid|blackbomb|com-tower",
+    "mech|no-ammo|invalid|blackbomb|forest",
+    "mech|no-ammo|invalid|blackbomb|headquarters",
+    "mech|no-ammo|invalid|blackbomb|lab",
+    "mech|no-ammo|invalid|blackbomb|missile-silo",
+    "mech|no-ammo|invalid|blackbomb|mountain",
+    "mech|no-ammo|invalid|blackbomb|plain",
+    "mech|no-ammo|invalid|blackbomb|port",
+    "mech|no-ammo|invalid|blackbomb|reef",
+    "mech|no-ammo|invalid|blackbomb|river",
+    "mech|no-ammo|invalid|blackbomb|road",
+    "mech|no-ammo|invalid|blackbomb|sea",
+    "mech|no-ammo|invalid|blackbomb|shoal",
+    "mech|no-ammo|invalid|bomber|airport",
+    "mech|no-ammo|invalid|bomber|base",
+    "mech|no-ammo|invalid|bomber|bridge",
+    "mech|no-ammo|invalid|bomber|city",
+    "mech|no-ammo|invalid|bomber|com-tower",
+    "mech|no-ammo|invalid|bomber|forest",
+    "mech|no-ammo|invalid|bomber|headquarters",
+    "mech|no-ammo|invalid|bomber|lab",
+    "mech|no-ammo|invalid|bomber|missile-silo",
+    "mech|no-ammo|invalid|bomber|mountain",
+    "mech|no-ammo|invalid|bomber|plain",
+    "mech|no-ammo|invalid|bomber|port",
+    "mech|no-ammo|invalid|bomber|reef",
+    "mech|no-ammo|invalid|bomber|river",
+    "mech|no-ammo|invalid|bomber|road",
+    "mech|no-ammo|invalid|bomber|sea",
+    "mech|no-ammo|invalid|bomber|shoal",
+    "mech|no-ammo|invalid|carrier|port",
+    "mech|no-ammo|invalid|carrier|reef",
+    "mech|no-ammo|invalid|carrier|sea",
+    "mech|no-ammo|invalid|crusier|port",
+    "mech|no-ammo|invalid|crusier|reef",
+    "mech|no-ammo|invalid|crusier|sea",
+    "mech|no-ammo|invalid|fighter|airport",
+    "mech|no-ammo|invalid|fighter|base",
+    "mech|no-ammo|invalid|fighter|bridge",
+    "mech|no-ammo|invalid|fighter|city",
+    "mech|no-ammo|invalid|fighter|com-tower",
+    "mech|no-ammo|invalid|fighter|forest",
+    "mech|no-ammo|invalid|fighter|headquarters",
+    "mech|no-ammo|invalid|fighter|lab",
+    "mech|no-ammo|invalid|fighter|missile-silo",
+    "mech|no-ammo|invalid|fighter|mountain",
+    "mech|no-ammo|invalid|fighter|plain",
+    "mech|no-ammo|invalid|fighter|port",
+    "mech|no-ammo|invalid|fighter|reef",
+    "mech|no-ammo|invalid|fighter|river",
+    "mech|no-ammo|invalid|fighter|road",
+    "mech|no-ammo|invalid|fighter|sea",
+    "mech|no-ammo|invalid|fighter|shoal",
+    "mech|no-ammo|invalid|lander|port",
+    "mech|no-ammo|invalid|lander|reef",
+    "mech|no-ammo|invalid|lander|sea",
+    "mech|no-ammo|invalid|lander|shoal",
+    "mech|no-ammo|invalid|stealth|airport",
+    "mech|no-ammo|invalid|stealth|base",
+    "mech|no-ammo|invalid|stealth|bridge",
+    "mech|no-ammo|invalid|stealth|city",
+    "mech|no-ammo|invalid|stealth|com-tower",
+    "mech|no-ammo|invalid|stealth|forest",
+    "mech|no-ammo|invalid|stealth|headquarters",
+    "mech|no-ammo|invalid|stealth|lab",
+    "mech|no-ammo|invalid|stealth|missile-silo",
+    "mech|no-ammo|invalid|stealth|mountain",
+    "mech|no-ammo|invalid|stealth|plain",
+    "mech|no-ammo|invalid|stealth|port",
+    "mech|no-ammo|invalid|stealth|reef",
+    "mech|no-ammo|invalid|stealth|river",
+    "mech|no-ammo|invalid|stealth|road",
+    "mech|no-ammo|invalid|stealth|sea",
+    "mech|no-ammo|invalid|stealth|shoal",
+    "mech|no-ammo|invalid|sub|port",
+    "mech|no-ammo|invalid|sub|reef",
+    "mech|no-ammo|invalid|sub|sea",
+    "mech|no-ammo|invalid|empty|road",
+    "mech|no-ammo|invalid|friendly-infantry|road"
+  ]
+}

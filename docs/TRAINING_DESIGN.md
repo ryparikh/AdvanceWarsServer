@@ -52,6 +52,8 @@ Replay data should be versioned and compact. Each sample should include:
 
 Do not store dense legal masks in replay. A dense mask for `standard-gl-v1` is about 1.55 MB per state, which grows too quickly. Materialize dense masks only for the active training batch if the loss implementation needs them.
 
+The v1 C++ replay writer emits sparse JSONL shards using `standard-gl-self-play-replay-v1`; see `docs/SELF_PLAY_REPLAYS.md` for the command and schema. The canonical replay stores full initial/final engine states, raw action history, sparse legal action indices, sparse positive MCTS visit counts, per-sample tensor checksums, and current-player-relative outcomes. Dense tensors and masks remain derived data.
+
 ## Training Loop
 
 Training should sample replay positions, rebuild tensors, expand sparse legal indices for masking, and optimize two losses:
@@ -77,4 +79,4 @@ CO matchup and pregame selection metrics should feed the later CO picker, not th
 
 ## Recommended First Milestone
 
-The first useful milestone is a single-worker self-play runner that writes sparse replay shards from deterministic games on a small Standard GL map set. Once replay validation is reliable, add the neural trainer and only then scale to parallel self-play workers.
+The first useful milestone is a single-worker self-play runner that writes validated sparse replay shards from deterministic games on a small Standard GL map set. Once replay validation is reliable, add the neural trainer and only then scale to parallel self-play workers.

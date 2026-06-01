@@ -8,6 +8,8 @@
 #include "AdvanceWarsServer.h"
 #include "MonteCarloTreeSearch.h"
 #include "MctsTest.h"
+#include "SelfPlayReplayTest.h"
+#include "SelfPlayRunner.h"
 #include "SubsystemTest.h"
 #include "Platform.h"
 #include <torch/torch.h>
@@ -21,7 +23,10 @@ int main(int argc, char* argv[]) noexcept {
 			std::cerr << "Options:\n";
 			std::cerr << "  -sim-random-move-game [seed] : Simulate a random move game.\n";
 			std::cerr << "  -sim-mcts-game        : Simulate an MCTS game.\n";
+			std::cerr << "  -self-play [options]  : Generate validated self-play replay JSONL.\n";
+			std::cerr << "  -validate-replay <path> : Validate a self-play replay JSONL file.\n";
 			std::cerr << "  -test-mcts            : Run focused MCTS tests.\n";
+			std::cerr << "  -test-replay          : Run focused self-play replay tests.\n";
 			std::cerr << "  -server               : Act as game server.\n";
 			return 1; // Return an error code
 		}
@@ -265,6 +270,15 @@ int main(int argc, char* argv[]) noexcept {
 		}
 		else if (argument == "-test-mcts") {
 			return RunMctsTests();
+		}
+		else if (argument == "-test-replay") {
+			return RunSelfPlayReplayTests();
+		}
+		else if (argument == "-self-play") {
+			return RunSelfPlayCommand(argc - 2, argv + 2);
+		}
+		else if (argument == "-validate-replay") {
+			return RunValidateReplayCommand(argc - 2, argv + 2);
 		}
 		else if (argument == "-server") {
 			return AdvanceWarsServer::getInstance().run();

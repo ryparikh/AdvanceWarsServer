@@ -34,7 +34,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [ ] Add a small environment wrapper around `GameState`; the REST/self-play API contract is tracked by #66.
 - [ ] Expose `reset`, `legalActions`, `step`, `isTerminal`, `currentPlayer`, and `winner` operations.
 - [ ] Add stable state serialization for replay data.
-- [ ] Add state tensor encoding in `Tensor.cpp` (#3).
+- [x] Add state tensor encoding in `Tensor.cpp` (#3).
 - [ ] Add a stable action encoding scheme for every `Action` variant (#4).
 - [ ] Add legal action masks aligned with the action encoding (#4).
 - [ ] Add tests proving encode/decode preserves actions, including move-attack, unload, buy, powers, and end-turn.
@@ -62,7 +62,7 @@ The rules/API completeness target for the initial playable environment is normal
 
 ## Phase 4: Neural Network
 
-- [ ] Define model input planes for terrain, ownership, units, health, ammo, fuel, moved flags, capture points, funds, powers, turn/player context, and optional fog state.
+- [x] Define model input planes via `standard-gl-v1-state` in `docs/STATE_TENSOR.md`.
 - [ ] Define policy head output shape matching the action encoding.
 - [ ] Define value head output as win/loss value from the current player's perspective.
 - [ ] Add model save/load checkpoints.
@@ -89,7 +89,7 @@ The rules/API completeness target for the initial playable environment is normal
 ## Candidate GitHub Issues
 
 - [x] #2 Create deterministic combat RNG for self-play.
-- [ ] #3 Implement state tensor encoding.
+- [x] #3 Implement state tensor encoding.
 - [ ] #4 Implement action encoding and legal action masks.
 - [ ] #5 Refactor MCTS for action-level self-play and same-player turn sequences.
 - [ ] #6 Add self-play replay writer.

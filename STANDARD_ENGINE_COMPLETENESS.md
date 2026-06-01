@@ -1,6 +1,6 @@
 # Standard Engine Completeness Matrix
 
-Last reviewed: 2026-05-25
+Last reviewed: 2026-06-01
 
 This document tracks the simulator against the first playable target: normal Advance Wars By Web Global League Standard games that can be driven through a REST API or AI training loop. Local source code and JSON fixtures are the source of truth for current implementation behavior. The gameplay target is checked against the local report at `C:\Users\Roshan\Downloads\advance-wars-by-web-report.md` and the [Advance Wars By Web Wiki](https://awbw.fandom.com/wiki/Advance_Wars_By_Web_Wiki), especially [Metagame](https://awbw.fandom.com/wiki/Metagame), [AWBW Guide](https://awbw.fandom.com/wiki/AWBW_Guide), [Units](https://awbw.fandom.com/wiki/Units), [Properties](https://awbw.fandom.com/wiki/Properties), [Damage Formula](https://awbw.fandom.com/wiki/Damage_Formula), [CO](https://awbw.fandom.com/wiki/CO), and [Changes in AWBW](https://awbw.fandom.com/wiki/Changes_in_AWBW).
 
@@ -65,7 +65,7 @@ Explicitly deferred modes and options:
 | Submitted action validation | Legal actions are generated, but direct submitted actions can bypass some validation or mutate before failing. | Submitted actions are validated and rejected atomically. | Partial | #67 |
 | Step semantics | REST action application commits exactly the submitted action and can report an `EndTurn`-only legal-action list without advancing. | One submitted action causes exactly one committed action. | Complete | #68 |
 | Terminal reasons | HQ capture, lab win, rout/fuel-out behavior exist. Canonical Standard/API stepping does not auto-resign by heuristic army value unless `heuristicAutoResign` is explicitly enabled. | Terminal reason should be explicit: HQ, lab, rout, capture limit, day limit, timeout, resign, or opt-in heuristic resign. | Partial | #74, #77, #82 |
-| State tensor | `Tensor.cpp` exists as planned home. | Deterministic current-player-relative tensor. | Partial | #3 |
+| State tensor | `StateTensor` exposes the deterministic `standard-gl-v1-state` current-player-relative tensor with JSON fixture coverage. | Deterministic current-player-relative tensor. | Complete for v1 | none |
 | Action encoding and masks | `Action` variants and legal action generation exist. | Stable encoded action space plus mask. | Partial | #4 |
 | MCTS sequence handling | Existing MCTS needs action-level self-play cleanup. | Same-player action sequences backed up correctly until `EndTurn`. | Partial | #5 |
 | Replay writer | Not complete. | Versioned self-play samples and reconstructable action history. | Partial | #6 |
@@ -169,7 +169,6 @@ Detailed implementation notes live in `CO_SUPPORT.md`.
 
 Training loop:
 
-- #3: Implement state tensor encoding.
 - #4: Implement action encoding and legal action masks.
 - #5: Refactor MCTS for action-level self-play and same-player turn sequences.
 - #6: Add self-play replay writer.

@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,7 +150,7 @@
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include\torch\csrc\api\include;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include\torch\csrc\api\include;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -201,6 +201,7 @@
     <ClInclude Include="inc\Result.h" />
     <ClInclude Include="inc\RestGameService.h" />
     <ClInclude Include="inc\Reward.h" />
+    <ClInclude Include="inc\StateTensor.h" />
     <ClInclude Include="inc\SubsystemTest.h" />
     <ClInclude Include="inc\Terrain.h" />
     <ClInclude Include="inc\TerrainFileId.h" />

@@ -7,7 +7,7 @@
 
 struct PropertyInfo{
 	int m_capturePoints = 20;
-	const Player* m_owner;
+	const Player* m_owner{ nullptr };
 };
 
 class MapTile final

@@ -14,9 +14,12 @@ struct JsonSubsystemTest {
 	bool fDeterministicReplay{ false };
 	json actionSpace;
 	json legalActionMask;
+	json stateTensor;
 	bool fHasActionSpace{ false };
 	bool fHasLegalActionMask{ false };
 	bool fLegalActionMaskShouldFail{ false };
+	bool fHasStateTensor{ false };
+	bool fStateTensorShouldFail{ false };
 };
 
 void from_json(json& j, JsonSubsystemTest& test);

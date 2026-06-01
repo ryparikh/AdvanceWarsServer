@@ -68,7 +68,7 @@ Explicitly deferred modes and options:
 | State tensor | `StateTensor` exposes the deterministic `standard-gl-v1-state` current-player-relative tensor with JSON fixture coverage. | Deterministic current-player-relative tensor. | Complete for v1 | none |
 | Action encoding and masks | `Action` variants and legal action generation exist. | Stable encoded action space plus mask. | Partial | #4 |
 | MCTS sequence handling | Existing MCTS needs action-level self-play cleanup. | Same-player action sequences backed up correctly until `EndTurn`. | Partial | #5 |
-| Replay writer | Not complete. | Versioned self-play samples and reconstructable action history. | Partial | #6 |
+| Replay writer | `-self-play` writes validated sparse `standard-gl-self-play-replay-v1` JSONL shards with full initial/final states, action history, sparse legal action indices, sparse MCTS visit counts, per-sample tensor checksums, outcomes, and metrics. `-validate-replay` reconstructs and checks shards. | Versioned self-play samples and reconstructable action history. | Complete for v1 sparse replay | #172, #173, #174 for cache/orchestration/compression |
 | Policy/value scaffold | Not complete. | Model input/output aligned with tensor/action encodings. | Partial | #7 |
 | Training entry point | Not complete. | Train from replay data and write checkpoints. | Partial | #8 |
 | Evaluation harness | Not complete. | Deterministic checkpoint evaluation against baselines. | Partial | #9 |
@@ -172,6 +172,9 @@ Training loop:
 - #4: Implement action encoding and legal action masks.
 - #5: Refactor MCTS for action-level self-play and same-player turn sequences.
 - #6: Add self-play replay writer.
+- #172: Add optional materialized replay cache for faster training loads.
+- #173: Add self-play orchestration for map pools, matchups, and side balancing.
+- #174: Add compressed self-play replay shard support.
 - #7: Add policy/value network scaffold.
 - #8: Add training command-line entry point.
 - #9: Add checkpoint evaluation harness.

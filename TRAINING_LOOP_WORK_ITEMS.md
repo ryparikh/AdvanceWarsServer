@@ -26,7 +26,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] Fix capture-limit property counting. Capture-limit wins count Cities, Bases, Airports, Ports, and HQs, excluding Labs and Com Towers (#73).
 - [ ] Audit unit count caching around load/unload, clone, add, and destroy paths before relying on unit-cap logic in training.
 - [ ] Replace hardcoded local paths such as `D:/awai`, `D:/MNIST`, and local libtorch directories with config or command-line options.
-- [ ] Add a maximum turn/action limit outcome for self-play games so training cannot hang indefinitely. Coordinate with day-limit and terminal metadata work in #74 and #82.
+- [x] Add a maximum action limit outcome for self-play games so training cannot hang indefinitely. `-self-play` records `terminalReason: "action-limit"` and null winner for runner safety stops (#6).
 - [x] Make combat RNG deterministic, seedable, or policy-controlled from the self-play runner (#2).
 
 ## Phase 1: Trainable Environment API
@@ -52,12 +52,12 @@ The rules/API completeness target for the initial playable environment is normal
 
 ## Phase 3: Self-Play Data Generation
 
-- [ ] Add a self-play command-line entry point.
-- [ ] Generate games using MCTS-selected actions.
-- [ ] Record each training sample as state tensor, legal action mask, MCTS visit policy, current player, and final outcome.
-- [ ] Store replay data in a versioned format.
-- [ ] Add replay validation that can reconstruct a game from recorded actions.
-- [ ] Add basic metrics: game length, winner, resignations, average branching factor, and search time per move.
+- [x] Add a self-play command-line entry point (`-self-play`).
+- [x] Generate games using MCTS-selected atomic actions.
+- [x] Record each training sample as a reconstructable sparse row: tensor checksum, sparse legal action indices, positive MCTS visit counts, current player, selected action index, and final outcome.
+- [x] Store replay data in the versioned `standard-gl-self-play-replay-v1` JSONL format.
+- [x] Add replay validation that reconstructs a game from recorded actions (`-validate-replay`).
+- [x] Add basic metrics: action count, turn count, winner, resignations, average branching factor, invalid action count, and search time per action.
 - [ ] Add parallel self-play workers after the single-worker path is reliable.
 
 ## Phase 4: Neural Network
@@ -82,7 +82,7 @@ The rules/API completeness target for the initial playable environment is normal
 
 - [ ] Add head-to-head evaluation between checkpoints.
 - [ ] Add random-player and heuristic-player baselines.
-- [ ] Add deterministic smoke tests for short self-play games.
+- [x] Add deterministic smoke tests for short self-play games (`-test-replay`).
 - [ ] Track win rate, average value loss, policy loss, game length, invalid action count, and search throughput.
 - [ ] Add regression maps that cover captures, purchases, transport logic, indirect combat, powers, and end-game conditions.
 
@@ -92,13 +92,16 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] #3 Implement state tensor encoding.
 - [ ] #4 Implement action encoding and legal action masks.
 - [ ] #5 Refactor MCTS for action-level self-play and same-player turn sequences.
-- [ ] #6 Add self-play replay writer.
+- [x] #6 Add self-play replay writer.
 - [ ] #7 Add policy/value network scaffold.
 - [ ] #8 Add training command-line entry point.
 - [ ] #9 Add checkpoint evaluation harness.
 - [ ] #166 Add neural-guided MCTS with PUCT.
 - [ ] #167 Add reusable MCTS search tree re-rooting.
 - [ ] #168 Add wall-clock MCTS search limits.
+- [ ] #172 Add optional materialized replay cache for faster training loads.
+- [ ] #173 Add self-play orchestration for map pools, matchups, and side balancing.
+- [ ] #174 Add compressed self-play replay shard support.
 - [ ] #65 Define and enforce normal Global League Standard game settings.
 - [ ] #66 Add REST game lifecycle and step API contract for self-play.
 - [ ] #67 Validate and atomically reject illegal submitted actions.

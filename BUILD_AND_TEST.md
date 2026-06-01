@@ -32,6 +32,7 @@ Set-Location .\AdvanceWarsServer
 ..\x64\Debug\AdvanceWarsServer.exe -test test/json
 ..\x64\Debug\AdvanceWarsServer.exe -test-api-contract
 ..\x64\Debug\AdvanceWarsServer.exe -test-mcts
+..\x64\Debug\AdvanceWarsServer.exe -test-replay
 ```
 
 Release:
@@ -56,6 +57,9 @@ The executable currently recognizes these development commands:
 | `-test [path]` | Run the recursive JSON fixture suite. | Defaults to `test/json`. Run from `AdvanceWarsServer/` so relative paths resolve. |
 | `-test-api-contract` | Run focused REST lifecycle/action contract tests. | Run from `AdvanceWarsServer/` so map templates and fixtures resolve. |
 | `-test-mcts` | Run focused MCTS contract tests. | Uses scripted fake states for deterministic search semantics. |
+| `-test-replay` | Run focused self-play replay writer/validator tests. | Writes temporary replay shards and cleans them up on success. |
+| `-self-play --out <path> --map <id> --player0-co <id> --player1-co <id> [options]` | Generate validated sparse self-play replay JSONL. | Fails if `--out` exists unless `--append` is passed. See `docs/SELF_PLAY_REPLAYS.md`. |
+| `-validate-replay <path>` | Validate a self-play replay JSONL shard. | Prints a concise summary on success and exact failure location on error. |
 | `-sim-random-move-game [seed]` | Run an experimental random-action simulation. | Uses local output paths that still need cleanup before general use. |
 | `-sim-mcts-game` | Run an experimental MCTS simulation. | Uses local output paths that still need cleanup before general use. |
 | `-server` | Run the current HTTP server on port 80. | Serves the canonical REST routes documented in `docs/API.md`. |
@@ -95,3 +99,4 @@ Set-Location .\AdvanceWarsServer
 - `STANDARD_ENGINE_COMPLETENESS.md`: current Standard rules/API matrix.
 - `docs/API.md`: current and target API shape.
 - `docs/JSON_FIXTURES.md`: fixture authoring guide.
+- `docs/SELF_PLAY_REPLAYS.md`: self-play replay command and schema reference.

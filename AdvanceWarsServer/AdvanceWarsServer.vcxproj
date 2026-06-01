@@ -173,6 +173,10 @@
     <ClCompile Include="src\MctsTest.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\RestGameService.cpp" />
+    <ClCompile Include="src\SelfPlayReplay.cpp" />
+    <ClCompile Include="src\SelfPlayReplayTest.cpp" />
+    <ClCompile Include="src\SelfPlayRunner.cpp" />
+    <ClCompile Include="src\StandardGameSetup.cpp" />
     <ClCompile Include="src\Tensor.cpp" />
     <ClCompile Include="src\TerrainInfo.cpp" />
     <ClCompile Include="src\Unit.cpp" />
@@ -200,7 +204,11 @@
     <ClInclude Include="inc\Player.h" />
     <ClInclude Include="inc\Result.h" />
     <ClInclude Include="inc\RestGameService.h" />
+    <ClInclude Include="inc\SelfPlayReplay.h" />
+    <ClInclude Include="inc\SelfPlayReplayTest.h" />
+    <ClInclude Include="inc\SelfPlayRunner.h" />
     <ClInclude Include="inc\Reward.h" />
+    <ClInclude Include="inc\StandardGameSetup.h" />
     <ClInclude Include="inc\StateTensor.h" />
     <ClInclude Include="inc\SubsystemTest.h" />
     <ClInclude Include="inc\Terrain.h" />

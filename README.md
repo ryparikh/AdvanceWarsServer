@@ -37,6 +37,7 @@ See [STANDARD_ENGINE_COMPLETENESS.md](STANDARD_ENGINE_COMPLETENESS.md) for the c
 | `TRAINING_LOOP_WORK_ITEMS.md` | Self-play, MCTS, tensor, model, and training-loop roadmap. |
 | `docs/API.md` | Current and target REST/API contract notes. |
 | `docs/TRAINING_DESIGN.md` | Recommended self-play training architecture and data flow. |
+| `docs/SELF_PLAY_REPLAYS.md` | Self-play replay JSONL command and schema reference. |
 | `docs/JSON_FIXTURES.md` | JSON regression fixture format and authoring guide. |
 
 ## Quick Start
@@ -61,6 +62,16 @@ Run a focused subset:
 ```
 
 More command details are in [BUILD_AND_TEST.md](BUILD_AND_TEST.md).
+
+Generate and validate a small self-play replay shard:
+
+```powershell
+Set-Location .\AdvanceWarsServer
+..\x64\Debug\AdvanceWarsServer.exe -self-play --out ..\artifacts\replays\smoke.jsonl --map mcts --player0-co andy --player1-co adder --games 1 --max-actions 1000 --mcts-simulations 128
+..\x64\Debug\AdvanceWarsServer.exe -validate-replay ..\artifacts\replays\smoke.jsonl
+```
+
+Replay schema details are in [docs/SELF_PLAY_REPLAYS.md](docs/SELF_PLAY_REPLAYS.md).
 
 ## Development Workflow
 

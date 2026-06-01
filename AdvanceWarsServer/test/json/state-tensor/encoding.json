@@ -1,0 +1,131 @@
+{
+  "initial-game-state": {
+    "activePlayer": 0,
+    "cap-limit": 10,
+    "game-over": false,
+    "gameId": "state-tensor-encoding",
+    "map": [
+      [
+        {
+          "property": { "capture-points": 15, "owner": "neutral" },
+          "terrain": 34,
+          "unit": { "ammo": 0, "fuel": 99, "health": 87, "hidden": false, "moved": false, "owner": "orange-star", "type": "infantry" }
+        },
+        {
+          "terrain": 1,
+          "unit": { "ammo": 5, "fuel": 50, "health": 73, "hidden": false, "moved": true, "owner": "blue-moon", "type": "tank" }
+        },
+        { "property": { "capture-points": 20, "owner": "orange-star" }, "terrain": 38 },
+        { "property": { "capture-points": 20, "owner": "blue-moon" }, "terrain": 44 },
+        {
+          "terrain": 28,
+          "unit": { "ammo": 6, "fuel": 60, "health": 100, "hidden": true, "moved": false, "owner": "blue-moon", "type": "sub" }
+        }
+      ],
+      [
+        {
+          "terrain": 1,
+          "unit": {
+            "ammo": 0,
+            "fuel": 60,
+            "health": 100,
+            "hidden": false,
+            "loaded-units": [
+              { "ammo": 0, "fuel": 99, "health": 100, "hidden": false, "moved": false, "owner": "orange-star", "type": "infantry" },
+              { "ammo": 3, "fuel": 70, "health": 44, "hidden": false, "moved": false, "owner": "orange-star", "type": "mech" }
+            ],
+            "moved": false,
+            "owner": "orange-star",
+            "type": "apc"
+          }
+        },
+        { "terrain": 1 },
+        { "terrain": 1 },
+        { "terrain": 1 },
+        { "terrain": 1 }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Sasha",
+        "funds": 25000,
+        "power-meter": { "charge": 27000, "cop-stars": 2, "scop-stars": 4, "star-value": 9000 },
+        "power-status": 0,
+        "luck-policy": 1
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Sonja",
+        "funds": 10000,
+        "power-meter": { "charge": 0, "cop-stars": 3, "scop-stars": 2, "star-value": 9000 },
+        "power-status": 2,
+        "luck-policy": 2
+      }
+    ],
+    "turn-count": 15,
+    "unit-cap": 50,
+    "weather": "rain",
+    "weather-turns-remaining": 2,
+    "winner": -1
+  },
+  "stateTensor": {
+    "version": "standard-gl-v1-state",
+    "width": 27,
+    "height": 23,
+    "channels": 219,
+    "channelIndices": [
+      { "channel": "in-bounds", "index": 0 },
+      { "channel": "self-unit/infantry", "index": 34 },
+      { "channel": "opponent-health-known", "index": 85 },
+      { "channel": "turn-count", "index": 214 },
+      { "channel": "weather-turns-remaining", "index": 218 }
+    ],
+    "values": [
+      { "channel": "in-bounds", "at": [0, 0], "value": 1.0 },
+      { "channel": "in-bounds", "at": [5, 0], "value": 0.0 },
+      { "channel": "terrain/city", "at": [0, 0], "value": 1.0 },
+      { "channel": "terrain/plain", "at": [1, 0], "value": 1.0 },
+      { "channel": "terrain/sea", "at": [4, 0], "value": 1.0 },
+      { "channel": "property-neutral", "at": [0, 0], "value": 1.0 },
+      { "channel": "property-capture-points", "at": [0, 0], "value": 0.75 },
+      { "channel": "property-self", "at": [2, 0], "value": 1.0 },
+      { "channel": "property-opponent", "at": [3, 0], "value": 1.0 },
+      { "channel": "self-unit/infantry", "at": [0, 0], "value": 1.0 },
+      { "channel": "self-health", "at": [0, 0], "value": 0.9 },
+      { "channel": "self-fuel", "at": [0, 0], "value": 1.0 },
+      { "channel": "opponent-unit/tank", "at": [1, 0], "value": 1.0 },
+      { "channel": "opponent-health", "at": [1, 0], "value": 0.0 },
+      { "channel": "opponent-health-known", "at": [1, 0], "value": 0.0 },
+      { "channel": "opponent-ammo", "at": [1, 0], "value": 0.5555555556 },
+      { "channel": "opponent-moved", "at": [1, 0], "value": 1.0 },
+      { "channel": "opponent-unit/sub", "at": [4, 0], "value": 0.0 },
+      { "channel": "opponent-hidden", "at": [4, 0], "value": 0.0 },
+      { "channel": "self-unit/apc", "at": [0, 1], "value": 1.0 },
+      { "channel": "self-loaded-count", "at": [0, 1], "value": 1.0 },
+      { "channel": "self-loaded/infantry", "at": [0, 1], "value": 0.5 },
+      { "channel": "self-loaded/mech", "at": [0, 1], "value": 0.5 },
+      { "channel": "self-loaded-health", "at": [0, 1], "value": 0.75 },
+      { "channel": "self-funds", "at": [0, 0], "value": 0.5 },
+      { "channel": "opponent-funds", "at": [0, 0], "value": 0.2 },
+      { "channel": "self-income", "at": [0, 0], "value": 0.022 },
+      { "channel": "opponent-income", "at": [0, 0], "value": 0.02 },
+      { "channel": "self-unit-count", "at": [0, 0], "value": 0.08 },
+      { "channel": "opponent-unit-count", "at": [0, 0], "value": 0.02 },
+      { "channel": "self-army-value", "at": [0, 0], "value": 0.0042 },
+      { "channel": "opponent-army-value", "at": [0, 0], "value": 0.0 },
+      { "channel": "self-capture-progress", "at": [0, 0], "value": 0.1 },
+      { "channel": "opponent-capture-progress", "at": [0, 0], "value": 0.1 },
+      { "channel": "self-co/sasha", "at": [0, 0], "value": 1.0 },
+      { "channel": "opponent-co/sonja", "at": [0, 0], "value": 1.0 },
+      { "channel": "self-power-normal", "at": [0, 0], "value": 1.0 },
+      { "channel": "self-power-charge", "at": [0, 0], "value": 0.5 },
+      { "channel": "opponent-power-scop-active", "at": [0, 0], "value": 1.0 },
+      { "channel": "turn-count", "at": [0, 0], "value": 0.5 },
+      { "channel": "weather-rain", "at": [0, 0], "value": 1.0 },
+      { "channel": "weather-clear", "at": [0, 0], "value": 0.0 },
+      { "channel": "weather-turns-remaining", "at": [0, 0], "value": 0.6666666667 },
+      { "channel": "self-funds", "at": [5, 0], "value": 0.0 }
+    ]
+  }
+}

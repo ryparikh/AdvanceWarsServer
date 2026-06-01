@@ -1931,6 +1931,54 @@ int GameState::CountOwnedProperties(const Player& player) const noexcept {
 	return properties;
 }
 
+int GameState::GetIncomeForPlayer(int playerIndex) const noexcept {
+	if (m_spmap == nullptr || playerIndex < 0 || playerIndex >= static_cast<int>(m_arrPlayers.size())) {
+		return 0;
+	}
+
+	int income = 0;
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			const MapTile* pTile = nullptr;
+			if (m_spmap->TryGetTile(x, y, &pTile) == Result::Failed || pTile == nullptr) {
+				continue;
+			}
+
+			if (pTile->m_spPropertyInfo != nullptr &&
+				pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[playerIndex] &&
+				FProducesIncome(pTile->GetTerrain().m_type)) {
+				income += GetCOIncomeForProperty(m_arrPlayers[playerIndex], pTile->GetTerrain().m_type);
+			}
+		}
+	}
+
+	return income;
+}
+
+int GameState::CountCaptureLimitPropertiesForPlayer(int playerIndex) const noexcept {
+	if (m_spmap == nullptr || playerIndex < 0 || playerIndex >= static_cast<int>(m_arrPlayers.size())) {
+		return 0;
+	}
+
+	int properties = 0;
+	for (int x = 0; x < m_spmap->GetCols(); ++x) {
+		for (int y = 0; y < m_spmap->GetRows(); ++y) {
+			const MapTile* pTile = nullptr;
+			if (m_spmap->TryGetTile(x, y, &pTile) == Result::Failed || pTile == nullptr) {
+				continue;
+			}
+
+			if (pTile->m_spPropertyInfo != nullptr &&
+				pTile->m_spPropertyInfo->m_owner == &m_arrPlayers[playerIndex] &&
+				FProducesIncome(pTile->GetTerrain().m_type)) {
+				++properties;
+			}
+		}
+	}
+
+	return properties;
+}
+
 int GameState::RollCombatLuck(int min, int max) {
 	std::uniform_int_distribution<int> distribution(min, max);
 	if (m_combatRng.has_value()) {

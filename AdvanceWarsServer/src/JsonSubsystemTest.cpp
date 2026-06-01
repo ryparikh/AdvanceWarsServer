@@ -1,12 +1,14 @@
 #include "SubsystemTest.h"
 
 #include <fstream>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <unordered_set>
 
 #include "ActionSpace.h"
 #include "GameState.h"
+#include "StateTensor.h"
 
 namespace {
 void SetMismatch(std::string& expected, std::string& actual, const std::string& message, const std::string& expectedValue, const std::string& actualValue) {
@@ -321,6 +323,97 @@ Result RunLegalActionMaskAssertions(const GameState& gameState, const json& lega
 
 	return Result::Succeeded;
 }
+
+Result RunStateTensorAssertions(const GameState& gameState, const json& stateTensor, bool shouldFail, std::string& expected, std::string& actual) {
+	std::vector<float> values;
+	Result result = StateTensor::Encode(gameState, values);
+	if (shouldFail) {
+		if (result == Result::Succeeded) {
+			SetMismatch(expected, actual, "state tensor encoding should fail", "failed", "succeeded");
+			return Result::Failed;
+		}
+
+		return Result::Succeeded;
+	}
+
+	if (result == Result::Failed) {
+		SetMismatch(expected, actual, "state tensor encoding should succeed", "succeeded", "failed");
+		return Result::Failed;
+	}
+
+	if (stateTensor.contains("version")) {
+		json actualVersion = StateTensor::Version();
+		IfFailedReturn(ExpectJsonValue(actualVersion, stateTensor.at("version"), "state tensor version", expected, actual));
+	}
+
+	if (stateTensor.contains("width")) {
+		json actualWidth = StateTensor::BoardWidth();
+		IfFailedReturn(ExpectJsonValue(actualWidth, stateTensor.at("width"), "state tensor width", expected, actual));
+	}
+
+	if (stateTensor.contains("height")) {
+		json actualHeight = StateTensor::BoardHeight();
+		IfFailedReturn(ExpectJsonValue(actualHeight, stateTensor.at("height"), "state tensor height", expected, actual));
+	}
+
+	if (stateTensor.contains("channels")) {
+		json actualChannels = StateTensor::ChannelCount();
+		IfFailedReturn(ExpectJsonValue(actualChannels, stateTensor.at("channels"), "state tensor channels", expected, actual));
+	}
+
+	const std::size_t expectedValueCount = static_cast<std::size_t>(StateTensor::ChannelCount() * StateTensor::BoardWidth() * StateTensor::BoardHeight());
+	if (values.size() != expectedValueCount) {
+		SetMismatch(expected, actual, "state tensor value count", std::to_string(expectedValueCount), std::to_string(values.size()));
+		return Result::Failed;
+	}
+
+	if (stateTensor.contains("channelIndices")) {
+		for (const json& channelIndexJson : stateTensor.at("channelIndices")) {
+			const std::string channel = channelIndexJson.at("channel").get<std::string>();
+			int channelIndex = -1;
+			if (StateTensor::ChannelIndex(channel, channelIndex) == Result::Failed) {
+				SetMismatch(expected, actual, "state tensor channel should exist", channel, "missing");
+				return Result::Failed;
+			}
+
+			const int expectedIndex = channelIndexJson.at("index").get<int>();
+			if (channelIndex != expectedIndex) {
+				SetMismatch(expected, actual, "state tensor channel index for " + channel, std::to_string(expectedIndex), std::to_string(channelIndex));
+				return Result::Failed;
+			}
+		}
+	}
+
+	const double tolerance = stateTensor.value("tolerance", 0.000001);
+	if (stateTensor.contains("values")) {
+		for (const json& valueJson : stateTensor.at("values")) {
+			const std::string channel = valueJson.at("channel").get<std::string>();
+			const int x = valueJson.at("at").at(0).get<int>();
+			const int y = valueJson.at("at").at(1).get<int>();
+			const double expectedValue = valueJson.at("value").get<double>();
+
+			int channelIndex = -1;
+			if (StateTensor::ChannelIndex(channel, channelIndex) == Result::Failed) {
+				SetMismatch(expected, actual, "state tensor channel should exist", channel, "missing");
+				return Result::Failed;
+			}
+
+			const int valueIndex = channelIndex * StateTensor::BoardWidth() * StateTensor::BoardHeight() + y * StateTensor::BoardWidth() + x;
+			if (valueIndex < 0 || valueIndex >= static_cast<int>(values.size())) {
+				SetMismatch(expected, actual, "state tensor coordinate should be in bounds", channel + " at " + std::to_string(x) + "," + std::to_string(y), "out of bounds");
+				return Result::Failed;
+			}
+
+			const double actualValue = values[valueIndex];
+			if (std::abs(actualValue - expectedValue) > tolerance) {
+				SetMismatch(expected, actual, "state tensor value for " + channel + " at " + std::to_string(x) + "," + std::to_string(y), std::to_string(expectedValue), std::to_string(actualValue));
+				return Result::Failed;
+			}
+		}
+	}
+
+	return Result::Succeeded;
+}
 }
 
 void from_json(json& j, JsonSubsystemTest& test) {
@@ -379,6 +472,16 @@ void from_json(json& j, JsonSubsystemTest& test) {
 	if (j.contains("legalActionMaskShouldFail")) {
 		j.at("legalActionMaskShouldFail").get_to(test.fLegalActionMaskShouldFail);
 		test.fHasLegalActionMask = true;
+	}
+
+	if (j.contains("stateTensor")) {
+		test.stateTensor = j.at("stateTensor");
+		test.fHasStateTensor = true;
+	}
+
+	if (j.contains("stateTensorShouldFail")) {
+		j.at("stateTensorShouldFail").get_to(test.fStateTensorShouldFail);
+		test.fHasStateTensor = true;
 	}
 }
 
@@ -498,6 +601,9 @@ Result JsonTestRunner::run() {
 		IfFailedReturn(RunLegalActionMaskAssertions(test.initialGameState, test.legalActionMask, test.fLegalActionMaskShouldFail, m_strExpected, m_strActual));
 	}
 
+	if (test.fHasStateTensor) {
+		IfFailedReturn(RunStateTensorAssertions(test.initialGameState, test.stateTensor, test.fStateTensorShouldFail, m_strExpected, m_strActual));
+	}
 
 	return Result::Succeeded;
 }

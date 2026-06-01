@@ -258,6 +258,11 @@ public:
 	const std::array<Player, 2>& GetPlayers() const noexcept;
 	std::array<Player, 2>& GetPlayers() noexcept { return m_arrPlayers; }
 	bool IsFirstPlayerTurn() const noexcept;
+	int GetTurnCount() const noexcept { return m_nTurnCount; }
+	WeatherType GetWeather() const noexcept { return m_weather; }
+	const std::optional<int>& GetWeatherTurnsRemaining() const noexcept { return m_weatherTurnsRemaining; }
+	int GetIncomeForPlayer(int playerIndex) const noexcept;
+	int CountCaptureLimitPropertiesForPlayer(int playerIndex) const noexcept;
 	Result GetValidActions(std::vector<Action>& vecActions) const noexcept;
 	Result GetValidActions(int x, int y, std::vector<Action>& vecActions) const noexcept;
 	bool AnyValidActions() const noexcept;

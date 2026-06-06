@@ -17,7 +17,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] Decide how combat luck should work during self-play. V1 uses seeded deterministic combat RNG derived from the self-play setup seed; averaged or disabled luck can remain a later experiment if training quality needs it.
 - [x] Decide whether v1 includes fog, hidden units, CO powers, transports, naval units, and all unit types. V1 targets normal Global League Standard: fog disabled, CO powers enabled, transports/naval units in scope, and Standard unit bans/settings enforced through setup.
 - [x] Decide the first map set for self-play. The bootstrap runner/API map catalog currently supports `lefty` and `mcts`; broader map pools and side balancing are tracked by #173.
-- [ ] Decide whether training should run inside the C++ executable only, or whether C++ should expose an environment API for a Python training process.
+- [x] Decide whether training should run inside the C++ executable only, or whether C++ should expose an environment API for a Python training process. V1 training stays inside the C++ executable with LibTorch; a Python environment API is deferred unless replay-driven C++ training becomes the bottleneck.
 
 ## Phase 0: Stabilize The Simulator
 

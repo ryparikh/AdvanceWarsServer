@@ -56,6 +56,8 @@ The v1 C++ replay writer emits sparse JSONL shards using `standard-gl-self-play-
 
 ## Training Loop
 
+V1 training should run inside the C++ executable with LibTorch. Do not expose a Python environment API yet; the replay shard format is the language-neutral boundary for future tools if Python becomes useful for experimentation, reporting, or distributed training.
+
 Training should sample replay positions, rebuild tensors, expand sparse legal indices for masking, and optimize two losses:
 
 - policy loss against the MCTS visit distribution

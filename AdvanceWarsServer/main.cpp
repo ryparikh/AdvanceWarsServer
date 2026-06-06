@@ -8,11 +8,12 @@
 #include "AdvanceWarsServer.h"
 #include "MonteCarloTreeSearch.h"
 #include "MctsTest.h"
+#include "PolicyValueModelCommands.h"
+#include "PolicyValueModelTest.h"
 #include "SelfPlayReplayTest.h"
 #include "SelfPlayRunner.h"
 #include "SubsystemTest.h"
 #include "Platform.h"
-#include <torch/torch.h>
 
 int RunRestApiContractTests();
 
@@ -26,78 +27,17 @@ int main(int argc, char* argv[]) noexcept {
 			std::cerr << "  -self-play [options]  : Generate validated self-play replay JSONL.\n";
 			std::cerr << "  -validate-replay <path> : Validate a self-play replay JSONL file.\n";
 			std::cerr << "  -test-mcts            : Run focused MCTS tests.\n";
+			std::cerr << "  -test-model           : Run focused policy/value model tests.\n";
 			std::cerr << "  -test-replay          : Run focused self-play replay tests.\n";
+			std::cerr << "  -model-init --out <dir> : Initialize and validate a policy/value checkpoint bundle.\n";
+			std::cerr << "  -torchlib [--mnist-path <path>] : Run a LibTorch smoke check and optional MNIST experiment.\n";
 			std::cerr << "  -server               : Act as game server.\n";
 			return 1; // Return an error code
 		}
 
 		std::string argument = argv[1];
 		if (argument == "-torchlib") {
-
-			std::cout << "CUDA support: " << (torch::cuda::is_available() ? "true" : "false") << std::endl;
-			std::cout << "CUDA devices: " << (torch::cuda::device_count()) << std::endl;
-
-			torch::Tensor tensor = torch::rand({ 2, 3 });
-			std::cout << tensor << std::endl;
-
-			struct Net : torch::nn::Module {
-				Net()
-					: conv1(torch::nn::Conv2dOptions(1, 32, 5)),
-					conv2(torch::nn::Conv2dOptions(32, 64, 5)),
-					fc1(1024, 128),
-					fc2(128, 10) {
-					register_module("conv1", conv1);
-					register_module("conv2", conv2);
-					register_module("fc1", fc1);
-					register_module("fc2", fc2);
-				}
-
-				torch::Tensor forward(torch::Tensor x) {
-					x = torch::relu(conv1->forward(x));
-					x = torch::max_pool2d(x, 2);
-					x = torch::relu(conv2->forward(x));
-					x = torch::max_pool2d(x, 2);
-					x = x.view({ x.size(0), -1 });
-					x = torch::relu(fc1->forward(x));
-					x = fc2->forward(x);
-					return torch::log_softmax(x, 1);
-				}
-
-				torch::nn::Conv2d conv1, conv2;
-				torch::nn::Linear fc1, fc2;
-			};
-			torch::Device device(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
-			std::cout << "Using device: " << (device.is_cuda() ? "CUDA" : "CPU") << "\n";
-
-			// Load MNIST dataset
-			auto train_dataset = torch::data::datasets::MNIST("D:/MNIST/MNIST/raw").map(
-				torch::data::transforms::Stack<>());
-			auto train_loader = torch::data::make_data_loader(std::move(train_dataset),
-				torch::data::DataLoaderOptions().batch_size(64));
-
-			// Initialize model, optimizer, and loss function
-			Net model;
-			model.to(device);
-			torch::optim::SGD optimizer(model.parameters(), torch::optim::SGDOptions(0.01).momentum(0.9));
-
-			// Training loop
-			for (size_t epoch = 1; epoch <= 5; ++epoch) {
-				size_t batch_idx = 0;
-				for (auto& batch : *train_loader) {
-					model.train();
-					auto data = batch.data.to(device), targets = batch.target.to(device);
-					optimizer.zero_grad();
-					auto output = model.forward(data);
-					auto loss = torch::nll_loss(output, targets);
-					loss.backward();
-					optimizer.step();
-
-					if (batch_idx++ % 100 == 0) {
-						std::cout << "Train Epoch: " << epoch << " [" << batch_idx * 64
-							<< "/60000] Loss: " << loss.item<float>() << "\n";
-					}
-				}
-			}
+			return RunTorchLibCommand(argc - 2, argv + 2);
 		}
 		else if (argument == "-sim-random-move-game") {
 			std::uint32_t randomMoveSeed = std::random_device{}();
@@ -270,6 +210,12 @@ int main(int argc, char* argv[]) noexcept {
 		}
 		else if (argument == "-test-mcts") {
 			return RunMctsTests();
+		}
+		else if (argument == "-test-model") {
+			return RunPolicyValueModelTests(argc - 2, argv + 2);
+		}
+		else if (argument == "-model-init") {
+			return RunModelInitCommand(argc - 2, argv + 2);
 		}
 		else if (argument == "-test-replay") {
 			return RunSelfPlayReplayTests();

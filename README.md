@@ -45,13 +45,16 @@ See [STANDARD_ENGINE_COMPLETENESS.md](STANDARD_ENGINE_COMPLETENESS.md) for the c
 Build the Debug x64 configuration from the repository root:
 
 ```powershell
-& 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe' 'AdvanceWarsServer.sln' /m /p:Configuration=Debug /p:Platform=x64 /v:minimal
+$libtorchRoot = 'C:\path\to\libtorch'
+& 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe' 'AdvanceWarsServer.sln' /m /p:Configuration=Debug /p:Platform=x64 /p:LIBTORCH_ROOT="$libtorchRoot" /v:minimal
 ```
 
 Run the full JSON suite from the project directory:
 
 ```powershell
 Set-Location .\AdvanceWarsServer
+$libtorchRoot = 'C:\path\to\libtorch'
+$env:PATH = "$libtorchRoot\bin;" + $env:PATH
 ..\x64\Debug\AdvanceWarsServer.exe -test test/json
 ```
 

@@ -28,6 +28,12 @@ Use a shared convolutional or residual trunk over the fixed board. The policy he
 
 The value head should output the expected game result from the current player's perspective.
 
+The v1 scaffold is `standard-gl-policy-value-v1`. It consumes `standard-gl-v1-state` tensors shaped `[N, 219, 23, 27]`, runs a small residual trunk, emits policy logits shaped `[N, ActionSpace::ActionCount()]`, and emits value predictions shaped `[N, 1]` in `[-1, 1]`. The default architecture is intentionally modest: 64 hidden channels, 4 residual blocks, and 8 group-norm groups. The command-line initializer can make smaller smoke-test models with `--hidden-channels`, `--res-blocks`, and `--norm-groups`; larger production-scale experiments are tracked separately by #177.
+
+Policy logits keep the action-space layout intact: `2503` source-cell planes over `23x27`, followed by the three global actions. MCTS and training should mask or normalize only the sparse legal action indices produced by the engine/action-space layer; the model does not infer legality from the tensor.
+
+Checkpoints are directory bundles containing both `metadata.json` and `model.pt`. `metadata.json` is the compatibility manifest: model version, state tensor version/shape, action-space version/count, policy/value output sizes, architecture knobs, seed, validated device, and parameter count. `model.pt` contains the learned weights and is required; it cannot be reconstructed from `metadata.json`.
+
 Start small enough to fit comfortably on an 8 GB GPU:
 
 - mixed precision when CUDA is available

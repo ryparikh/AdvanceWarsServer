@@ -25,7 +25,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] Fix action deserialization for `unloadIndex`; action JSON now assigns `Action::m_optUnloadIndex`, equality includes it, and REST/action-space tests cover unload-index handling (#4, #67).
 - [x] Fix capture-limit property counting. Capture-limit wins count Cities, Bases, Airports, Ports, and HQs, excluding Labs and Com Towers (#73).
 - [ ] Audit unit count caching around load/unload, clone, add, and destroy paths before relying on unit-cap logic in training.
-- [ ] Replace hardcoded local paths such as `D:/awai`, `D:/MNIST`, and local libtorch directories with config or command-line options.
+- [ ] Replace remaining hardcoded local paths such as `D:/awai` with config or command-line options. LibTorch now uses `LIBTORCH_ROOT`, and the old MNIST experiment only runs when `-torchlib --mnist-path <path>` is provided.
 - [x] Add a maximum action limit outcome for self-play games so training cannot hang indefinitely. `-self-play` records `terminalReason: "action-limit"` and null winner for runner safety stops (#6).
 - [x] Make combat RNG deterministic, seedable, or policy-controlled from the self-play runner (#2).
 
@@ -67,9 +67,11 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] Define model input planes via `standard-gl-v1-state` in `docs/STATE_TENSOR.md`.
 - [x] Define policy head output shape matching the action encoding: source-cell planes over `27x23` plus global logits in `docs/TRAINING_DESIGN.md`.
 - [x] Define value head output as expected win/loss result from the current player's perspective in `docs/TRAINING_DESIGN.md`.
-- [ ] Add model save/load checkpoints.
+- [x] Add a LibTorch policy/value model scaffold for `standard-gl-policy-value-v1` (#7).
+- [x] Add model save/load checkpoints with strict `metadata.json` compatibility checks and required `model.pt` weights (#7).
 - [ ] Add inference batching for MCTS.
-- [ ] Add CPU-only fallback so development does not depend on CUDA being configured.
+- [x] Add CPU-only fallback so development does not depend on CUDA being configured (#7).
+- [x] Add focused model smoke tests for forward shape, real Standard tensor inference, deterministic init, and checkpoint rejection (`-test-model`) (#7).
 
 ## Phase 5: Training Loop
 
@@ -98,7 +100,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] #4 Implement action encoding and legal action masks.
 - [x] #5 Refactor MCTS for action-level self-play and same-player turn sequences.
 - [x] #6 Add self-play replay writer.
-- [ ] #7 Add policy/value network scaffold.
+- [x] #7 Add policy/value network scaffold.
 - [ ] #8 Add training command-line entry point.
 - [ ] #9 Add checkpoint evaluation harness.
 - [ ] #164 Track CO matchup statistics for pregame selection.

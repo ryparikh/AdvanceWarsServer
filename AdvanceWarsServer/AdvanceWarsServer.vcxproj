@@ -69,22 +69,26 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <UseLibtorchCuda Condition="'$(UseLibtorchCuda)'==''">false</UseLibtorchCuda>
+    <LibtorchBaseDependencies>$(LIBTORCH_ROOT)\lib\c10.lib;$(LIBTORCH_ROOT)\lib\torch.lib;$(LIBTORCH_ROOT)\lib\torch_cpu.lib;$(LIBTORCH_ROOT)\lib\kineto.lib</LibtorchBaseDependencies>
+    <LibtorchCudaDependencies>$(LIBTORCH_ROOT)\lib\caffe2_nvrtc.lib;$(LIBTORCH_ROOT)\lib\c10_cuda.lib;$(LIBTORCH_ROOT)\lib\torch_cuda.lib;$(CUDA_PATH)\lib\x64\cublas.lib;$(CUDA_PATH)\lib\x64\cudart.lib;$(CUDA_PATH)\lib\x64\cufft.lib;$(CUDA_PATH)\lib\x64\curand.lib;$(CUDNN_LIB_PATH)\cudnn.lib;$(NVTOOLSEXT_PATH)\lib\x64\nvToolsExt64_1.lib;-INCLUDE:?warp_size@cuda@at@@YAHXZ</LibtorchCudaDependencies>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\include;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\include\torch\csrc\api\include;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\deps\json-develop\single_include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(LIBTORCH_ROOT)\include;$(LIBTORCH_ROOT)\include\torch\csrc\api\include;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\deps\json-develop\single_include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBTORCH_ROOT)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include\;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include\torch\csrc\api\include;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\deps\json-develop\single_include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\bin;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(LIBTORCH_ROOT)\include;$(LIBTORCH_ROOT)\include\torch\csrc\api\include;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\deps\json-develop\single_include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBTORCH_ROOT)\bin;$(LIBTORCH_ROOT)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,16 +111,19 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(UseLibtorchCuda)'!='true'">_ITERATOR_DEBUG_LEVEL=0;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(UseLibtorchCuda)'=='true'">AW_USE_LIBTORCH_CUDA;_ITERATOR_DEBUG_LEVEL=0;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)inc;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(LIBTORCH_ROOT)\include;$(LIBTORCH_ROOT)\include\torch\csrc\api\include;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>rpcrt4.lib;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib\caffe2_nvrtc.lib;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib\c10.lib;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib\c10_cuda.lib;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib\kineto.lib;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib\torch.lib;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib\torch_cpu.lib;D:\Projects\libtorch-win-shared-with-deps-debug-2.6.0+cu118\libtorch\lib\torch_cuda.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\cublas.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\cudart.lib;C:\Program Files\NVIDIA\CUDNN\v9.7\lib\11.8\x64\cudnn.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\cufft.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\curand.lib;C:\Program Files\NVIDIA Corporation\NvToolsExt\lib\x64\nvToolsExt64_1.lib;-INCLUDE:?warp_size@cuda@at@@YAHXZ;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(UseLibtorchCuda)'!='true'">rpcrt4.lib;$(LibtorchBaseDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(UseLibtorchCuda)'=='true'">rpcrt4.lib;$(LibtorchBaseDependencies);$(LibtorchCudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -147,17 +154,19 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(UseLibtorchCuda)'!='true'">_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(UseLibtorchCuda)'=='true'">AW_USE_LIBTORCH_CUDA;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)inc;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include\torch\csrc\api\include;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\include;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(LIBTORCH_ROOT)\include;$(LIBTORCH_ROOT)\include\torch\csrc\api\include;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>rpcrt4.lib;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib\caffe2_nvrtc.lib;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib\c10.lib;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib\c10_cuda.lib;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib\kineto.lib;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib\torch.lib;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib\torch_cpu.lib;D:\Projects\libtorch-win-shared-with-deps-2.6.0+cu118\libtorch\lib\torch_cuda.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\cublas.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\cudart.lib;C:\Program Files\NVIDIA\CUDNN\v9.7\lib\11.8\x64\cudnn.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\cufft.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64\curand.lib;C:\Program Files\NVIDIA Corporation\NvToolsExt\lib\x64\nvToolsExt64_1.lib;-INCLUDE:?warp_size@cuda@at@@YAHXZ;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(UseLibtorchCuda)'!='true'">rpcrt4.lib;$(LibtorchBaseDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(UseLibtorchCuda)'=='true'">rpcrt4.lib;$(LibtorchBaseDependencies);$(LibtorchCudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -172,6 +181,9 @@
     <ClCompile Include="src\MapTile.cpp" />
     <ClCompile Include="src\MctsTest.cpp" />
     <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\PolicyValueModel.cpp" />
+    <ClCompile Include="src\PolicyValueModelCommands.cpp" />
+    <ClCompile Include="src\PolicyValueModelTest.cpp" />
     <ClCompile Include="src\RestGameService.cpp" />
     <ClCompile Include="src\SelfPlayReplay.cpp" />
     <ClCompile Include="src\SelfPlayReplayTest.cpp" />
@@ -201,6 +213,9 @@
     <ClInclude Include="inc\MonteCarloTreeSearch.h" />
     <ClInclude Include="inc\MovementTypes.h" />
     <ClInclude Include="inc\Platform.h" />
+    <ClInclude Include="inc\PolicyValueModel.h" />
+    <ClInclude Include="inc\PolicyValueModelCommands.h" />
+    <ClInclude Include="inc\PolicyValueModelTest.h" />
     <ClInclude Include="inc\Player.h" />
     <ClInclude Include="inc\Result.h" />
     <ClInclude Include="inc\RestGameService.h" />

@@ -37,6 +37,7 @@ See [STANDARD_ENGINE_COMPLETENESS.md](STANDARD_ENGINE_COMPLETENESS.md) for the c
 | `TRAINING_LOOP_WORK_ITEMS.md` | Self-play, MCTS, tensor, model, and training-loop roadmap. |
 | `docs/API.md` | Current and target REST/API contract notes. |
 | `docs/TRAINING_DESIGN.md` | Recommended self-play training architecture and data flow. |
+| `docs/TRAINING_COMMAND_DESIGN.md` | Concrete v1 replay training command design and follow-up boundaries. |
 | `docs/SELF_PLAY_REPLAYS.md` | Self-play replay JSONL command and schema reference. |
 | `docs/JSON_FIXTURES.md` | JSON regression fixture format and authoring guide. |
 
@@ -75,6 +76,19 @@ Set-Location .\AdvanceWarsServer
 ```
 
 Replay schema details are in [docs/SELF_PLAY_REPLAYS.md](docs/SELF_PLAY_REPLAYS.md).
+
+Run a tiny replay-to-checkpoint training smoke test:
+
+```powershell
+Set-Location .\AdvanceWarsServer
+$libtorchRoot = 'C:\path\to\libtorch'
+$env:PATH = "$libtorchRoot\bin;" + $env:PATH
+..\x64\Debug\AdvanceWarsServer.exe -model-init --out ..\artifacts\checkpoints\seed --hidden-channels 8 --res-blocks 0 --norm-groups 1 --seed 7 --force
+..\x64\Debug\AdvanceWarsServer.exe -self-play --out ..\artifacts\replays\train-smoke.jsonl --map mcts --player0-co andy --player1-co adder --games 1 --max-actions 2 --mcts-simulations 1 --mcts-max-nodes 16
+..\x64\Debug\AdvanceWarsServer.exe -train --replay ..\artifacts\replays\train-smoke.jsonl --checkpoint-in ..\artifacts\checkpoints\seed --checkpoint-out ..\artifacts\checkpoints\trained --epochs 1 --batch-size 3 --learning-rate 0.01 --device cpu --force
+```
+
+The training command writes a new checkpoint bundle with `metadata.json`, `model.pt`, and `training.json`. Detailed trainer scope and follow-up issues are in [docs/TRAINING_COMMAND_DESIGN.md](docs/TRAINING_COMMAND_DESIGN.md).
 
 ## Development Workflow
 

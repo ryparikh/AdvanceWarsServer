@@ -36,9 +36,9 @@ Checkpoints are directory bundles containing both `metadata.json` and `model.pt`
 
 Start small enough to fit comfortably on an 8 GB GPU:
 
-- mixed precision when CUDA is available
+- float32 for the v1 `-train` command; mixed precision is deferred until trainer-state checkpointing can persist scaler state (#181)
 - small batches such as 1, 2, 4, or 8
-- gradient accumulation if a larger effective batch helps stability
+- gradient accumulation later if a larger effective batch helps stability
 - modest channel and block counts before scaling up
 
 Longer training with smaller batches is acceptable. The first priority is stable self-play and replay quality, not maximum GPU throughput.
@@ -64,10 +64,12 @@ The v1 C++ replay writer emits sparse JSONL shards using `standard-gl-self-play-
 
 V1 training should run inside the C++ executable with LibTorch. Do not expose a Python environment API yet; the replay shard format is the language-neutral boundary for future tools if Python becomes useful for experimentation, reporting, or distributed training.
 
-Training should sample replay positions, rebuild tensors, expand sparse legal indices for masking, and optimize two losses:
+The v1 `-train` command samples replay positions from validated `standard-gl-self-play-replay-v1` shards, rebuilds tensors lazily, trains only over legal action logits, writes `training.json` provenance, and optimizes two losses:
 
 - policy loss against the MCTS visit distribution
-- value loss against the final outcome
+- value MSE loss against the final outcome
+
+The first trainer uses AdamW, a constant learning rate, float32, and model-only checkpoint continuation. Streaming replay loading, optimizer-state resume, learning-rate schedules, mixed precision, and atomic checkpoint publishing are tracked separately by #180, #181, and #182. See `docs/TRAINING_COMMAND_DESIGN.md` for the concrete command contract.
 
 Checkpoints should be evaluated against the current best checkpoint on fixed maps, fixed seeds, and a held-out map set. Promote a checkpoint only when it improves head-to-head results or clearly improves selected metrics.
 

@@ -118,6 +118,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)inc;$(LIBTORCH_ROOT)\include;$(LIBTORCH_ROOT)\include\torch\csrc\api\include;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,6 +160,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)inc;$(LIBTORCH_ROOT)\include;$(LIBTORCH_ROOT)\include\torch\csrc\api\include;D:\Projects\json-develop\json-develop\include;D:\Projects\via-httplib-main\via-httplib-main\include;D:\Projects\asio-1.30.2\asio-1.30.2\include\;C:\Users\Roshan\source\repos\AdvanceWarsServer\AdvanceWarsServer\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -191,6 +193,9 @@
     <ClCompile Include="src\StandardGameSetup.cpp" />
     <ClCompile Include="src\Tensor.cpp" />
     <ClCompile Include="src\TerrainInfo.cpp" />
+    <ClCompile Include="src\Training.cpp" />
+    <ClCompile Include="src\TrainingCommand.cpp" />
+    <ClCompile Include="src\TrainingTest.cpp" />
     <ClCompile Include="src\Unit.cpp" />
     <ClCompile Include="src\UnitInfo.cpp" />
     <ClCompile Include="src\RestApiContractTest.cpp" />
@@ -229,6 +234,9 @@
     <ClInclude Include="inc\Terrain.h" />
     <ClInclude Include="inc\TerrainFileId.h" />
     <ClInclude Include="inc\TerrainInfo.h" />
+    <ClInclude Include="inc\Training.h" />
+    <ClInclude Include="inc\TrainingCommand.h" />
+    <ClInclude Include="inc\TrainingTest.h" />
     <ClInclude Include="inc\Unit.h" />
     <ClInclude Include="inc\UnitInfo.h" />
     <ClInclude Include="resource.h" />

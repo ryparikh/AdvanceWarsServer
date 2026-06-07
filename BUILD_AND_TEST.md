@@ -56,6 +56,7 @@ Set-Location .\AdvanceWarsServer
 ..\x64\Debug\AdvanceWarsServer.exe -test-mcts
 ..\x64\Debug\AdvanceWarsServer.exe -test-model
 ..\x64\Debug\AdvanceWarsServer.exe -test-replay
+..\x64\Debug\AdvanceWarsServer.exe -test-train
 ```
 
 Release:
@@ -82,9 +83,11 @@ The executable currently recognizes these development commands:
 | `-test-mcts` | Run focused MCTS contract tests. | Uses scripted fake states for deterministic search semantics. |
 | `-test-model [--device cpu|auto|cuda]` | Run focused policy/value model tests. | Verifies forward shapes, real Standard tensor inference, deterministic init, checkpoint round trip, and strict metadata rejection. |
 | `-test-replay` | Run focused self-play replay writer/validator tests. | Writes temporary replay shards and cleans them up on success. |
+| `-test-train` | Run focused replay training tests. | Generates a tiny temporary replay, trains a small model for one epoch, verifies `training.json`, and checks that model parameters changed. |
 | `-model-init --out <checkpoint-dir> [--device cpu|auto|cuda] [--hidden-channels <n>] [--res-blocks <n>] [--norm-groups <n>] [--seed <n>] [--force]` | Initialize and validate a policy/value checkpoint bundle. | Writes `metadata.json` plus `model.pt`. `model.pt` is required; it cannot be reconstructed from metadata alone. |
 | `-self-play --out <path> --map <id> --player0-co <id> --player1-co <id> [options]` | Generate validated sparse self-play replay JSONL. | Fails if `--out` exists unless `--append` is passed. See `docs/SELF_PLAY_REPLAYS.md`. |
 | `-validate-replay <path>` | Validate a self-play replay JSONL shard. | Prints a concise summary on success and exact failure location on error. |
+| `-train --replay <file-or-directory> --checkpoint-in <checkpoint-dir> --checkpoint-out <checkpoint-dir> --epochs <n> --batch-size <n> --learning-rate <x> [options]` | Train a policy/value checkpoint from replay data. | Validates replay shards, trains with AdamW in float32, writes `metadata.json`, `model.pt`, and `training.json`. Use `--max-samples` for smoke subsets and `--force` to overwrite known bundle files. |
 | `-sim-random-move-game [seed]` | Run an experimental random-action simulation. | Uses local output paths that still need cleanup before general use. |
 | `-sim-mcts-game` | Run an experimental MCTS simulation. | Uses local output paths that still need cleanup before general use. |
 | `-server` | Run the current HTTP server on port 80. | Serves the canonical REST routes documented in `docs/API.md`. |

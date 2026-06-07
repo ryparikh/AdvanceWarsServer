@@ -26,13 +26,23 @@ $libtorchRoot = 'C:\path\to\libtorch'
 & 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe' 'AdvanceWarsServer.sln' /m /p:Configuration=Release /p:Platform=x64 /p:LIBTORCH_ROOT="$libtorchRoot" /v:minimal
 ```
 
-The default build links the CPU LibTorch libraries and keeps CUDA probing disabled so development does not require a configured CUDA toolchain. To build the CUDA-enabled path, pass `/p:UseLibtorchCuda=true` and make sure `CUDA_PATH`, `CUDNN_LIB_PATH`, and `NVTOOLSEXT_PATH` resolve on the machine.
+The default build links the CPU LibTorch libraries and keeps CUDA probing disabled so development does not require a configured CUDA toolchain. For GPU training, build with CUDA enabled:
+
+```powershell
+$libtorchRoot = 'C:\path\to\libtorch'
+$cudaRoot = 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8'
+$cudnnRoot = 'C:\Program Files\NVIDIA\CUDNN\v9.7'
+$nvToolsExtRoot = 'C:\Program Files\NVIDIA Corporation\NvToolsExt'
+& 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe' 'AdvanceWarsServer.sln' /m /p:Configuration=Release /p:Platform=x64 /p:LIBTORCH_ROOT="$libtorchRoot" /p:UseLibtorchCuda=true /p:CUDA_PATH="$cudaRoot" /p:CUDNN_LIB_PATH="$cudnnRoot\lib\11.8\x64" /p:NVTOOLSEXT_PATH="$nvToolsExtRoot" /v:minimal
+```
 
 When running model commands, add the LibTorch `bin` directory to `PATH` first:
 
 ```powershell
 $libtorchRoot = 'C:\path\to\libtorch'
-$env:PATH = "$libtorchRoot\bin;" + $env:PATH
+$cudaRoot = 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8'
+$cudnnRoot = 'C:\Program Files\NVIDIA\CUDNN\v9.7'
+$env:PATH = "$libtorchRoot\bin;$cudaRoot\bin;$cudnnRoot\bin\11.8;" + $env:PATH
 ```
 
 ## Run Tests

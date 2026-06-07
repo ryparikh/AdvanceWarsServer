@@ -14,6 +14,8 @@
 #include "SelfPlayRunner.h"
 #include "SubsystemTest.h"
 #include "Platform.h"
+#include "TrainingCommand.h"
+#include "TrainingTest.h"
 
 int RunRestApiContractTests();
 
@@ -29,7 +31,9 @@ int main(int argc, char* argv[]) noexcept {
 			std::cerr << "  -test-mcts            : Run focused MCTS tests.\n";
 			std::cerr << "  -test-model           : Run focused policy/value model tests.\n";
 			std::cerr << "  -test-replay          : Run focused self-play replay tests.\n";
+			std::cerr << "  -test-train           : Run focused replay training tests.\n";
 			std::cerr << "  -model-init --out <dir> : Initialize and validate a policy/value checkpoint bundle.\n";
+			std::cerr << "  -train [options]      : Train a policy/value checkpoint from replay data.\n";
 			std::cerr << "  -torchlib [--mnist-path <path>] : Run a LibTorch smoke check and optional MNIST experiment.\n";
 			std::cerr << "  -server               : Act as game server.\n";
 			return 1; // Return an error code
@@ -220,11 +224,17 @@ int main(int argc, char* argv[]) noexcept {
 		else if (argument == "-test-replay") {
 			return RunSelfPlayReplayTests();
 		}
+		else if (argument == "-test-train") {
+			return RunTrainingTests();
+		}
 		else if (argument == "-self-play") {
 			return RunSelfPlayCommand(argc - 2, argv + 2);
 		}
 		else if (argument == "-validate-replay") {
 			return RunValidateReplayCommand(argc - 2, argv + 2);
+		}
+		else if (argument == "-train") {
+			return RunTrainingCommand(argc - 2, argv + 2);
 		}
 		else if (argument == "-server") {
 			return AdvanceWarsServer::getInstance().run();

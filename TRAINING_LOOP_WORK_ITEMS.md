@@ -75,14 +75,14 @@ The rules/API completeness target for the initial playable environment is normal
 
 ## Phase 5: Training Loop
 
-- [ ] Add supervised-style training over replay samples.
-- [ ] Train policy with cross entropy against MCTS visit distributions.
-- [ ] Train value with mean squared error or cross entropy against final outcomes.
-- [ ] Add a replay shard reader/dataset that reconstructs tensors, sparse legal indices, dense batch-local masks, visit distributions, and outcomes from `standard-gl-self-play-replay-v1`.
-- [ ] Add replay buffer sampling and retention policy.
+- [x] Add supervised-style training over replay samples (`-train`) (#8).
+- [x] Train policy with cross entropy against MCTS visit distributions over legal actions (#8).
+- [x] Train value with mean squared error against final outcomes (#8).
+- [x] Add a replay shard reader/dataset that reconstructs tensors, sparse legal indices, visit distributions, and outcomes from `standard-gl-self-play-replay-v1` (#8).
+- [x] Add in-memory seeded sample shuffling for the v1 replay buffer; streaming and bounded-buffer loading are tracked by #180.
 - [ ] Add optional materialized replay cache for faster repeated training loads (#172).
 - [ ] Add checkpoint promotion/evaluation against previous models.
-- [ ] Add command-line options for epochs, batch size, learning rate, device, checkpoint path, and replay path.
+- [x] Add command-line options for epochs, batch size, learning rate, device, checkpoint path, replay path, max samples, loss weights, weight decay, gradient clipping, and periodic checkpoints (#8).
 
 ## Phase 6: Evaluation And Iteration
 
@@ -101,7 +101,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] #5 Refactor MCTS for action-level self-play and same-player turn sequences.
 - [x] #6 Add self-play replay writer.
 - [x] #7 Add policy/value network scaffold.
-- [ ] #8 Add training command-line entry point.
+- [x] #8 Add training command-line entry point.
 - [ ] #9 Add checkpoint evaluation harness.
 - [ ] #164 Track CO matchup statistics for pregame selection.
 - [ ] #166 Add neural-guided MCTS with PUCT.
@@ -110,6 +110,9 @@ The rules/API completeness target for the initial playable environment is normal
 - [ ] #172 Add optional materialized replay cache for faster training loads.
 - [ ] #173 Add self-play orchestration for map pools, matchups, and side balancing.
 - [ ] #174 Add compressed self-play replay shard support.
+- [ ] #180 Add streaming or bounded replay dataset loading for training.
+- [ ] #181 Persist optimizer state for resumable long training runs.
+- [ ] #182 Harden training checkpoint writes with atomic bundle commits.
 - [x] #65 Define and enforce normal Global League Standard game settings.
 - [x] #66 Add REST game lifecycle and step API contract for self-play.
 - [x] #67 Validate and atomically reject illegal submitted actions.

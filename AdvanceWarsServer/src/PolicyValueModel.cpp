@@ -274,6 +274,7 @@ Result ParseMetadata(const json& metadata, PolicyValueModelConfig& config, std::
 Result PrepareCheckpointDirectory(const std::filesystem::path& checkpointDir, bool force, PolicyValueModelError& error) {
 	const std::filesystem::path metadataPath = checkpointDir / "metadata.json";
 	const std::filesystem::path modelPath = checkpointDir / "model.pt";
+	const std::filesystem::path trainingPath = checkpointDir / "training.json";
 
 	if (std::filesystem::exists(checkpointDir)) {
 		if (!std::filesystem::is_directory(checkpointDir)) {
@@ -287,13 +288,14 @@ Result PrepareCheckpointDirectory(const std::filesystem::path& checkpointDir, bo
 
 		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(checkpointDir)) {
 			const std::filesystem::path filename = entry.path().filename();
-			if (filename != "metadata.json" && filename != "model.pt") {
+			if (filename != "metadata.json" && filename != "model.pt" && filename != "training.json") {
 				SetError(error, "checkpoint-has-unexpected-file", "checkpoint directory contains unexpected file: " + filename.string());
 				return Result::Failed;
 			}
 		}
 		std::filesystem::remove(metadataPath);
 		std::filesystem::remove(modelPath);
+		std::filesystem::remove(trainingPath);
 		return Result::Succeeded;
 	}
 

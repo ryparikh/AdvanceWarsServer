@@ -90,6 +90,17 @@ $env:PATH = "$libtorchRoot\bin;" + $env:PATH
 
 The training command writes a new checkpoint bundle with `metadata.json`, `model.pt`, and `training.json`. Detailed trainer scope and follow-up issues are in [docs/TRAINING_COMMAND_DESIGN.md](docs/TRAINING_COMMAND_DESIGN.md).
 
+Evaluate a checkpoint against the deterministic random baseline and write a report:
+
+```powershell
+Set-Location .\AdvanceWarsServer
+$libtorchRoot = 'C:\path\to\libtorch'
+$env:PATH = "$libtorchRoot\bin;" + $env:PATH
+..\x64\Debug\AdvanceWarsServer.exe -evaluate --agent0 checkpoint-policy --checkpoint0 ..\artifacts\checkpoints\trained --agent1 random --map mcts --player0-co andy --player1-co adder --rounds 1 --max-actions 20 --device cpu --out ..\artifacts\evaluations\trained-vs-random.json --force
+```
+
+Evaluation is report-only: it writes an `evaluation.json` style artifact with compact per-game rows, score rates, true draws, action-limit no-results, and a promotion recommendation, but it does not mutate checkpoint bundles. Design details are in [docs/EVALUATION_COMMAND_DESIGN.md](docs/EVALUATION_COMMAND_DESIGN.md).
+
 ## Development Workflow
 
 1. Check the relevant docs and issues before changing rules behavior.

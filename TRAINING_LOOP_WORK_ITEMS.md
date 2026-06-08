@@ -81,15 +81,15 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] Add a replay shard reader/dataset that reconstructs tensors, sparse legal indices, visit distributions, and outcomes from `standard-gl-self-play-replay-v1` (#8).
 - [x] Add in-memory seeded sample shuffling for the v1 replay buffer; streaming and bounded-buffer loading are tracked by #180.
 - [ ] Add optional materialized replay cache for faster repeated training loads (#172).
-- [ ] Add checkpoint promotion/evaluation against previous models.
+- [x] Add report-only checkpoint evaluation against previous models and the random baseline (`-evaluate`) (#9).
 - [x] Add command-line options for epochs, batch size, learning rate, device, checkpoint path, replay path, max samples, loss weights, weight decay, gradient clipping, and periodic checkpoints (#8).
 
 ## Phase 6: Evaluation And Iteration
 
-- [ ] Add head-to-head evaluation between checkpoints.
-- [ ] Add random-player and heuristic-player baselines.
+- [x] Add head-to-head evaluation between checkpoints.
+- [x] Add deterministic random-player baseline. Heuristic-player baseline is intentionally deferred; v1 avoids hand-coded AI behavior.
 - [x] Add deterministic smoke tests for short self-play games (`-test-replay`).
-- [ ] Track win rate, average value loss, policy loss, game length, invalid action count, and search throughput.
+- [x] Track evaluation win rate, draws, no-results, terminal reasons, game length, invalid action count, and action-selection timing.
 - [ ] Track CO matchup statistics for pregame CO selection separately from the in-game action model (#164).
 - [ ] Add regression maps that cover captures, purchases, transport logic, indirect combat, powers, and end-game conditions.
 
@@ -102,7 +102,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] #6 Add self-play replay writer.
 - [x] #7 Add policy/value network scaffold.
 - [x] #8 Add training command-line entry point.
-- [ ] #9 Add checkpoint evaluation harness.
+- [x] #9 Add checkpoint evaluation harness.
 - [ ] #164 Track CO matchup statistics for pregame selection.
 - [ ] #166 Add neural-guided MCTS with PUCT.
 - [ ] #167 Add reusable MCTS search tree re-rooting.

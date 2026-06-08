@@ -41,10 +41,10 @@ The rules/API completeness target for the initial playable environment is normal
 
 ## Phase 2: MCTS Improvements
 
-- [x] Separate pure rollout MCTS from neural-network-guided MCTS. Neural-guided PUCT is tracked by #166.
+- [x] Separate pure rollout MCTS from neural-network-guided MCTS; `-self-play` defaults to rollout and can opt into neural PUCT with a checkpoint (#166).
 - [x] Expand one child at a time or track unexpanded actions to avoid expanding every legal action immediately.
 - [x] Replace `rand()` rollout action selection with a seeded RNG object.
-- [ ] Add PUCT selection using policy priors once a policy head exists (#166).
+- [x] Add PUCT selection using policy/value priors and leaf values from the LibTorch model path (#166).
 - [x] Store visit counts per legal action for training targets.
 - [x] Handle same-player action sequences explicitly in value backup.
 - [x] Add temperature controls for early-game exploration and late-game exploitation.
@@ -104,7 +104,7 @@ The rules/API completeness target for the initial playable environment is normal
 - [x] #8 Add training command-line entry point.
 - [x] #9 Add checkpoint evaluation harness.
 - [ ] #164 Track CO matchup statistics for pregame selection.
-- [ ] #166 Add neural-guided MCTS with PUCT.
+- [x] #166 Add neural-guided MCTS with PUCT.
 - [ ] #167 Add reusable MCTS search tree re-rooting.
 - [ ] #168 Add wall-clock MCTS search limits.
 - [ ] #172 Add optional materialized replay cache for faster training loads.

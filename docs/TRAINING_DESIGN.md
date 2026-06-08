@@ -71,7 +71,7 @@ The v1 `-train` command samples replay positions from validated `standard-gl-sel
 
 The first trainer uses AdamW, a constant learning rate, float32, and model-only checkpoint continuation. Streaming replay loading, optimizer-state resume, learning-rate schedules, mixed precision, and atomic checkpoint publishing are tracked separately by #180, #181, and #182. See `docs/TRAINING_COMMAND_DESIGN.md` for the concrete command contract.
 
-Checkpoints should be evaluated against the current best checkpoint on fixed maps, fixed seeds, and a held-out map set. The v1 `-evaluate` command is report-only: it writes an `evaluation.json` style artifact with compact per-game outcomes and a promotion recommendation, but it does not mutate checkpoint bundles. The first checkpoint agent uses legal-policy argmax and is intentionally labeled `checkpoint-policy`; neural-guided PUCT remains tracked by #166.
+Checkpoints should be evaluated against the current best checkpoint on fixed maps, fixed seeds, and a held-out map set. The v1 `-evaluate` command is report-only: it writes an `evaluation.json` style artifact with compact per-game outcomes and a promotion recommendation, but it does not mutate checkpoint bundles. The first checkpoint agent uses legal-policy argmax and is intentionally labeled `checkpoint-policy`; self-play can opt into neural-guided PUCT via `-self-play --mcts-mode neural-puct`.
 
 ## Metrics
 

@@ -25,6 +25,19 @@ struct MCTSActionStats {
 	int visits{ 0 };
 	double totalValue{ 0.0 };
 	double averageValue{ 0.0 };
+	double prior{ 0.0 };
+};
+
+template <typename ActionType>
+struct MCTSActionPrior {
+	ActionType action;
+	double prior{ 0.0 };
+};
+
+template <typename ActionType>
+struct MCTSNeuralEvaluation {
+	double value{ 0.0 };
+	std::vector<MCTSActionPrior<ActionType>> actionPriors;
 };
 
 template <typename ActionType>
@@ -82,23 +95,70 @@ public:
 		return result;
 	}
 
+	template <typename EvaluatorType>
+	MCTSSearchResult<ActionType> searchNeural(const StateType& rootState, EvaluatorType& evaluator, const MCTSOptions& options = MCTSOptions()) {
+		std::mt19937 rng(options.seed);
+		SearchContext context{ std::max(1, options.maxNodes), 1 };
+
+		Node root(rootState, std::nullopt, nullptr);
+		MCTSSearchResult<ActionType> result;
+		result.nodesCreated = context.nodesCreated;
+
+		if (root.state.isTerminal() || root.legalActions.empty()) {
+			result.rootActionStats = BuildRootActionStats(root);
+			return result;
+		}
+
+		double rootValue = 0.0;
+		EvaluateAndExpand(root, evaluator, context, rootValue);
+
+		const int maxSimulations = std::max(0, options.maxSimulations);
+		for (int i = 0; i < maxSimulations; ++i) {
+			Node* leaf = SelectNeural(root, options.explorationConstant);
+			double value = 0.0;
+			if (leaf->state.isTerminal()) {
+				value = static_cast<double>(leaf->state.evaluate(leaf->state.getCurrentPlayer()));
+			}
+			else if (!leaf->neuralExpanded) {
+				EvaluateAndExpand(*leaf, evaluator, context, value);
+			}
+			else {
+				value = leaf->evaluatedValue;
+			}
+
+			BackpropagateNeural(leaf, value);
+			++result.simulationsRun;
+		}
+
+		result.nodesCreated = context.nodesCreated;
+		result.rootActionStats = BuildRootActionStats(root);
+		result.selectedAction = SelectAction(result.rootActionStats, options.temperature, rng);
+		return result;
+	}
+
 private:
 	struct Node {
 		StateType state;
 		std::optional<ActionType> action;
 		Node* parent{ nullptr };
+		double prior{ 0.0 };
 		std::vector<ActionType> legalActions;
+		std::vector<double> legalActionPriors;
 		std::vector<ActionType> unexpandedActions;
 		std::vector<std::unique_ptr<Node>> children;
 		int visits{ 0 };
 		double totalValue{ 0.0 };
+		bool neuralExpanded{ false };
+		double evaluatedValue{ 0.0 };
 
-		Node(const StateType& state, std::optional<ActionType> action, Node* parent) :
+		Node(const StateType& state, std::optional<ActionType> action, Node* parent, double prior = 0.0) :
 			state(state),
 			action(std::move(action)),
-			parent(parent) {
+			parent(parent),
+			prior(prior) {
 			if (!this->state.isTerminal()) {
 				legalActions = this->state.getLegalActions();
+				legalActionPriors.assign(legalActions.size(), 0.0);
 				unexpandedActions = legalActions;
 			}
 		}
@@ -137,6 +197,38 @@ private:
 		return node.children.back().get();
 	}
 
+	template <typename EvaluatorType>
+	void EvaluateAndExpand(Node& node, EvaluatorType& evaluator, SearchContext& context, double& value) {
+		if (node.state.isTerminal()) {
+			value = static_cast<double>(node.state.evaluate(node.state.getCurrentPlayer()));
+			node.evaluatedValue = value;
+			node.neuralExpanded = true;
+			return;
+		}
+
+		if (node.legalActions.empty()) {
+			value = 0.0;
+			node.evaluatedValue = value;
+			node.neuralExpanded = true;
+			return;
+		}
+
+		MCTSNeuralEvaluation<ActionType> evaluation = evaluator.evaluate(node.state, node.legalActions);
+		value = std::isfinite(evaluation.value) ? evaluation.value : 0.0;
+		node.evaluatedValue = value;
+		node.legalActionPriors = NormalizePriors(node.legalActions, evaluation.actionPriors);
+		node.neuralExpanded = true;
+
+		for (std::size_t i = 0; i < node.legalActions.size() && context.nodesCreated < context.maxNodes; ++i) {
+			if (FindChild(node, node.legalActions[i]) != nullptr) {
+				continue;
+			}
+			StateType newState = node.state.applyAction(node.legalActions[i]);
+			node.children.push_back(std::make_unique<Node>(newState, node.legalActions[i], &node, node.legalActionPriors[i]));
+			++context.nodesCreated;
+		}
+	}
+
 	StateType Rollout(const StateType& startState, int maxRolloutActions, std::mt19937& rng, bool& reachedTerminal) {
 		StateType state(startState);
 		for (int i = 0; i < maxRolloutActions && !state.isTerminal(); ++i) {
@@ -162,9 +254,26 @@ private:
 		}
 	}
 
+	Node* SelectNeural(Node& root, double explorationConstant) {
+		Node* node = &root;
+		while (!node->state.isTerminal() && node->neuralExpanded && !node->children.empty()) {
+			node = BestPuctChild(*node, explorationConstant);
+			if (!node->neuralExpanded) {
+				break;
+			}
+		}
+		return node;
+	}
+
 	Node* BestChild(Node& node, double explorationConstant) {
 		return std::max_element(node.children.begin(), node.children.end(), [&](const std::unique_ptr<Node>& left, const std::unique_ptr<Node>& right) {
 			return UctValue(node, *left, explorationConstant) < UctValue(node, *right, explorationConstant);
+		})->get();
+	}
+
+	Node* BestPuctChild(Node& node, double explorationConstant) {
+		return std::max_element(node.children.begin(), node.children.end(), [&](const std::unique_ptr<Node>& left, const std::unique_ptr<Node>& right) {
+			return PuctValue(node, *left, explorationConstant) < PuctValue(node, *right, explorationConstant);
 		})->get();
 	}
 
@@ -182,16 +291,47 @@ private:
 		return averageValue + exploration;
 	}
 
+	double PuctValue(const Node& parent, const Node& child, double explorationConstant) const {
+		double averageValue = 0.0;
+		if (child.visits > 0) {
+			averageValue = child.totalValue / child.visits;
+			if (child.state.getCurrentPlayer() != parent.state.getCurrentPlayer()) {
+				averageValue *= -1.0;
+			}
+		}
+
+		const double exploration = explorationConstant * child.prior * std::sqrt(parent.visits + 1.0) / (1.0 + child.visits);
+		return averageValue + exploration;
+	}
+
+	void BackpropagateNeural(Node* node, double leafValue) {
+		const int leafPlayer = node->state.getCurrentPlayer();
+		while (node != nullptr) {
+			++node->visits;
+			double value = leafValue;
+			if (node->state.getCurrentPlayer() != leafPlayer) {
+				value *= -1.0;
+			}
+			node->totalValue += value;
+			node = node->parent;
+		}
+	}
+
 	std::vector<MCTSActionStats<ActionType>> BuildRootActionStats(const Node& root) const {
 		std::vector<MCTSActionStats<ActionType>> stats;
 		stats.reserve(root.legalActions.size());
 
-		for (const ActionType& action : root.legalActions) {
+		for (std::size_t i = 0; i < root.legalActions.size(); ++i) {
+			const ActionType& action = root.legalActions[i];
 			MCTSActionStats<ActionType> actionStats;
 			actionStats.action = action;
+			if (i < root.legalActionPriors.size()) {
+				actionStats.prior = root.legalActionPriors[i];
+			}
 
 			const Node* child = FindChild(root, action);
 			if (child != nullptr) {
+				actionStats.prior = child->prior;
 				actionStats.visits = child->visits;
 				actionStats.totalValue = child->totalValue;
 				if (child->state.getCurrentPlayer() != root.state.getCurrentPlayer()) {
@@ -214,6 +354,30 @@ private:
 		}
 
 		return nullptr;
+	}
+
+	std::vector<double> NormalizePriors(const std::vector<ActionType>& legalActions, const std::vector<MCTSActionPrior<ActionType>>& actionPriors) const {
+		std::vector<double> priors(legalActions.size(), 0.0);
+		double total = 0.0;
+		for (std::size_t i = 0; i < legalActions.size(); ++i) {
+			for (const MCTSActionPrior<ActionType>& actionPrior : actionPriors) {
+				if (actionPrior.action == legalActions[i] && std::isfinite(actionPrior.prior) && actionPrior.prior > 0.0) {
+					priors[i] += actionPrior.prior;
+				}
+			}
+			total += priors[i];
+		}
+
+		if (total <= 0.0) {
+			const double uniform = legalActions.empty() ? 0.0 : 1.0 / static_cast<double>(legalActions.size());
+			std::fill(priors.begin(), priors.end(), uniform);
+			return priors;
+		}
+
+		for (double& prior : priors) {
+			prior /= total;
+		}
+		return priors;
 	}
 
 	std::optional<ActionType> SelectAction(const std::vector<MCTSActionStats<ActionType>>& stats, double temperature, std::mt19937& rng) const {

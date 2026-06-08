@@ -7,23 +7,147 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <optional>
 #include <sstream>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ActionSpace.h"
+#include "PolicyValueModel.h"
 #include "StandardGameSetup.h"
 #include "StateTensor.h"
 
 namespace {
+class NeuralMctsEvaluationException : public std::runtime_error {
+public:
+	NeuralMctsEvaluationException(std::string code, const std::string& message) :
+		std::runtime_error(message),
+		m_code(std::move(code)) {
+	}
+
+	const std::string& code() const noexcept {
+		return m_code;
+	}
+
+private:
+	std::string m_code;
+};
+
+struct SelfPlayRuntime {
+	PolicyValueNetwork model{ nullptr };
+	torch::Device device{ torch::kCPU };
+	std::string resolvedDevice{ "cpu" };
+};
+
 void SetError(SelfPlayError& error, const std::string& code, const std::string& message, int gameIndex = -1, int ply = -1) {
 	error.code = code;
 	error.message = message;
 	error.gameIndex = gameIndex;
 	error.ply = ply;
 }
+
+const char* MctsModeName(SelfPlayMctsMode mode) noexcept {
+	switch (mode) {
+	case SelfPlayMctsMode::Rollout:
+		return "rollout";
+	case SelfPlayMctsMode::NeuralPuct:
+		return "neural-puct";
+	default:
+		return "unknown";
+	}
+}
+
+bool ParseMctsMode(const std::string& value, SelfPlayMctsMode& mode) {
+	if (value == "rollout") {
+		mode = SelfPlayMctsMode::Rollout;
+		return true;
+	}
+	if (value == "neural-puct" || value == "neural") {
+		mode = SelfPlayMctsMode::NeuralPuct;
+		return true;
+	}
+	return false;
+}
+
+json OptionalPathJson(const std::filesystem::path& path) {
+	return path.empty() ? json(nullptr) : json(path.string());
+}
+
+class PolicyValueMctsEvaluator {
+public:
+	PolicyValueMctsEvaluator(PolicyValueNetwork& model, const torch::Device& device) :
+		m_model(model),
+		m_device(device) {
+	}
+
+	MCTSNeuralEvaluation<Action> evaluate(const GameState& gameState, const std::vector<Action>& legalActions) {
+		if (legalActions.empty()) {
+			return {};
+		}
+
+		std::vector<float> values;
+		if (StateTensor::Encode(gameState, values) == Result::Failed) {
+			throw NeuralMctsEvaluationException("state-tensor-failed", "state tensor encoding failed during neural MCTS evaluation");
+		}
+
+		torch::Tensor input = torch::from_blob(
+			values.data(),
+			{ 1, StateTensor::ChannelCount(), StateTensor::BoardHeight(), StateTensor::BoardWidth() },
+			torch::TensorOptions().dtype(torch::kFloat32)).clone().contiguous().to(m_device);
+
+		PolicyValueNetworkOutput output;
+		PolicyValueModelError modelError;
+		if (RunPolicyValueInference(m_model, input, output, modelError) == Result::Failed) {
+			throw NeuralMctsEvaluationException(modelError.code, modelError.message);
+		}
+
+		const torch::Tensor policyLogits = output.policyLogits.index({ 0 }).to(torch::kCPU);
+		MCTSNeuralEvaluation<Action> evaluation;
+		evaluation.value = output.value.view({ -1 }).index({ 0 }).to(torch::kCPU).item<double>();
+
+		std::vector<double> logits;
+		logits.reserve(legalActions.size());
+		double maxLogit = -std::numeric_limits<double>::infinity();
+		for (const Action& action : legalActions) {
+			int actionIndex = -1;
+			if (ActionSpace::EncodeAction(action, actionIndex) == Result::Failed) {
+				throw NeuralMctsEvaluationException("action-encoding-failed", "legal action failed to encode during neural MCTS evaluation");
+			}
+
+			const double logit = policyLogits.index({ actionIndex }).item<double>();
+			if (!std::isfinite(logit)) {
+				throw NeuralMctsEvaluationException("invalid-policy-logit", "model produced a non-finite legal action logit");
+			}
+			logits.push_back(logit);
+			maxLogit = std::max(maxLogit, logit);
+		}
+
+		double denominator = 0.0;
+		for (double logit : logits) {
+			denominator += std::exp(logit - maxLogit);
+		}
+		if (!std::isfinite(denominator) || denominator <= 0.0) {
+			throw NeuralMctsEvaluationException("invalid-policy-priors", "legal action logits could not be normalized");
+		}
+
+		evaluation.actionPriors.reserve(legalActions.size());
+		for (std::size_t i = 0; i < legalActions.size(); ++i) {
+			evaluation.actionPriors.push_back({
+				legalActions[i],
+				std::exp(logits[i] - maxLogit) / denominator,
+			});
+		}
+		return evaluation;
+	}
+
+private:
+	PolicyValueNetwork& m_model;
+	torch::Device m_device;
+};
 
 std::string ChecksumToHex(std::uint64_t checksum) {
 	std::ostringstream stream;
@@ -84,6 +208,9 @@ json BuildHeader(const SelfPlayRunnerOptions& options) {
 			{ "player1Co", options.player1CoId },
 			{ "baseSeed", options.baseSeed },
 			{ "maxActions", options.maxActions },
+			{ "mctsMode", MctsModeName(options.mctsMode) },
+			{ "policyValueCheckpoint", OptionalPathJson(options.policyValueCheckpointPath) },
+			{ "device", options.deviceName },
 			{ "settings", SettingsJsonFromOptions(options) },
 			{ "mctsOptions", MctsOptionsJson(options.mctsOptions) },
 		} },
@@ -213,6 +340,9 @@ json GameConfigJson(const SelfPlayRunnerOptions& options, int gameIndex, std::ui
 		{ "combatSeed", combatSeed },
 		{ "mctsSeed", mctsSeed },
 		{ "maxActions", options.maxActions },
+		{ "mctsMode", MctsModeName(options.mctsMode) },
+		{ "policyValueCheckpoint", OptionalPathJson(options.policyValueCheckpointPath) },
+		{ "device", options.deviceName },
 		{ "mctsOptions", MctsOptionsJson(options.mctsOptions) },
 	};
 }
@@ -232,7 +362,7 @@ Result CreateGame(const SelfPlayRunnerOptions& options, int gameIndex, std::uint
 	return Result::Succeeded;
 }
 
-Result BuildGameRecord(const SelfPlayRunnerOptions& options, int gameIndex, int outputGameIndex, json& gameRecord, SelfPlayRunSummary& summary, SelfPlayError& error) {
+Result BuildGameRecord(const SelfPlayRunnerOptions& options, SelfPlayRuntime& runtime, int gameIndex, int outputGameIndex, json& gameRecord, SelfPlayRunSummary& summary, SelfPlayError& error) {
 	const std::uint32_t combatSeed = AddSeed(options.baseSeed, static_cast<std::uint32_t>(gameIndex));
 	const std::uint32_t mctsGameSeed = AddSeed(options.baseSeed, static_cast<std::uint32_t>(1000003u * (static_cast<std::uint32_t>(gameIndex) + 1u)));
 
@@ -270,7 +400,24 @@ Result BuildGameRecord(const SelfPlayRunnerOptions& options, int gameIndex, int 
 		searchOptions.seed = actionMctsSeed;
 
 		const auto searchStart = std::chrono::steady_clock::now();
-		MCTSSearchResult<Action> searchResult = mcts.search(gameState, searchOptions);
+		MCTSSearchResult<Action> searchResult;
+		if (options.mctsMode == SelfPlayMctsMode::NeuralPuct) {
+			if (runtime.model.is_empty()) {
+				SetError(error, "model-not-loaded", "neural MCTS requested without a loaded policy/value model", gameIndex, ply);
+				return Result::Failed;
+			}
+			PolicyValueMctsEvaluator evaluator(runtime.model, runtime.device);
+			try {
+				searchResult = mcts.searchNeural(gameState, evaluator, searchOptions);
+			}
+			catch (const NeuralMctsEvaluationException& err) {
+				SetError(error, err.code(), err.what(), gameIndex, ply);
+				return Result::Failed;
+			}
+		}
+		else {
+			searchResult = mcts.search(gameState, searchOptions);
+		}
 		const auto searchEnd = std::chrono::steady_clock::now();
 		const double searchTimeMs = std::chrono::duration<double, std::milli>(searchEnd - searchStart).count();
 		totalSearchTimeMs += searchTimeMs;
@@ -435,6 +582,14 @@ Result ValidateOptions(const SelfPlayRunnerOptions& options, SelfPlayError& erro
 		SetError(error, "missing-co", "--player0-co and --player1-co are required");
 		return Result::Failed;
 	}
+	if (options.mctsMode == SelfPlayMctsMode::NeuralPuct && options.policyValueCheckpointPath.empty()) {
+		SetError(error, "missing-policy-value-checkpoint", "--policy-value-checkpoint is required when --mcts-mode neural-puct");
+		return Result::Failed;
+	}
+	if (options.mctsMode == SelfPlayMctsMode::Rollout && !options.policyValueCheckpointPath.empty()) {
+		SetError(error, "unexpected-policy-value-checkpoint", "--policy-value-checkpoint requires --mcts-mode neural-puct");
+		return Result::Failed;
+	}
 	if (options.games < 1) {
 		SetError(error, "invalid-games", "--games must be at least 1");
 		return Result::Failed;
@@ -505,11 +660,39 @@ int PrintError(const SelfPlayError& error) {
 	std::cerr << std::endl;
 	return 1;
 }
+
+Result LoadSelfPlayRuntime(const SelfPlayRunnerOptions& options, SelfPlayRuntime& runtime, SelfPlayError& error) {
+	runtime = SelfPlayRuntime{};
+	if (options.mctsMode == SelfPlayMctsMode::Rollout) {
+		return Result::Succeeded;
+	}
+
+	PolicyValueModelError modelError;
+	runtime.device = ResolvePolicyValueDevice(options.deviceName, modelError);
+	if (!modelError.code.empty()) {
+		SetError(error, modelError.code, modelError.message);
+		return Result::Failed;
+	}
+	runtime.resolvedDevice = PolicyValueDeviceName(runtime.device);
+
+	PolicyValueModelConfig config;
+	std::int64_t seed = -1;
+	if (LoadPolicyValueCheckpoint(options.policyValueCheckpointPath, runtime.model, config, seed, modelError) == Result::Failed) {
+		SetError(error, modelError.code, modelError.message);
+		return Result::Failed;
+	}
+
+	runtime.model->to(runtime.device);
+	runtime.model->eval();
+	return Result::Succeeded;
+}
 }
 
 Result RunSelfPlay(const SelfPlayRunnerOptions& options, SelfPlayRunSummary& summary, SelfPlayError& error) {
 	summary = SelfPlayRunSummary{};
 	IfFailedReturn(ValidateOptions(options, error));
+	SelfPlayRuntime runtime;
+	IfFailedReturn(LoadSelfPlayRuntime(options, runtime, error));
 
 	const json header = BuildHeader(options);
 	int existingGames = 0;
@@ -528,7 +711,7 @@ Result RunSelfPlay(const SelfPlayRunnerOptions& options, SelfPlayRunSummary& sum
 
 	for (int gameIndex = 0; gameIndex < options.games; ++gameIndex) {
 		json gameRecord;
-		IfFailedReturn(BuildGameRecord(options, existingGames + gameIndex, existingGames + gameIndex, gameRecord, summary, error));
+		IfFailedReturn(BuildGameRecord(options, runtime, existingGames + gameIndex, existingGames + gameIndex, gameRecord, summary, error));
 		output << gameRecord.dump() << "\n";
 		if (!options.quiet) {
 			std::cout << "self-play game " << (existingGames + gameIndex) <<
@@ -582,6 +765,13 @@ int RunSelfPlayCommand(int argc, char* argv[]) noexcept {
 		else if (arg == "--capture-limit" && requireValue(value) && ParseInt(value, options.captureLimit)) {}
 		else if (arg == "--day-limit" && requireValue(value) && ParseInt(value, options.dayLimit)) {
 			options.hasDayLimit = true;
+		}
+		else if (arg == "--mcts-mode" && requireValue(value) && ParseMctsMode(value, options.mctsMode)) {}
+		else if (arg == "--policy-value-checkpoint" && requireValue(value)) {
+			options.policyValueCheckpointPath = value;
+		}
+		else if (arg == "--device" && requireValue(value)) {
+			options.deviceName = value;
 		}
 		else if (arg == "--mcts-simulations" && requireValue(value) && ParseInt(value, options.mctsOptions.maxSimulations)) {}
 		else if (arg == "--mcts-max-nodes" && requireValue(value) && ParseInt(value, options.mctsOptions.maxNodes)) {}

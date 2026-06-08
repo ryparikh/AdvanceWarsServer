@@ -345,6 +345,99 @@ bool TestTemperatureZeroTieAndPositiveTemperatureSampling() {
 		Expect(sampledResult.selectedAction.has_value(), "positive temperature should select an action") &&
 		Expect(sampledResult.selectedAction->id == positiveVisitAction, "positive temperature should sample only positive-visit actions when any exist");
 }
+
+class TestPolicyValueEvaluator {
+public:
+	MCTSNeuralEvaluation<TestAction> evaluate(const TestState&, const std::vector<TestAction>& legalActions) {
+		++calls;
+		MCTSNeuralEvaluation<TestAction> evaluation;
+		evaluation.value = 0.0;
+		for (const TestAction& action : legalActions) {
+			double prior = 1.0;
+			if (action.id == 1) {
+				prior = 0.05;
+			}
+			else if (action.id == 2) {
+				prior = 0.15;
+			}
+			else if (action.id == 3) {
+				prior = 0.80;
+			}
+			evaluation.actionPriors.push_back({ action, prior });
+		}
+		return evaluation;
+	}
+
+	int calls{ 0 };
+};
+
+class LeafValueEvaluator {
+public:
+	MCTSNeuralEvaluation<TestAction> evaluate(const TestState&, const std::vector<TestAction>& legalActions) {
+		++calls;
+		MCTSNeuralEvaluation<TestAction> evaluation;
+		evaluation.value = 0.0;
+		if (!legalActions.empty() && legalActions.front().id == 11) {
+			evaluation.value = 0.9;
+		}
+		for (const TestAction& action : legalActions) {
+			evaluation.actionPriors.push_back({ action, 1.0 });
+		}
+		return evaluation;
+	}
+
+	int calls{ 0 };
+};
+
+bool TestNeuralSearchUsesPuctPriorsForRootVisits() {
+	MCTS<TestState, TestAction> mcts;
+	MCTSOptions options;
+	options.maxSimulations = 24;
+	options.maxNodes = 10;
+	options.maxRolloutActions = 0;
+	options.explorationConstant = 2.0;
+	options.temperature = 0.0;
+
+	TestPolicyValueEvaluator evaluator;
+	MCTSSearchResult<TestAction> result = mcts.searchNeural(MakeThreeTerminalActionState(), evaluator, options);
+
+	return Expect(evaluator.calls == 1, "terminal children should only require root neural evaluation") &&
+		Expect(result.simulationsRun == 24, "neural search should run requested simulations") &&
+		Expect(result.nodesCreated == 4, "neural search should create root plus all root children") &&
+		Expect(SumRootVisits(result) == 24, "neural root visits should sum to simulations") &&
+		Expect(NearlyEqual(FindStats(result, 1)->prior, 0.05), "root stats should expose normalized prior for action 1") &&
+		Expect(NearlyEqual(FindStats(result, 2)->prior, 0.15), "root stats should expose normalized prior for action 2") &&
+		Expect(NearlyEqual(FindStats(result, 3)->prior, 0.80), "root stats should expose normalized prior for action 3") &&
+		Expect(VisitsFor(result, 3) > VisitsFor(result, 2), "PUCT should visit the highest-prior root action most") &&
+		Expect(VisitsFor(result, 2) > VisitsFor(result, 1), "PUCT should reflect lower prior actions in visit counts") &&
+		Expect(SelectedActionIs(result, 3), "temperature zero should select the highest-visit neural action");
+}
+
+bool TestNeuralSearchBacksUpLeafValueWithoutRollout() {
+	TestState root = MakeState({
+		{ 0, std::nullopt, { { 1 }, { 2 } }, { { { 1 }, 1 }, { { 2 }, 2 } } },
+		{ 0, std::nullopt, { { 11 } }, { { { 11 }, 3 } } },
+		{ 0, std::nullopt, { { 21 } }, { { { 21 }, 4 } } },
+		{ 0, 1, {}, {} },
+		{ 0, 0, {}, {} },
+	});
+
+	MCTS<TestState, TestAction> mcts;
+	MCTSOptions options;
+	options.maxSimulations = 1;
+	options.maxNodes = 10;
+	options.maxRolloutActions = 100;
+	options.temperature = 0.0;
+
+	LeafValueEvaluator evaluator;
+	MCTSSearchResult<TestAction> result = mcts.searchNeural(root, evaluator, options);
+
+	return Expect(evaluator.calls == 2, "neural search should evaluate the root and selected leaf") &&
+		Expect(VisitsFor(result, 1) == 1, "first legal action should receive the single PUCT visit") &&
+		Expect(NearlyEqual(AverageFor(result, 1), 0.9), "leaf value should back up without rolling out to the scripted loss") &&
+		Expect(VisitsFor(result, 2) == 0, "unvisited neural root actions should remain in stats with zero visits") &&
+		Expect(SelectedActionIs(result, 1), "temperature zero should select the visited neural action");
+}
 }
 
 int RunMctsTests() {
@@ -357,6 +450,8 @@ int RunMctsTests() {
 	passed = TestNodeLimitReusesExistingChildrenWhenExpansionIsBlocked() && passed;
 	passed = TestTerminalAndActionlessRootsReturnNoSelection() && passed;
 	passed = TestTemperatureZeroTieAndPositiveTemperatureSampling() && passed;
+	passed = TestNeuralSearchUsesPuctPriorsForRootVisits() && passed;
+	passed = TestNeuralSearchBacksUpLeafValueWithoutRollout() && passed;
 
 	if (!passed) {
 		return 1;

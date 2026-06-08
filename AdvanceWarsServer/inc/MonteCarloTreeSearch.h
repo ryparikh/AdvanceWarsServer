@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include <random>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -51,10 +52,34 @@ struct MCTSSearchResult {
 // StateType must provide:
 // - std::vector<ActionType> getLegalActions() const
 // - StateType applyAction(const ActionType&) const
+// - optional StateType applyKnownLegalAction(const ActionType&) for known-legal MCTS actions
 // - bool isTerminal() const
 // - int getCurrentPlayer() const
 // - double-compatible evaluate(int player) const
 // ActionType must be equality-comparable.
+namespace MctsDetail {
+template <typename StateType, typename ActionType, typename = void>
+struct HasKnownLegalApply : std::false_type {
+};
+
+template <typename StateType, typename ActionType>
+struct HasKnownLegalApply<
+	StateType,
+	ActionType,
+	std::void_t<decltype(std::declval<StateType&>().applyKnownLegalAction(std::declval<const ActionType&>()))>> : std::true_type {
+};
+
+template <typename StateType, typename ActionType>
+StateType ApplyKnownLegalAction(StateType& state, const ActionType& action) {
+	if constexpr (HasKnownLegalApply<StateType, ActionType>::value) {
+		return state.applyKnownLegalAction(action);
+	}
+	else {
+		return state.applyAction(action);
+	}
+}
+}
+
 template <typename StateType, typename ActionType>
 class MCTS {
 public:
@@ -192,7 +217,7 @@ private:
 		ActionType action = node.unexpandedActions[static_cast<std::size_t>(actionIndex)];
 		node.unexpandedActions.erase(node.unexpandedActions.begin() + actionIndex);
 
-		StateType newState = node.state.applyAction(action);
+		StateType newState = MctsDetail::ApplyKnownLegalAction(node.state, action);
 		node.children.push_back(std::make_unique<Node>(newState, action, &node));
 		return node.children.back().get();
 	}
@@ -223,7 +248,7 @@ private:
 			if (FindChild(node, node.legalActions[i]) != nullptr) {
 				continue;
 			}
-			StateType newState = node.state.applyAction(node.legalActions[i]);
+			StateType newState = MctsDetail::ApplyKnownLegalAction(node.state, node.legalActions[i]);
 			node.children.push_back(std::make_unique<Node>(newState, node.legalActions[i], &node, node.legalActionPriors[i]));
 			++context.nodesCreated;
 		}
@@ -238,7 +263,7 @@ private:
 			}
 
 			std::uniform_int_distribution<int> distribution(0, static_cast<int>(actions.size() - 1));
-			state = state.applyAction(actions[static_cast<std::size_t>(distribution(rng))]);
+			state = MctsDetail::ApplyKnownLegalAction(state, actions[static_cast<std::size_t>(distribution(rng))]);
 		}
 
 		reachedTerminal = state.isTerminal();

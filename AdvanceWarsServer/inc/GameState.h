@@ -211,6 +211,22 @@ public:
 		return actedGameState;
 	}
 
+	GameState applyKnownLegalAction(const Action& action) {
+		GameState actedGameState{ Clone() };
+		if (Result::Failed == actedGameState.ExecuteAction(action)) {
+			json jaction;
+			::to_json(jaction, action);
+			json jstate;
+			to_json(jstate, *this);
+			std::cout << "Failed to execute a known-legal action:" << jaction.dump() << "\n" << jstate.dump() << std::endl;
+			return Clone();
+		}
+		if (actedGameState.FHeuristicAutoResign()) {
+			actedGameState.CheckPlayerResigns();
+		}
+		return actedGameState;
+	}
+
 	double evaluate(int playerPerspective) const {
 		if (!m_fGameOver || m_winningPlayer == 2) {
 			return 0;

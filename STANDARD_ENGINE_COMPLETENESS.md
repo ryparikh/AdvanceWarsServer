@@ -71,7 +71,7 @@ Explicitly deferred modes and options:
 | Replay writer | `-self-play` writes validated sparse `standard-gl-self-play-replay-v1` JSONL shards with full initial/final states, action history, sparse legal action indices, sparse MCTS visit counts, per-sample tensor checksums, outcomes, and metrics. `-validate-replay` reconstructs and checks shards. | Versioned self-play samples and reconstructable action history. | Complete for v1 sparse replay | #172, #173, #174 for cache/orchestration/compression |
 | Policy/value scaffold | Not complete. | Model input/output aligned with tensor/action encodings. | Partial | #7 |
 | Training entry point | Not complete. | Train from replay data and write checkpoints. | Partial | #8 |
-| Evaluation harness | Not complete. | Deterministic checkpoint evaluation against baselines. | Partial | #9 |
+| Evaluation harness | `-evaluate` writes report-only checkpoint-policy versus checkpoint/random evaluation artifacts with deterministic seeds, side swapping, score rates, true draws, action-limit no-results, and promotion recommendations. | Deterministic checkpoint evaluation against baselines. | Complete for v1 policy/random evaluation | #166 for neural-guided PUCT |
 
 ## Actions And Terminal Conditions
 

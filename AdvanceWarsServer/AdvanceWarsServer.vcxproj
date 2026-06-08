@@ -176,6 +176,9 @@
     <ClCompile Include="src\ActionSpace.cpp" />
     <ClCompile Include="src\AdvanceWarsServer.cpp" />
     <ClCompile Include="src\CommandingOfficier.cpp" />
+    <ClCompile Include="src\Evaluation.cpp" />
+    <ClCompile Include="src\EvaluationCommand.cpp" />
+    <ClCompile Include="src\EvaluationTest.cpp" />
     <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\JsonSubsystemTest.cpp" />
     <ClCompile Include="src\Map.cpp" />
@@ -210,6 +213,9 @@
     <ClInclude Include="inc\ActionSpace.h" />
     <ClInclude Include="inc\AdvanceWarsServer.h" />
     <ClInclude Include="inc\CommandingOfficier.h" />
+    <ClInclude Include="inc\Evaluation.h" />
+    <ClInclude Include="inc\EvaluationCommand.h" />
+    <ClInclude Include="inc\EvaluationTest.h" />
     <ClInclude Include="inc\GameState.h" />
     <ClInclude Include="inc\Map.h" />
     <ClInclude Include="inc\MapParser.h" />

@@ -6,6 +6,8 @@
 #include <thread>
 #include <future>
 #include "AdvanceWarsServer.h"
+#include "EvaluationCommand.h"
+#include "EvaluationTest.h"
 #include "MonteCarloTreeSearch.h"
 #include "MctsTest.h"
 #include "PolicyValueModelCommands.h"
@@ -30,10 +32,12 @@ int main(int argc, char* argv[]) noexcept {
 			std::cerr << "  -validate-replay <path> : Validate a self-play replay JSONL file.\n";
 			std::cerr << "  -test-mcts            : Run focused MCTS tests.\n";
 			std::cerr << "  -test-model           : Run focused policy/value model tests.\n";
+			std::cerr << "  -test-evaluate        : Run focused checkpoint evaluation tests.\n";
 			std::cerr << "  -test-replay          : Run focused self-play replay tests.\n";
 			std::cerr << "  -test-train           : Run focused replay training tests.\n";
 			std::cerr << "  -model-init --out <dir> : Initialize and validate a policy/value checkpoint bundle.\n";
 			std::cerr << "  -train [options]      : Train a policy/value checkpoint from replay data.\n";
+			std::cerr << "  -evaluate [options]   : Evaluate checkpoint agents and write an evaluation report.\n";
 			std::cerr << "  -torchlib [--mnist-path <path>] : Run a LibTorch smoke check and optional MNIST experiment.\n";
 			std::cerr << "  -server               : Act as game server.\n";
 			return 1; // Return an error code
@@ -221,6 +225,9 @@ int main(int argc, char* argv[]) noexcept {
 		else if (argument == "-model-init") {
 			return RunModelInitCommand(argc - 2, argv + 2);
 		}
+		else if (argument == "-test-evaluate") {
+			return RunEvaluationTests();
+		}
 		else if (argument == "-test-replay") {
 			return RunSelfPlayReplayTests();
 		}
@@ -235,6 +242,9 @@ int main(int argc, char* argv[]) noexcept {
 		}
 		else if (argument == "-train") {
 			return RunTrainingCommand(argc - 2, argv + 2);
+		}
+		else if (argument == "-evaluate") {
+			return RunEvaluationCommand(argc - 2, argv + 2);
 		}
 		else if (argument == "-server") {
 			return AdvanceWarsServer::getInstance().run();

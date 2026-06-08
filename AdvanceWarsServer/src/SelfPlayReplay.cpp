@@ -61,6 +61,38 @@ Result RequireObjectWithFields(const json& value, const std::vector<std::string>
 	return Result::Succeeded;
 }
 
+Result RequireObjectWithRequiredAndOptionalFields(
+	const json& value,
+	const std::vector<std::string>& requiredFields,
+	const std::vector<std::string>& optionalFields,
+	const std::string& label,
+	SelfPlayError& error,
+	int line,
+	int gameIndex = -1,
+	int ply = -1) {
+	if (!value.is_object()) {
+		SetError(error, "schema-error", label + " must be an object", line, gameIndex, ply);
+		return Result::Failed;
+	}
+
+	std::vector<std::string> allowedFields = requiredFields;
+	allowedFields.insert(allowedFields.end(), optionalFields.begin(), optionalFields.end());
+	std::string invalidField;
+	if (!ContainsOnlyFields(value, allowedFields, invalidField)) {
+		SetError(error, "schema-error", label + " has unknown or invalid field: " + invalidField, line, gameIndex, ply);
+		return Result::Failed;
+	}
+
+	for (const std::string& requiredField : requiredFields) {
+		if (!value.contains(requiredField)) {
+			SetError(error, "schema-error", label + " is missing required field: " + requiredField, line, gameIndex, ply);
+			return Result::Failed;
+		}
+	}
+
+	return Result::Succeeded;
+}
+
 std::string ChecksumToHex(std::uint64_t checksum) {
 	std::ostringstream stream;
 	stream << std::hex << std::setw(16) << std::setfill('0') << checksum;
@@ -144,6 +176,23 @@ bool IsSortedUniqueInts(const json& value) {
 	return true;
 }
 
+void NormalizeHeaderConfigDefaults(json& header) {
+	if (!header.contains("config") || !header.at("config").is_object()) {
+		return;
+	}
+
+	json& config = header["config"];
+	if (!config.contains("mctsMode")) {
+		config["mctsMode"] = "rollout";
+	}
+	if (!config.contains("policyValueCheckpoint")) {
+		config["policyValueCheckpoint"] = nullptr;
+	}
+	if (!config.contains("device")) {
+		config["device"] = "auto";
+	}
+}
+
 Result ValidateHeader(const json& header, const json* expectedHeader, SelfPlayError& error, int line) {
 	IfFailedReturn(RequireObjectWithFields(header, { "recordType", "replayFormatVersion", "createdAt", "versions", "config" }, "header", error, line));
 	if (header.at("recordType") != "header") {
@@ -172,6 +221,8 @@ Result ValidateHeader(const json& header, const json* expectedHeader, SelfPlayEr
 		json expectedComparable = *expectedHeader;
 		actualComparable.erase("createdAt");
 		expectedComparable.erase("createdAt");
+		NormalizeHeaderConfigDefaults(actualComparable);
+		NormalizeHeaderConfigDefaults(expectedComparable);
 		if (actualComparable != expectedComparable) {
 			SetError(error, "append-header-mismatch", "existing replay header is not compatible with requested append", line);
 			return Result::Failed;
@@ -328,8 +379,33 @@ Result ValidateGameRecord(const json& game, SelfPlayReplayValidationSummary& sum
 	}
 
 	const int gameIndex = game.at("gameIndex").get<int>();
-	IfFailedReturn(RequireObjectWithFields(game.at("config"), { "mapId", "baseSeed", "combatSeed", "mctsSeed", "maxActions", "mctsOptions" }, "game.config", error, line, gameIndex));
+	IfFailedReturn(RequireObjectWithRequiredAndOptionalFields(
+		game.at("config"),
+		{ "mapId", "baseSeed", "combatSeed", "mctsSeed", "maxActions", "mctsOptions" },
+		{ "mctsMode", "policyValueCheckpoint", "device" },
+		"game.config",
+		error,
+		line,
+		gameIndex));
 	IfFailedReturn(RequireObjectWithFields(game.at("config").at("mctsOptions"), { "maxSimulations", "maxNodes", "maxRolloutActions", "explorationConstant", "temperature" }, "game.config.mctsOptions", error, line, gameIndex));
+	if (game.at("config").contains("mctsMode")) {
+		const json& mode = game.at("config").at("mctsMode");
+		if (!mode.is_string() || (mode != "rollout" && mode != "neural-puct")) {
+			SetError(error, "schema-error", "game.config.mctsMode must be rollout or neural-puct", line, gameIndex);
+			return Result::Failed;
+		}
+	}
+	if (game.at("config").contains("policyValueCheckpoint") &&
+		!game.at("config").at("policyValueCheckpoint").is_null() &&
+		!game.at("config").at("policyValueCheckpoint").is_string()) {
+		SetError(error, "schema-error", "game.config.policyValueCheckpoint must be a string or null", line, gameIndex);
+		return Result::Failed;
+	}
+	if (game.at("config").contains("device") &&
+		!game.at("config").at("device").is_string()) {
+		SetError(error, "schema-error", "game.config.device must be a string", line, gameIndex);
+		return Result::Failed;
+	}
 	if (!game.at("players").is_array() || game.at("players").size() != 2) {
 		SetError(error, "schema-error", "players must contain two entries", line, gameIndex);
 		return Result::Failed;

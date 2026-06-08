@@ -8,10 +8,18 @@
 #include "Result.h"
 #include "SelfPlayReplay.h"
 
+enum class SelfPlayMctsMode {
+	Rollout,
+	NeuralPuct,
+};
+
 struct SelfPlayRunnerOptions {
 	std::filesystem::path outputPath;
 	bool append{ false };
 	bool quiet{ false };
+	SelfPlayMctsMode mctsMode{ SelfPlayMctsMode::Rollout };
+	std::filesystem::path policyValueCheckpointPath;
+	std::string deviceName{ "auto" };
 	std::string mapId;
 	std::string player0CoId;
 	std::string player1CoId;

@@ -27,6 +27,22 @@ Validate an existing shard:
 ..\x64\Debug\AdvanceWarsServer.exe -validate-replay ..\artifacts\replays\smoke.jsonl
 ```
 
+Generate one neural-guided PUCT replay from an initialized checkpoint:
+
+```powershell
+..\x64\Debug\AdvanceWarsServer.exe -self-play `
+  --out ..\artifacts\replays\neural-smoke.jsonl `
+  --map mcts `
+  --player0-co andy `
+  --player1-co adder `
+  --mcts-mode neural-puct `
+  --policy-value-checkpoint ..\artifacts\models\candidate `
+  --device auto `
+  --games 1 `
+  --max-actions 100 `
+  --mcts-simulations 64
+```
+
 `-self-play` writes the replay and then validates the whole file. If validation fails, the file is left in place for debugging and the process returns nonzero.
 
 By default, `-self-play` fails when `--out` already exists. Pass `--append` to append to an existing compatible shard. Appends validate the whole existing file first. An empty existing file is treated as a new shard and receives a fresh header.
@@ -60,6 +76,9 @@ MCTS options:
 
 | Option | Default | Meaning |
 | --- | ---: | --- |
+| `--mcts-mode <mode>` | `rollout` | Search mode. Use `rollout` for pure rollout MCTS or `neural-puct` for policy/value-guided PUCT. |
+| `--policy-value-checkpoint <dir>` | unset | Required with `--mcts-mode neural-puct`; points at a strict policy/value checkpoint bundle. |
+| `--device <name>` | `auto` | Model device for neural PUCT: `cpu`, `auto`, or `cuda`. |
 | `--mcts-simulations <n>` | `128` | Root simulations per action. Must be at least `1`. |
 | `--mcts-max-nodes <n>` | `10000` | Search node cap. |
 | `--mcts-max-rollout-actions <n>` | `512` | Rollout action cap. |
@@ -87,6 +106,9 @@ The first line is a header:
     "player1Co": "adder",
     "baseSeed": 123,
     "maxActions": 1000,
+    "mctsMode": "rollout",
+    "policyValueCheckpoint": null,
+    "device": "auto",
     "settings": {},
     "mctsOptions": {}
   }
@@ -110,6 +132,9 @@ Every following line is a game record. Game records are self-contained enough to
     "combatSeed": 123,
     "mctsSeed": 1000126,
     "maxActions": 1000,
+    "mctsMode": "rollout",
+    "policyValueCheckpoint": null,
+    "device": "auto",
     "mctsOptions": {}
   },
   "players": [
@@ -177,6 +202,8 @@ Samples contain compact training targets:
 Replay v1 does not store dense state tensors or dense legal action masks. Validation rebuilds the state from `initialState` plus `actions[0..ply)`, regenerates the tensor checksum and sparse legal action indices, and compares them exactly.
 
 `visitCounts` stores positive visits only, sorted by `actionIndex`. Legal actions with zero visits are implied by `legalActionIndices`.
+
+In `neural-puct` mode, the runner gathers model policy logits only at the sparse legal action indices, normalizes those legal logits into priors, uses PUCT for tree selection, and backs up the value head at expanded leaves. The replay target format is unchanged: training still consumes sparse positive visit counts over legal action indices.
 
 `outcome` is from the sample's `currentPlayer` perspective:
 

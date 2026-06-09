@@ -29,6 +29,8 @@ struct TestNodeDef {
 
 struct TestGraph {
 	std::vector<TestNodeDef> nodes;
+	mutable int applyActionCalls{ 0 };
+	mutable int applyKnownLegalActionCalls{ 0 };
 };
 
 class TestState {
@@ -48,13 +50,13 @@ public:
 	}
 
 	TestState applyAction(const TestAction& action) const {
-		for (const auto& transition : GetNode().transitions) {
-			if (transition.first == action) {
-				return TestState(m_graph, transition.second);
-			}
-		}
+		++m_graph->applyActionCalls;
+		return ApplyTransition(action);
+	}
 
-		throw std::runtime_error("test action was not legal in scripted state");
+	TestState applyKnownLegalAction(const TestAction& action) const {
+		++m_graph->applyKnownLegalActionCalls;
+		return ApplyTransition(action);
 	}
 
 	bool isTerminal() const {
@@ -74,9 +76,27 @@ public:
 		return *node.winner == player ? 1.0 : -1.0;
 	}
 
+	int getApplyActionCalls() const {
+		return m_graph->applyActionCalls;
+	}
+
+	int getApplyKnownLegalActionCalls() const {
+		return m_graph->applyKnownLegalActionCalls;
+	}
+
 private:
 	const TestNodeDef& GetNode() const {
 		return m_graph->nodes.at(static_cast<std::size_t>(m_nodeId));
+	}
+
+	TestState ApplyTransition(const TestAction& action) const {
+		for (const auto& transition : GetNode().transitions) {
+			if (transition.first == action) {
+				return TestState(m_graph, transition.second);
+			}
+		}
+
+		throw std::runtime_error("test action was not legal in scripted state");
 	}
 
 	std::shared_ptr<const TestGraph> m_graph;
@@ -196,6 +216,24 @@ bool TestOneActionExpansionAndRootStats() {
 		Expect(SumRootVisits(result) == 1, "only one root action should be visited") &&
 		Expect(CountVisitedRootActions(result) == 1, "only one root child should be expanded") &&
 		Expect(result.selectedAction.has_value(), "a selected action should be returned for non-empty root");
+}
+
+bool TestSearchExpansionUsesKnownLegalApplyPath() {
+	TestState root = MakeThreeTerminalActionState();
+
+	MCTS<TestState, TestAction> mcts;
+	MCTSOptions options;
+	options.maxSimulations = 1;
+	options.maxNodes = 10;
+	options.maxRolloutActions = 0;
+	options.temperature = 0.0;
+	options.seed = 7;
+
+	MCTSSearchResult<TestAction> result = mcts.search(root, options);
+
+	return Expect(result.nodesCreated == 2, "test setup should create one expanded child") &&
+		Expect(root.getApplyKnownLegalActionCalls() == 1, "MCTS expansion should use the known-legal apply path") &&
+		Expect(root.getApplyActionCalls() == 0, "MCTS expansion should not use the validating apply path for known-legal actions");
 }
 
 bool TestSeededSearchIsReproducible() {
@@ -443,6 +481,7 @@ bool TestNeuralSearchBacksUpLeafValueWithoutRollout() {
 int RunMctsTests() {
 	bool passed = true;
 	passed = TestOneActionExpansionAndRootStats() && passed;
+	passed = TestSearchExpansionUsesKnownLegalApplyPath() && passed;
 	passed = TestSeededSearchIsReproducible() && passed;
 	passed = TestPlayerPerspectiveBackupHandlesSamePlayerAndSwitches() && passed;
 	passed = TestRolloutCutoffBacksUpZero() && passed;

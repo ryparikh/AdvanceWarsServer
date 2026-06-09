@@ -194,7 +194,9 @@ Samples contain compact training targets:
     "mctsSeed": 3992670690,
     "simulationsRun": 128,
     "nodesCreated": 128,
-    "searchTimeMs": 14.7
+    "searchTimeMs": 14.7,
+    "legalActionGenerationCalls": 129,
+    "legalActionGenerationTimeMs": 4.2
   }
 }
 ```
@@ -202,6 +204,8 @@ Samples contain compact training targets:
 Replay v1 does not store dense state tensors or dense legal action masks. Validation rebuilds the state from `initialState` plus `actions[0..ply)`, regenerates the tensor checksum and sparse legal action indices, and compares them exactly.
 
 `visitCounts` stores positive visits only, sorted by `actionIndex`. Legal actions with zero visits are implied by `legalActionIndices`.
+
+Each sample's `mcts` block records total search wall time plus legal-action generation calls/time observed inside MCTS. The game-level `metrics` block also aggregates `totalLegalActionGenerationCalls`, `totalLegalActionGenerationTimeMs`, and `averageLegalActionGenerationTimeMs` so self-play runs can be used as focused legal-action generation perf reports.
 
 In `neural-puct` mode, the runner gathers model policy logits only at the sparse legal action indices, normalizes those legal logits into priors, uses PUCT for tree selection, and backs up the value head at expanded leaves. The replay target format is unchanged: training still consumes sparse positive visit counts over legal action indices.
 

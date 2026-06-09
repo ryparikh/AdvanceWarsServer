@@ -29,6 +29,7 @@ struct TestNodeDef {
 
 struct TestGraph {
 	std::vector<TestNodeDef> nodes;
+	mutable int legalActionCalls{ 0 };
 	mutable int applyActionCalls{ 0 };
 	mutable int applyKnownLegalActionCalls{ 0 };
 };
@@ -41,6 +42,7 @@ public:
 	}
 
 	std::vector<TestAction> getLegalActions() const {
+		++m_graph->legalActionCalls;
 		const TestNodeDef& node = GetNode();
 		if (node.winner.has_value()) {
 			return {};
@@ -84,6 +86,10 @@ public:
 		return m_graph->applyKnownLegalActionCalls;
 	}
 
+	int getLegalActionCalls() const {
+		return m_graph->legalActionCalls;
+	}
+
 private:
 	const TestNodeDef& GetNode() const {
 		return m_graph->nodes.at(static_cast<std::size_t>(m_nodeId));
@@ -101,6 +107,75 @@ private:
 
 	std::shared_ptr<const TestGraph> m_graph;
 	int m_nodeId{ 0 };
+};
+
+struct CopyCountingAction {
+	int id{ 0 };
+
+	CopyCountingAction() = default;
+	explicit CopyCountingAction(int id) : id(id) {}
+	CopyCountingAction(const CopyCountingAction& other) : id(other.id) {
+		++s_copies;
+	}
+	CopyCountingAction& operator=(const CopyCountingAction& other) {
+		id = other.id;
+		++s_copies;
+		return *this;
+	}
+	CopyCountingAction(CopyCountingAction&& other) noexcept = default;
+	CopyCountingAction& operator=(CopyCountingAction&& other) noexcept = default;
+
+	bool operator==(const CopyCountingAction& other) const noexcept {
+		return id == other.id;
+	}
+
+	static void ResetCopies() {
+		s_copies = 0;
+	}
+
+	static int Copies() {
+		return s_copies;
+	}
+
+private:
+	static int s_copies;
+};
+
+int CopyCountingAction::s_copies = 0;
+
+class CopyCountingState {
+public:
+	CopyCountingState(std::shared_ptr<const std::vector<CopyCountingAction>> legalActions) :
+		m_legalActions(std::move(legalActions)) {
+	}
+
+	void getLegalActions(std::vector<CopyCountingAction>& legalActions) const {
+		legalActions.clear();
+		legalActions.insert(legalActions.end(), m_legalActions->begin(), m_legalActions->end());
+	}
+
+	std::vector<CopyCountingAction> getLegalActions() const {
+		return *m_legalActions;
+	}
+
+	CopyCountingState applyAction(const CopyCountingAction&) const {
+		return CopyCountingState(std::make_shared<std::vector<CopyCountingAction>>());
+	}
+
+	bool isTerminal() const {
+		return false;
+	}
+
+	int getCurrentPlayer() const {
+		return 0;
+	}
+
+	double evaluate(int) const {
+		return 0.0;
+	}
+
+private:
+	std::shared_ptr<const std::vector<CopyCountingAction>> m_legalActions;
 };
 
 TestState MakeState(std::vector<TestNodeDef> nodes, int nodeId = 0) {
@@ -234,6 +309,41 @@ bool TestSearchExpansionUsesKnownLegalApplyPath() {
 	return Expect(result.nodesCreated == 2, "test setup should create one expanded child") &&
 		Expect(root.getApplyKnownLegalActionCalls() == 1, "MCTS expansion should use the known-legal apply path") &&
 		Expect(root.getApplyActionCalls() == 0, "MCTS expansion should not use the validating apply path for known-legal actions");
+}
+
+bool TestSearchReportsLegalActionGenerationTelemetry() {
+	MCTS<TestState, TestAction> mcts;
+	MCTSOptions options;
+	options.maxSimulations = 1;
+	options.maxNodes = 10;
+	options.maxRolloutActions = 0;
+	options.temperature = 0.0;
+	options.seed = 7;
+
+	MCTSSearchResult<TestAction> result = mcts.search(MakeThreeTerminalActionState(), options);
+
+	return Expect(result.legalActionGenerationCalls == 1, "search should count legal-action generation calls") &&
+		Expect(result.legalActionGenerationTimeMs >= 0.0, "search should report nonnegative legal-action generation time");
+}
+
+bool TestSearchDoesNotCopyLegalActionsIntoUnexpandedActions() {
+	std::vector<CopyCountingAction> legalActions;
+	for (int i = 0; i < 8; ++i) {
+		legalActions.emplace_back(i);
+	}
+	CopyCountingState root(std::make_shared<std::vector<CopyCountingAction>>(std::move(legalActions)));
+
+	MCTS<CopyCountingState, CopyCountingAction> mcts;
+	MCTSOptions options;
+	options.maxSimulations = 0;
+	options.temperature = 0.0;
+
+	CopyCountingAction::ResetCopies();
+	MCTSSearchResult<CopyCountingAction> result = mcts.search(root, options);
+	const int actionCount = static_cast<int>(result.rootActionStats.size());
+
+	return Expect(actionCount == 8, "test setup should expose all root legal actions") &&
+		Expect(CopyCountingAction::Copies() <= actionCount * 2 + 1, "MCTS should not copy each root action into both stats and a separate unexpanded action list");
 }
 
 bool TestSeededSearchIsReproducible() {
@@ -476,12 +586,37 @@ bool TestNeuralSearchBacksUpLeafValueWithoutRollout() {
 		Expect(VisitsFor(result, 2) == 0, "unvisited neural root actions should remain in stats with zero visits") &&
 		Expect(SelectedActionIs(result, 1), "temperature zero should select the visited neural action");
 }
+
+bool TestNeuralSearchLoadsChildLegalActionsLazily() {
+	TestState root = MakeState({
+		{ 0, std::nullopt, { { 1 }, { 2 } }, { { { 1 }, 1 }, { { 2 }, 2 } } },
+		{ 0, std::nullopt, { { 11 } }, { { { 11 }, 3 } } },
+		{ 0, std::nullopt, { { 21 } }, { { { 21 }, 4 } } },
+		{ 0, 1, {}, {} },
+		{ 0, 0, {}, {} },
+	});
+
+	MCTS<TestState, TestAction> mcts;
+	MCTSOptions options;
+	options.maxSimulations = 1;
+	options.maxNodes = 10;
+	options.maxRolloutActions = 0;
+	options.temperature = 0.0;
+
+	LeafValueEvaluator evaluator;
+	MCTSSearchResult<TestAction> result = mcts.searchNeural(root, evaluator, options);
+
+	return Expect(result.legalActionGenerationCalls == 2, "neural search should load legal actions for the root and selected leaf only") &&
+		Expect(root.getLegalActionCalls() == 2, "unvisited neural children should not generate legal actions during node creation");
+}
 }
 
 int RunMctsTests() {
 	bool passed = true;
 	passed = TestOneActionExpansionAndRootStats() && passed;
 	passed = TestSearchExpansionUsesKnownLegalApplyPath() && passed;
+	passed = TestSearchReportsLegalActionGenerationTelemetry() && passed;
+	passed = TestSearchDoesNotCopyLegalActionsIntoUnexpandedActions() && passed;
 	passed = TestSeededSearchIsReproducible() && passed;
 	passed = TestPlayerPerspectiveBackupHandlesSamePlayerAndSwitches() && passed;
 	passed = TestRolloutCutoffBacksUpZero() && passed;
@@ -491,6 +626,7 @@ int RunMctsTests() {
 	passed = TestTemperatureZeroTieAndPositiveTemperatureSampling() && passed;
 	passed = TestNeuralSearchUsesPuctPriorsForRootVisits() && passed;
 	passed = TestNeuralSearchBacksUpLeafValueWithoutRollout() && passed;
+	passed = TestNeuralSearchLoadsChildLegalActionsLazily() && passed;
 
 	if (!passed) {
 		return 1;

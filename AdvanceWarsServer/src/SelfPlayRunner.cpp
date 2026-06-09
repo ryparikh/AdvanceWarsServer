@@ -377,6 +377,8 @@ Result BuildGameRecord(const SelfPlayRunnerOptions& options, SelfPlayRuntime& ru
 	int invalidActionCount = 0;
 	int legalActionTotal = 0;
 	double totalSearchTimeMs = 0.0;
+	int totalLegalActionGenerationCalls = 0;
+	double totalLegalActionGenerationTimeMs = 0.0;
 
 	const auto gameStart = std::chrono::steady_clock::now();
 	for (int ply = 0; ply < options.maxActions && !gameState.FGameOver(); ++ply) {
@@ -421,6 +423,8 @@ Result BuildGameRecord(const SelfPlayRunnerOptions& options, SelfPlayRuntime& ru
 		const auto searchEnd = std::chrono::steady_clock::now();
 		const double searchTimeMs = std::chrono::duration<double, std::milli>(searchEnd - searchStart).count();
 		totalSearchTimeMs += searchTimeMs;
+		totalLegalActionGenerationCalls += searchResult.legalActionGenerationCalls;
+		totalLegalActionGenerationTimeMs += searchResult.legalActionGenerationTimeMs;
 
 		if (!searchResult.selectedAction.has_value()) {
 			SetError(error, "mcts-no-action", "MCTS did not select an action", gameIndex, ply);
@@ -466,6 +470,8 @@ Result BuildGameRecord(const SelfPlayRunnerOptions& options, SelfPlayRuntime& ru
 				{ "simulationsRun", searchResult.simulationsRun },
 				{ "nodesCreated", searchResult.nodesCreated },
 				{ "searchTimeMs", searchTimeMs },
+				{ "legalActionGenerationCalls", searchResult.legalActionGenerationCalls },
+				{ "legalActionGenerationTimeMs", searchResult.legalActionGenerationTimeMs },
 			} },
 		});
 
@@ -499,6 +505,7 @@ Result BuildGameRecord(const SelfPlayRunnerOptions& options, SelfPlayRuntime& ru
 	const int sampleCount = static_cast<int>(samples.size());
 	const double averageBranchingFactor = sampleCount == 0 ? 0.0 : static_cast<double>(legalActionTotal) / sampleCount;
 	const double averageSearchTimeMs = sampleCount == 0 ? 0.0 : totalSearchTimeMs / sampleCount;
+	const double averageLegalActionGenerationTimeMs = totalLegalActionGenerationCalls == 0 ? 0.0 : totalLegalActionGenerationTimeMs / totalLegalActionGenerationCalls;
 	const int resignations = terminalReason.is_string() && terminalReason.get<std::string>() == "heuristic-resign" ? 1 : 0;
 
 	gameRecord = {
@@ -524,6 +531,9 @@ Result BuildGameRecord(const SelfPlayRunnerOptions& options, SelfPlayRuntime& ru
 			{ "averageBranchingFactor", averageBranchingFactor },
 			{ "totalSearchTimeMs", totalSearchTimeMs },
 			{ "averageSearchTimeMs", averageSearchTimeMs },
+			{ "totalLegalActionGenerationCalls", totalLegalActionGenerationCalls },
+			{ "totalLegalActionGenerationTimeMs", totalLegalActionGenerationTimeMs },
+			{ "averageLegalActionGenerationTimeMs", averageLegalActionGenerationTimeMs },
 			{ "totalElapsedMs", totalElapsedMs },
 		} },
 	};
@@ -719,6 +729,8 @@ Result RunSelfPlay(const SelfPlayRunnerOptions& options, SelfPlayRunSummary& sum
 				" winner=" << gameRecord.at("winner").dump() <<
 				" actions=" << gameRecord.at("metrics").at("actionCount") <<
 				" samples=" << gameRecord.at("metrics").at("sampleCount") <<
+				" searchMs=" << gameRecord.at("metrics").at("totalSearchTimeMs") <<
+				" legalActionMs=" << gameRecord.at("metrics").at("totalLegalActionGenerationTimeMs") <<
 				" elapsedMs=" << gameRecord.at("metrics").at("totalElapsedMs") <<
 				" out=" << options.outputPath.string() << std::endl;
 		}

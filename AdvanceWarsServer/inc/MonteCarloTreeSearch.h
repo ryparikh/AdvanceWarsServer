@@ -1,7 +1,9 @@
 #pragma once
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <memory>
@@ -47,10 +49,13 @@ struct MCTSSearchResult {
 	std::vector<MCTSActionStats<ActionType>> rootActionStats;
 	int simulationsRun{ 0 };
 	int nodesCreated{ 0 };
+	int legalActionGenerationCalls{ 0 };
+	double legalActionGenerationTimeMs{ 0.0 };
 };
 
 // StateType must provide:
 // - std::vector<ActionType> getLegalActions() const
+// - optional void/result getLegalActions(std::vector<ActionType>&) const for caller-owned action storage
 // - StateType applyAction(const ActionType&) const
 // - optional StateType applyKnownLegalAction(const ActionType&) for known-legal MCTS actions
 // - bool isTerminal() const
@@ -67,6 +72,17 @@ struct HasKnownLegalApply<
 	StateType,
 	ActionType,
 	std::void_t<decltype(std::declval<StateType&>().applyKnownLegalAction(std::declval<const ActionType&>()))>> : std::true_type {
+};
+
+template <typename StateType, typename ActionType, typename = void>
+struct HasFillLegalActions : std::false_type {
+};
+
+template <typename StateType, typename ActionType>
+struct HasFillLegalActions<
+	StateType,
+	ActionType,
+	std::void_t<decltype(std::declval<const StateType&>().getLegalActions(std::declval<std::vector<ActionType>&>()))>> : std::true_type {
 };
 
 template <typename StateType, typename ActionType>
@@ -88,11 +104,12 @@ public:
 		SearchContext context{ std::max(1, options.maxNodes), 1 };
 
 		Node root(rootState, std::nullopt, nullptr);
+		InitializeNode(root, context, true);
 		MCTSSearchResult<ActionType> result;
-		result.nodesCreated = context.nodesCreated;
 
 		if (root.state.isTerminal() || root.legalActions.empty()) {
 			result.rootActionStats = BuildRootActionStats(root);
+			FinalizeSearchResult(result, context);
 			return result;
 		}
 
@@ -102,21 +119,21 @@ public:
 			Node* simulationStart = selected;
 
 			if (!selected->state.isTerminal() &&
-				!selected->unexpandedActions.empty() &&
+				!selected->unexpandedActionIndices.empty() &&
 				context.nodesCreated < context.maxNodes) {
-				simulationStart = ExpandOne(*selected, rng);
+				simulationStart = ExpandOne(*selected, context, rng);
 				++context.nodesCreated;
 			}
 
 			bool reachedTerminal = false;
-			StateType rolloutState = Rollout(simulationStart->state, std::max(0, options.maxRolloutActions), rng, reachedTerminal);
+			StateType rolloutState = Rollout(simulationStart->state, std::max(0, options.maxRolloutActions), context, rng, reachedTerminal);
 			Backpropagate(simulationStart, rolloutState, reachedTerminal);
 			++result.simulationsRun;
 		}
 
-		result.nodesCreated = context.nodesCreated;
 		result.rootActionStats = BuildRootActionStats(root);
 		result.selectedAction = SelectAction(result.rootActionStats, options.temperature, rng);
+		FinalizeSearchResult(result, context);
 		return result;
 	}
 
@@ -126,11 +143,12 @@ public:
 		SearchContext context{ std::max(1, options.maxNodes), 1 };
 
 		Node root(rootState, std::nullopt, nullptr);
+		InitializeNode(root, context, false);
 		MCTSSearchResult<ActionType> result;
-		result.nodesCreated = context.nodesCreated;
 
 		if (root.state.isTerminal() || root.legalActions.empty()) {
 			result.rootActionStats = BuildRootActionStats(root);
+			FinalizeSearchResult(result, context);
 			return result;
 		}
 
@@ -155,13 +173,20 @@ public:
 			++result.simulationsRun;
 		}
 
-		result.nodesCreated = context.nodesCreated;
 		result.rootActionStats = BuildRootActionStats(root);
 		result.selectedAction = SelectAction(result.rootActionStats, options.temperature, rng);
+		FinalizeSearchResult(result, context);
 		return result;
 	}
 
 private:
+	struct SearchContext {
+		int maxNodes{ 1 };
+		int nodesCreated{ 1 };
+		int legalActionGenerationCalls{ 0 };
+		double legalActionGenerationTimeMs{ 0.0 };
+	};
+
 	struct Node {
 		StateType state;
 		std::optional<ActionType> action;
@@ -169,35 +194,69 @@ private:
 		double prior{ 0.0 };
 		std::vector<ActionType> legalActions;
 		std::vector<double> legalActionPriors;
-		std::vector<ActionType> unexpandedActions;
+		std::vector<std::size_t> unexpandedActionIndices;
 		std::vector<std::unique_ptr<Node>> children;
 		int visits{ 0 };
 		double totalValue{ 0.0 };
+		bool legalActionsLoaded{ false };
 		bool neuralExpanded{ false };
 		double evaluatedValue{ 0.0 };
 
-		Node(const StateType& state, std::optional<ActionType> action, Node* parent, double prior = 0.0) :
-			state(state),
+		Node(StateType state, std::optional<ActionType> action, Node* parent, double prior = 0.0) :
+			state(std::move(state)),
 			action(std::move(action)),
 			parent(parent),
 			prior(prior) {
-			if (!this->state.isTerminal()) {
-				legalActions = this->state.getLegalActions();
-				legalActionPriors.assign(legalActions.size(), 0.0);
-				unexpandedActions = legalActions;
-			}
 		}
 	};
 
-	struct SearchContext {
-		int maxNodes{ 1 };
-		int nodesCreated{ 1 };
-	};
+	void LoadLegalActions(const StateType& state, std::vector<ActionType>& legalActions, SearchContext& context) const {
+		const auto start = std::chrono::steady_clock::now();
+		legalActions.clear();
+		if constexpr (MctsDetail::HasFillLegalActions<StateType, ActionType>::value) {
+			state.getLegalActions(legalActions);
+		}
+		else {
+			legalActions = state.getLegalActions();
+		}
+		const auto end = std::chrono::steady_clock::now();
+		++context.legalActionGenerationCalls;
+		context.legalActionGenerationTimeMs += std::chrono::duration<double, std::milli>(end - start).count();
+	}
+
+	void InitializeNode(Node& node, SearchContext& context, bool trackUnexpandedActions) const {
+		if (node.legalActionsLoaded) {
+			return;
+		}
+
+		if (node.state.isTerminal()) {
+			node.legalActionsLoaded = true;
+			return;
+		}
+
+		LoadLegalActions(node.state, node.legalActions, context);
+		node.legalActionsLoaded = true;
+		if (!trackUnexpandedActions) {
+			return;
+		}
+
+		node.unexpandedActionIndices.clear();
+		node.unexpandedActionIndices.reserve(node.legalActions.size());
+		for (std::size_t i = 0; i < node.legalActions.size(); ++i) {
+			node.unexpandedActionIndices.push_back(i);
+		}
+	}
+
+	void FinalizeSearchResult(MCTSSearchResult<ActionType>& result, const SearchContext& context) const {
+		result.nodesCreated = context.nodesCreated;
+		result.legalActionGenerationCalls = context.legalActionGenerationCalls;
+		result.legalActionGenerationTimeMs = context.legalActionGenerationTimeMs;
+	}
 
 	Node* Select(Node& root, double explorationConstant, bool canExpand) {
 		Node* node = &root;
 		while (!node->state.isTerminal()) {
-			if (!node->unexpandedActions.empty() && (canExpand || node->children.empty())) {
+			if (!node->unexpandedActionIndices.empty() && (canExpand || node->children.empty())) {
 				return node;
 			}
 
@@ -211,14 +270,18 @@ private:
 		return node;
 	}
 
-	Node* ExpandOne(Node& node, std::mt19937& rng) {
-		std::uniform_int_distribution<int> distribution(0, static_cast<int>(node.unexpandedActions.size() - 1));
-		const int actionIndex = distribution(rng);
-		ActionType action = node.unexpandedActions[static_cast<std::size_t>(actionIndex)];
-		node.unexpandedActions.erase(node.unexpandedActions.begin() + actionIndex);
+	Node* ExpandOne(Node& node, SearchContext& context, std::mt19937& rng) {
+		std::uniform_int_distribution<int> distribution(0, static_cast<int>(node.unexpandedActionIndices.size() - 1));
+		const std::size_t unexpandedIndex = static_cast<std::size_t>(distribution(rng));
+		const std::size_t actionIndex = node.unexpandedActionIndices[unexpandedIndex];
+		node.unexpandedActionIndices[unexpandedIndex] = node.unexpandedActionIndices.back();
+		node.unexpandedActionIndices.pop_back();
 
+		const ActionType& action = node.legalActions[actionIndex];
 		StateType newState = MctsDetail::ApplyKnownLegalAction(node.state, action);
-		node.children.push_back(std::make_unique<Node>(newState, action, &node));
+		auto child = std::make_unique<Node>(std::move(newState), action, &node);
+		InitializeNode(*child, context, true);
+		node.children.push_back(std::move(child));
 		return node.children.back().get();
 	}
 
@@ -231,6 +294,7 @@ private:
 			return;
 		}
 
+		InitializeNode(node, context, false);
 		if (node.legalActions.empty()) {
 			value = 0.0;
 			node.evaluatedValue = value;
@@ -244,20 +308,25 @@ private:
 		node.legalActionPriors = NormalizePriors(node.legalActions, evaluation.actionPriors);
 		node.neuralExpanded = true;
 
+		const int remainingNodes = context.maxNodes - context.nodesCreated;
+		if (remainingNodes > 0) {
+			const std::size_t childCapacity = std::min(node.legalActions.size(), static_cast<std::size_t>(remainingNodes));
+			node.children.reserve(node.children.size() + childCapacity);
+		}
+
 		for (std::size_t i = 0; i < node.legalActions.size() && context.nodesCreated < context.maxNodes; ++i) {
-			if (FindChild(node, node.legalActions[i]) != nullptr) {
-				continue;
-			}
 			StateType newState = MctsDetail::ApplyKnownLegalAction(node.state, node.legalActions[i]);
-			node.children.push_back(std::make_unique<Node>(newState, node.legalActions[i], &node, node.legalActionPriors[i]));
+			auto child = std::make_unique<Node>(std::move(newState), node.legalActions[i], &node, node.legalActionPriors[i]);
+			node.children.push_back(std::move(child));
 			++context.nodesCreated;
 		}
 	}
 
-	StateType Rollout(const StateType& startState, int maxRolloutActions, std::mt19937& rng, bool& reachedTerminal) {
+	StateType Rollout(const StateType& startState, int maxRolloutActions, SearchContext& context, std::mt19937& rng, bool& reachedTerminal) {
 		StateType state(startState);
+		std::vector<ActionType> actions;
 		for (int i = 0; i < maxRolloutActions && !state.isTerminal(); ++i) {
-			std::vector<ActionType> actions = state.getLegalActions();
+			LoadLegalActions(state, actions, context);
 			if (actions.empty()) {
 				break;
 			}
@@ -348,8 +417,7 @@ private:
 
 		for (std::size_t i = 0; i < root.legalActions.size(); ++i) {
 			const ActionType& action = root.legalActions[i];
-			MCTSActionStats<ActionType> actionStats;
-			actionStats.action = action;
+			MCTSActionStats<ActionType> actionStats{ action };
 			if (i < root.legalActionPriors.size()) {
 				actionStats.prior = root.legalActionPriors[i];
 			}
@@ -365,7 +433,7 @@ private:
 				actionStats.averageValue = actionStats.visits == 0 ? 0.0 : actionStats.totalValue / actionStats.visits;
 			}
 
-			stats.push_back(actionStats);
+			stats.push_back(std::move(actionStats));
 		}
 
 		return stats;

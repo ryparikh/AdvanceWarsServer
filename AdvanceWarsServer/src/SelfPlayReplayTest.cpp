@@ -153,6 +153,15 @@ bool GeneratedReplayValidatesAndUsesSparseSamples() {
 	if (!Expect(!game.at("samples")[0].contains("legalActionMask"), "sample should not store a dense legal action mask")) {
 		return false;
 	}
+	if (!Expect(game.at("samples")[0].at("mcts").at("legalActionGenerationCalls").get<int>() > 0, "sample should report MCTS legal-action generation calls")) {
+		return false;
+	}
+	if (!Expect(game.at("samples")[0].at("mcts").at("legalActionGenerationTimeMs").get<double>() >= 0.0, "sample should report nonnegative MCTS legal-action generation time")) {
+		return false;
+	}
+	if (!Expect(game.at("metrics").at("totalLegalActionGenerationCalls").get<int>() > 0, "metrics should aggregate legal-action generation calls")) {
+		return false;
+	}
 
 	std::filesystem::remove(replayPath);
 	return true;
@@ -227,10 +236,13 @@ bool GeneratedNeuralReplayUsesPolicyValueEvaluator() {
 
 	const json header = ReadJsonLine(replayPath, 1);
 	const json game = ReadJsonLine(replayPath, 2);
+	const json& mcts = game.at("samples")[0].at("mcts");
 	const bool passed =
 		Expect(header.at("config").at("mctsMode") == "neural-puct", "header should record neural MCTS mode") &&
 		Expect(game.at("config").at("mctsMode") == "neural-puct", "game config should record neural MCTS mode") &&
-		Expect(game.at("samples")[0].at("mcts").at("simulationsRun") == 2, "neural sample should record requested simulations") &&
+		Expect(mcts.at("simulationsRun") == 2, "neural sample should record requested simulations") &&
+		Expect(mcts.at("legalActionGenerationCalls").get<int>() > 0, "neural sample should report MCTS legal-action generation calls") &&
+		Expect(mcts.at("legalActionGenerationTimeMs").get<double>() >= 0.0, "neural sample should report MCTS legal-action generation time") &&
 		Expect(runSummary.samplesWritten == 1, "neural smoke run should write one sample");
 
 	std::filesystem::remove(replayPath);

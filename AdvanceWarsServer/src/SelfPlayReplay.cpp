@@ -237,8 +237,16 @@ bool IsNonnegativeNumber(const json& value) {
 		(value.is_number_float() && value.get<double>() >= 0.0);
 }
 
-Result ValidateMctsBlock(const json& mcts, int& simulationsRun, int& nodesCreated, double& searchTimeMs, SelfPlayError& error, int line, int gameIndex, int ply) {
-	IfFailedReturn(RequireObjectWithFields(mcts, { "mctsSeed", "simulationsRun", "nodesCreated", "searchTimeMs" }, "sample.mcts", error, line, gameIndex, ply));
+Result ValidateMctsBlock(const json& mcts, int& simulationsRun, int& nodesCreated, double& searchTimeMs, int& legalActionGenerationCalls, double& legalActionGenerationTimeMs, SelfPlayError& error, int line, int gameIndex, int ply) {
+	IfFailedReturn(RequireObjectWithRequiredAndOptionalFields(
+		mcts,
+		{ "mctsSeed", "simulationsRun", "nodesCreated", "searchTimeMs" },
+		{ "legalActionGenerationCalls", "legalActionGenerationTimeMs" },
+		"sample.mcts",
+		error,
+		line,
+		gameIndex,
+		ply));
 	if (!mcts.at("mctsSeed").is_number_unsigned() && !mcts.at("mctsSeed").is_number_integer()) {
 		SetError(error, "schema-error", "mctsSeed must be an integer", line, gameIndex, ply);
 		return Result::Failed;
@@ -255,10 +263,21 @@ Result ValidateMctsBlock(const json& mcts, int& simulationsRun, int& nodesCreate
 		SetError(error, "schema-error", "searchTimeMs must be nonnegative", line, gameIndex, ply);
 		return Result::Failed;
 	}
+	if (mcts.contains("legalActionGenerationCalls") &&
+		(!mcts.at("legalActionGenerationCalls").is_number_integer() || mcts.at("legalActionGenerationCalls").get<int>() < 0)) {
+		SetError(error, "schema-error", "legalActionGenerationCalls must be nonnegative", line, gameIndex, ply);
+		return Result::Failed;
+	}
+	if (mcts.contains("legalActionGenerationTimeMs") && !IsNonnegativeNumber(mcts.at("legalActionGenerationTimeMs"))) {
+		SetError(error, "schema-error", "legalActionGenerationTimeMs must be nonnegative", line, gameIndex, ply);
+		return Result::Failed;
+	}
 
 	simulationsRun = mcts.at("simulationsRun").get<int>();
 	nodesCreated = mcts.at("nodesCreated").get<int>();
 	searchTimeMs = mcts.at("searchTimeMs").get<double>();
+	legalActionGenerationCalls = mcts.contains("legalActionGenerationCalls") ? mcts.at("legalActionGenerationCalls").get<int>() : 0;
+	legalActionGenerationTimeMs = mcts.contains("legalActionGenerationTimeMs") ? mcts.at("legalActionGenerationTimeMs").get<double>() : 0.0;
 	return Result::Succeeded;
 }
 
@@ -325,9 +344,16 @@ int ExpectedOutcome(const json& winner, int currentPlayer) {
 	return winningPlayer == currentPlayer ? 1 : -1;
 }
 
-Result ValidateMetrics(const json& game, int actionCount, int sampleCount, int turnCount, double totalSearchTimeMs, double averageBranchingFactor, SelfPlayReplayValidationSummary& summary, SelfPlayError& error, int line, int gameIndex) {
+Result ValidateMetrics(const json& game, int actionCount, int sampleCount, int turnCount, double totalSearchTimeMs, int totalLegalActionGenerationCalls, double totalLegalActionGenerationTimeMs, double averageBranchingFactor, SelfPlayReplayValidationSummary& summary, SelfPlayError& error, int line, int gameIndex) {
 	const json& metrics = game.at("metrics");
-	IfFailedReturn(RequireObjectWithFields(metrics, { "actionCount", "sampleCount", "turnCount", "resignations", "invalidActionCount", "averageBranchingFactor", "totalSearchTimeMs", "averageSearchTimeMs", "totalElapsedMs" }, "metrics", error, line, gameIndex));
+	IfFailedReturn(RequireObjectWithRequiredAndOptionalFields(
+		metrics,
+		{ "actionCount", "sampleCount", "turnCount", "resignations", "invalidActionCount", "averageBranchingFactor", "totalSearchTimeMs", "averageSearchTimeMs", "totalElapsedMs" },
+		{ "totalLegalActionGenerationCalls", "totalLegalActionGenerationTimeMs", "averageLegalActionGenerationTimeMs" },
+		"metrics",
+		error,
+		line,
+		gameIndex));
 
 	if (!metrics.at("actionCount").is_number_integer() || metrics.at("actionCount").get<int>() != actionCount ||
 		!metrics.at("sampleCount").is_number_integer() || metrics.at("sampleCount").get<int>() != sampleCount ||
@@ -357,6 +383,32 @@ Result ValidateMetrics(const json& game, int actionCount, int sampleCount, int t
 	if (std::fabs(metrics.at("totalSearchTimeMs").get<double>() - totalSearchTimeMs) > kMetricTolerance) {
 		SetError(error, "metrics-mismatch", "totalSearchTimeMs does not match samples", line, gameIndex);
 		return Result::Failed;
+	}
+	const bool hasLegalActionMetrics =
+		metrics.contains("totalLegalActionGenerationCalls") ||
+		metrics.contains("totalLegalActionGenerationTimeMs") ||
+		metrics.contains("averageLegalActionGenerationTimeMs");
+	if (hasLegalActionMetrics) {
+		if (!metrics.contains("totalLegalActionGenerationCalls") ||
+			!metrics.contains("totalLegalActionGenerationTimeMs") ||
+			!metrics.contains("averageLegalActionGenerationTimeMs")) {
+			SetError(error, "schema-error", "legal-action generation metrics must be present together", line, gameIndex);
+			return Result::Failed;
+		}
+		if (!metrics.at("totalLegalActionGenerationCalls").is_number_integer() ||
+			metrics.at("totalLegalActionGenerationCalls").get<int>() < 0 ||
+			!IsNonnegativeNumber(metrics.at("totalLegalActionGenerationTimeMs")) ||
+			!IsNonnegativeNumber(metrics.at("averageLegalActionGenerationTimeMs"))) {
+			SetError(error, "schema-error", "legal-action generation metrics must be nonnegative", line, gameIndex);
+			return Result::Failed;
+		}
+		const double expectedAverage = totalLegalActionGenerationCalls == 0 ? 0.0 : totalLegalActionGenerationTimeMs / totalLegalActionGenerationCalls;
+		if (metrics.at("totalLegalActionGenerationCalls").get<int>() != totalLegalActionGenerationCalls ||
+			std::fabs(metrics.at("totalLegalActionGenerationTimeMs").get<double>() - totalLegalActionGenerationTimeMs) > kMetricTolerance ||
+			std::fabs(metrics.at("averageLegalActionGenerationTimeMs").get<double>() - expectedAverage) > kMetricTolerance) {
+			SetError(error, "metrics-mismatch", "legal-action generation metrics do not match samples", line, gameIndex);
+			return Result::Failed;
+		}
 	}
 
 	summary.invalidActions += metrics.at("invalidActionCount").get<int>();
@@ -443,6 +495,8 @@ Result ValidateGameRecord(const json& game, SelfPlayReplayValidationSummary& sum
 
 	int legalActionTotal = 0;
 	double totalSearchTimeMs = 0.0;
+	int totalLegalActionGenerationCalls = 0;
+	double totalLegalActionGenerationTimeMs = 0.0;
 	for (std::size_t i = 0; i < game.at("samples").size(); ++i) {
 		const int ply = static_cast<int>(i);
 		const json& actionEntry = game.at("actions").at(i);
@@ -509,9 +563,13 @@ Result ValidateGameRecord(const json& game, SelfPlayReplayValidationSummary& sum
 		int simulationsRun = 0;
 		int nodesCreated = 0;
 		double searchTimeMs = 0.0;
-		IfFailedReturn(ValidateMctsBlock(sample.at("mcts"), simulationsRun, nodesCreated, searchTimeMs, error, line, gameIndex, ply));
+		int legalActionGenerationCalls = 0;
+		double legalActionGenerationTimeMs = 0.0;
+		IfFailedReturn(ValidateMctsBlock(sample.at("mcts"), simulationsRun, nodesCreated, searchTimeMs, legalActionGenerationCalls, legalActionGenerationTimeMs, error, line, gameIndex, ply));
 		IfFailedReturn(ValidateVisitCounts(sample.at("visitCounts"), legalActionIndices, actionIndex, simulationsRun, error, line, gameIndex, ply));
 		totalSearchTimeMs += searchTimeMs;
+		totalLegalActionGenerationCalls += legalActionGenerationCalls;
+		totalLegalActionGenerationTimeMs += legalActionGenerationTimeMs;
 
 		if (!sample.at("outcome").is_number_integer() || sample.at("outcome").get<int>() != ExpectedOutcome(game.at("winner"), currentPlayer)) {
 			SetError(error, "outcome-mismatch", "sample outcome does not match winner/currentPlayer", line, gameIndex, ply);
@@ -557,7 +615,7 @@ Result ValidateGameRecord(const json& game, SelfPlayReplayValidationSummary& sum
 
 	const int sampleCount = static_cast<int>(game.at("samples").size());
 	const double averageBranchingFactor = sampleCount == 0 ? 0.0 : static_cast<double>(legalActionTotal) / sampleCount;
-	IfFailedReturn(ValidateMetrics(game, static_cast<int>(game.at("actions").size()), sampleCount, replayState.GetTurnCount(), totalSearchTimeMs, averageBranchingFactor, summary, error, line, gameIndex));
+	IfFailedReturn(ValidateMetrics(game, static_cast<int>(game.at("actions").size()), sampleCount, replayState.GetTurnCount(), totalSearchTimeMs, totalLegalActionGenerationCalls, totalLegalActionGenerationTimeMs, averageBranchingFactor, summary, error, line, gameIndex));
 
 	++summary.games;
 	summary.samples += sampleCount;

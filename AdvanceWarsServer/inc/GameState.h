@@ -190,9 +190,14 @@ public:
 		return m_fGameOver;
 	}
 
+	void getLegalActions(std::vector<Action>& vecActions) const noexcept {
+		vecActions.clear();
+		GetValidActions(vecActions);
+	}
+
 	std::vector<Action> getLegalActions() const {
 		std::vector<Action> vecActions;
-		GetValidActions(vecActions);
+		getLegalActions(vecActions);
 		return vecActions;
 	}
 

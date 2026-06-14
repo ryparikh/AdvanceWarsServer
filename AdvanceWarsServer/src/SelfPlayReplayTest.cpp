@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "PolicyValueModel.h"
 #include "SelfPlayReplay.h"
@@ -374,6 +376,66 @@ bool LegacyReplayHeaderCanAppendRolloutDefaults() {
 		Expect(validationSummary.games == 2, "legacy append test should contain two games");
 }
 
+bool CurriculumMapsCanGenerateValidatedReplays() {
+	const std::vector<std::pair<std::string, int>> mapCases{
+		{ "tiny-capture-5x5", 5 },
+		{ "tiny-skirmish-5x5", 5 },
+		{ "small-capture-7x7", 7 },
+		{ "small-production-7x7", 7 },
+	};
+
+	for (std::size_t i = 0; i < mapCases.size(); ++i) {
+		const std::string& mapId = mapCases[i].first;
+		const int expectedSize = mapCases[i].second;
+		const std::filesystem::path replayPath = MakeTempReplayPath("self-play-" + mapId);
+		std::filesystem::remove(replayPath);
+
+		SelfPlayRunnerOptions options;
+		options.outputPath = replayPath;
+		options.mapId = mapId;
+		options.player0CoId = "andy";
+		options.player1CoId = "adder";
+		options.games = 1;
+		options.maxActions = 2;
+		options.baseSeed = static_cast<std::uint32_t>(101 + i);
+		options.mctsOptions.maxSimulations = 1;
+		options.mctsOptions.maxNodes = 32;
+		options.mctsOptions.maxRolloutActions = 4;
+		options.mctsOptions.temperature = 0.0;
+		options.quiet = true;
+
+		SelfPlayRunSummary runSummary;
+		SelfPlayError error;
+		if (!Expect(RunSelfPlay(options, runSummary, error) == Result::Succeeded, "curriculum map should generate replay: " + mapId + " " + error.message)) {
+			std::filesystem::remove(replayPath);
+			return false;
+		}
+
+		SelfPlayReplayValidationSummary validationSummary;
+		if (!Expect(ValidateSelfPlayReplay(replayPath, validationSummary, error) == Result::Succeeded, "curriculum map replay should validate: " + mapId + " " + error.message)) {
+			std::filesystem::remove(replayPath);
+			return false;
+		}
+
+		const json header = ReadJsonLine(replayPath, 1);
+		const json game = ReadJsonLine(replayPath, 2);
+		const json& map = game.at("initialState").at("map");
+		const bool passed =
+			Expect(header.at("config").at("mapId") == mapId, "header should record curriculum map id: " + mapId) &&
+			Expect(game.at("config").at("mapId") == mapId, "game should record curriculum map id: " + mapId) &&
+			Expect(static_cast<int>(map.size()) == expectedSize, "curriculum map should have expected row count: " + mapId) &&
+			Expect(static_cast<int>(map.at(0).size()) == expectedSize, "curriculum map should have expected column count: " + mapId) &&
+			Expect(validationSummary.games == 1, "curriculum map validation should see one game: " + mapId);
+
+		std::filesystem::remove(replayPath);
+		if (!passed) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool InvalidSelfPlaySetupReportsError() {
 	SelfPlayRunnerOptions options;
 	options.outputPath = MakeTempReplayPath("self-play-invalid-setup");
@@ -418,6 +480,10 @@ int RunSelfPlayReplayTests() {
 	}
 
 	if (!LegacyReplayHeaderCanAppendRolloutDefaults()) {
+		return 1;
+	}
+
+	if (!CurriculumMapsCanGenerateValidatedReplays()) {
 		return 1;
 	}
 

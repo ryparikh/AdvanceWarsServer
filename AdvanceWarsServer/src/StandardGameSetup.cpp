@@ -16,9 +16,13 @@ struct MapTemplate {
 	const char* path;
 };
 
-constexpr std::array<MapTemplate, 2> MapTemplates{ {
+constexpr std::array<MapTemplate, 6> MapTemplates{ {
 	{ "lefty", "res/AWBW/MapSources/Lefty.json" },
 	{ "mcts", "res/AWBW/MapSources/MCTS.json" },
+	{ "tiny-capture-5x5", "res/AWBW/MapSources/TinyCapture5x5.json" },
+	{ "tiny-skirmish-5x5", "res/AWBW/MapSources/TinySkirmish5x5.json" },
+	{ "small-capture-7x7", "res/AWBW/MapSources/SmallCapture7x7.json" },
+	{ "small-production-7x7", "res/AWBW/MapSources/SmallProduction7x7.json" },
 } };
 
 void SetError(StandardGameSetupError& error, StandardGameSetupErrorType type, const std::string& code, const std::string& message, json details = json::object()) {

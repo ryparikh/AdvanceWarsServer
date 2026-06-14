@@ -1,4 +1,9 @@
 import { parseGameStatePayload, type ParsedGameStatePayload } from "./schema";
+import { isVisualizerTracePayload, parseVisualizerTracePayload, type ParsedVisualizerTrace } from "./trace";
+
+export type ParsedLoadedPayload = ParsedGameStatePayload & {
+  trace?: ParsedVisualizerTrace;
+};
 
 function selectedFileLabel(fileName: string): string {
   return fileName.trim() || "selected file";
@@ -32,7 +37,7 @@ function isReplayGameRecord(payload: unknown): payload is { initialState: unknow
   );
 }
 
-function parseReplayJsonl(text: string, fileName: string): ParsedGameStatePayload {
+function parseReplayJsonl(text: string, fileName: string): ParsedLoadedPayload {
   const lines = text.split(/\r?\n/);
 
   for (let index = 0; index < lines.length; index += 1) {
@@ -50,7 +55,20 @@ function parseReplayJsonl(text: string, fileName: string): ParsedGameStatePayloa
   throw new Error(`${selectedFileLabel(fileName)} does not contain a replay game record`);
 }
 
-export function parseGameStateFileText(text: string, fileName = "selected file"): ParsedGameStatePayload {
+export function parseLoadedPayload(payload: unknown): ParsedLoadedPayload {
+  if (isVisualizerTracePayload(payload)) {
+    const trace = parseVisualizerTracePayload(payload);
+    return {
+      gameState: trace.initialState,
+      legalActionGroups: [],
+      trace
+    };
+  }
+
+  return parseGameStatePayload(payload);
+}
+
+export function parseGameStateFileText(text: string, fileName = "selected file"): ParsedLoadedPayload {
   if (text.trim().length === 0) {
     throw new Error(`${selectedFileLabel(fileName)} is empty`);
   }
@@ -64,5 +82,5 @@ export function parseGameStateFileText(text: string, fileName = "selected file")
     return parseGameStatePayload(payload.initialState);
   }
 
-  return parseGameStatePayload(payload);
+  return parseLoadedPayload(payload);
 }

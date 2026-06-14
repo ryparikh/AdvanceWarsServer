@@ -2,8 +2,9 @@ import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { BoardCanvas } from "./components/BoardCanvas";
 import { actionHighlightsForSource } from "./rendering/actions";
 import { actionToSubmitFromBoardTarget, actionsVisibleInInspector, buyMenuItems, globalActionsFromLegalActions, labelForAction } from "./gameState/actionDisplay";
-import { coordinateKey, parseGameStatePayload, type Action, legalActionEnvelopeSchema, type Coordinate, type GameState, type ValidActionGroup } from "./gameState/schema";
-import { parseGameStateFileText } from "./gameState/filePayload";
+import { coordinateKey, type Action, legalActionEnvelopeSchema, type Coordinate, type GameState, type ValidActionGroup } from "./gameState/schema";
+import { parseGameStateFileText, parseLoadedPayload, type ParsedLoadedPayload } from "./gameState/filePayload";
+import { changedTilesBetween, stateForTraceIndex, stepForTraceIndex, type ParsedVisualizerTrace } from "./gameState/trace";
 import { normalizeServerBaseUrl, serverApiUrl } from "./api/url";
 import { terrainDisplayName } from "./rendering/terrain";
 import { unitAssetPath, unitFallbackLabel } from "./rendering/unitAssets";
@@ -21,6 +22,8 @@ type LoadedState = {
   legalActionGroups: ValidActionGroup[];
   source: LoadSource;
   label: string;
+  trace?: ParsedVisualizerTrace;
+  traceIndex: number;
 };
 
 type Toggles = {
@@ -91,6 +94,24 @@ function selectedTile(gameState: GameState, selected?: Coordinate) {
   return gameState.map[selected[1]]?.[selected[0]];
 }
 
+function loadedStateFromParsed(parsed: ParsedLoadedPayload, source: LoadSource, label: string, globalActions: Action[] = []): LoadedState {
+  return {
+    gameState: parsed.trace ? stateForTraceIndex(parsed.trace, 0) : parsed.gameState,
+    legalActionGroups: parsed.legalActionGroups,
+    globalActions,
+    source,
+    label,
+    trace: parsed.trace,
+    traceIndex: 0
+  };
+}
+
+function traceSourceLabel(trace: ParsedVisualizerTrace): string {
+  const kind = typeof trace.source?.kind === "string" ? trace.source.kind : "trace";
+  const gameIndex = typeof trace.source?.gameIndex === "number" ? ` game ${trace.source.gameIndex}` : "";
+  return `${kind}${gameIndex}`;
+}
+
 export default function App() {
   const [loaded, setLoaded] = useState<LoadedState | undefined>();
   const [selected, setSelected] = useState<Coordinate | undefined>();
@@ -111,6 +132,19 @@ export default function App() {
     terrainIds: false
   });
 
+  function resetInspection() {
+    setSelected(undefined);
+    setInspectedCoordinate(undefined);
+    setSelectedActions([]);
+    setInspectedActions([]);
+  }
+
+  function setParsedLoaded(parsed: ParsedLoadedPayload, source: LoadSource, label: string, globalActions: Action[] = []) {
+    actionRequestId.current += 1;
+    setLoaded(loadedStateFromParsed(parsed, source, label, globalActions));
+    resetInspection();
+  }
+
   async function loadPayload(path: string, label: string) {
     const requestId = loadRequestId.current + 1;
     loadRequestId.current = requestId;
@@ -118,16 +152,11 @@ export default function App() {
     setError(undefined);
     try {
       const payload = await fetchJson(path);
-      const parsed = parseGameStatePayload(payload);
+      const parsed = parseLoadedPayload(payload);
       if (loadRequestId.current !== requestId) {
         return;
       }
-      actionRequestId.current += 1;
-      setLoaded({ ...parsed, globalActions: [], source: "sample", label });
-      setSelected(undefined);
-      setInspectedCoordinate(undefined);
-      setSelectedActions([]);
-      setInspectedActions([]);
+      setParsedLoaded(parsed, "sample", label);
     } catch (err) {
       if (loadRequestId.current === requestId) {
         setError(err instanceof Error ? err.message : "Unable to load sample");
@@ -176,17 +205,12 @@ export default function App() {
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
       }
-      const parsed = parseGameStatePayload(await response.json());
+      const parsed = parseLoadedPayload(await response.json());
       const globalActions = await fetchServerGlobalActions(baseUrl, parsed.gameState.gameId);
       if (loadRequestId.current !== requestId) {
         return;
       }
-      actionRequestId.current += 1;
-      setLoaded({ ...parsed, globalActions, source: "server", label: "Server game" });
-      setSelected(undefined);
-      setInspectedCoordinate(undefined);
-      setSelectedActions([]);
-      setInspectedActions([]);
+      setParsedLoaded(parsed, "server", "Server game", globalActions);
     } catch (err) {
       if (loadRequestId.current === requestId) {
         setError(err instanceof Error ? err.message : "Unable to create server game");
@@ -206,13 +230,7 @@ export default function App() {
       if (pasteValue.length > maxPastedJsonCharacters) {
         throw new Error("Pasted JSON is too large");
       }
-      const parsed = parseGameStatePayload(JSON.parse(pasteValue));
-      actionRequestId.current += 1;
-      setLoaded({ ...parsed, globalActions: [], source: "pasted", label: "Pasted JSON" });
-      setSelected(undefined);
-      setInspectedCoordinate(undefined);
-      setSelectedActions([]);
-      setInspectedActions([]);
+      setParsedLoaded(parseLoadedPayload(JSON.parse(pasteValue)), "pasted", "Pasted JSON");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to parse pasted JSON");
     }
@@ -235,12 +253,7 @@ export default function App() {
         return;
       }
 
-      actionRequestId.current += 1;
-      setLoaded({ ...parsed, globalActions: [], source: "file", label: file.name });
-      setSelected(undefined);
-      setInspectedCoordinate(undefined);
-      setSelectedActions([]);
-      setInspectedActions([]);
+      setParsedLoaded(parsed, "file", file.name);
     } catch (err) {
       if (loadRequestId.current === requestId) {
         setError(err instanceof Error ? err.message : "Unable to load selected file");
@@ -329,17 +342,13 @@ export default function App() {
         throw new Error(`${response.status} ${response.statusText}`);
       }
 
-      const parsed = parseGameStatePayload(await response.json());
+      const parsed = parseLoadedPayload(await response.json());
       const globalActions = await fetchServerGlobalActions(baseUrl, parsed.gameState.gameId);
       if (loadRequestId.current !== requestId) {
         return;
       }
 
-      setLoaded({ ...parsed, globalActions, source: "server", label: loaded.label });
-      setSelected(undefined);
-      setInspectedCoordinate(undefined);
-      setSelectedActions([]);
-      setInspectedActions([]);
+      setParsedLoaded(parsed, "server", loaded.label, globalActions);
     } catch (err) {
       if (loadRequestId.current === requestId) {
         setError(err instanceof Error ? err.message : "Unable to submit action");
@@ -353,6 +362,28 @@ export default function App() {
 
   function toggle(key: keyof Toggles) {
     setToggles((current) => ({ ...current, [key]: !current[key] }));
+  }
+
+  function selectTraceIndex(index: number) {
+    if (!loaded?.trace) {
+      return;
+    }
+
+    actionRequestId.current += 1;
+    resetInspection();
+    setLoaded((current) => {
+      if (!current?.trace) {
+        return current;
+      }
+
+      const traceIndex = Math.max(0, Math.min(index, current.trace.steps.length));
+      return {
+        ...current,
+        gameState: stateForTraceIndex(current.trace, traceIndex),
+        traceIndex,
+        globalActions: []
+      };
+    });
   }
 
   const displayCoordinate = inspectedCoordinate ?? selected;
@@ -369,6 +400,17 @@ export default function App() {
   const canSubmitDisplayedActions = loaded?.source === "server" && loaded.gameState["game-over"] === false;
   const mapRows = loaded?.gameState.map.length ?? 0;
   const mapCols = loaded?.gameState.map[0]?.length ?? 0;
+  const currentTraceStep = loaded?.trace ? stepForTraceIndex(loaded.trace, loaded.traceIndex) : undefined;
+  const changedTiles = useMemo(() => {
+    if (!loaded?.trace || loaded.traceIndex <= 0) {
+      return [];
+    }
+
+    return changedTilesBetween(
+      stateForTraceIndex(loaded.trace, loaded.traceIndex - 1),
+      stateForTraceIndex(loaded.trace, loaded.traceIndex)
+    );
+  }, [loaded?.trace, loaded?.traceIndex]);
 
   return (
     <main className="app-shell">
@@ -381,6 +423,7 @@ export default function App() {
               <span>{activePlayerName(loaded.gameState)}</span>
               <span>{loaded.gameState.weather ?? "clear"}</span>
               <span>{loaded.gameState["game-over"] ? `Winner ${loaded.gameState.winner}` : "active"}</span>
+              {loaded.trace && <span>Step {loaded.traceIndex}/{loaded.trace.steps.length}</span>}
             </>
           ) : (
             <span>Loading board</span>
@@ -394,6 +437,9 @@ export default function App() {
         </button>
         <button type="button" onClick={() => loadPayload("/samples/grit-indirect-range-valid-actions.json", "Grit action sample")}>
           Action sample
+        </button>
+        <button type="button" onClick={() => loadPayload("/samples/tiny-self-play-trace.json", "Tiny replay trace")}>
+          Replay trace
         </button>
         <button type="button" onClick={() => fileInputRef.current?.click()}>
           Open file
@@ -451,10 +497,30 @@ export default function App() {
                 showCoordinates={toggles.coordinates}
                 showGrid={toggles.grid}
                 showTerrainIds={toggles.terrainIds}
+                changedTiles={changedTiles}
                 onSelectTile={selectTile}
               />
             )}
           </div>
+
+          {loaded?.trace && (
+            <div className="trace-controls">
+              <button type="button" onClick={() => selectTraceIndex(loaded.traceIndex - 1)} disabled={loaded.traceIndex <= 0}>
+                Prev
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={loaded.trace.steps.length}
+                value={loaded.traceIndex}
+                onChange={(event) => selectTraceIndex(Number(event.target.value))}
+              />
+              <button type="button" onClick={() => selectTraceIndex(loaded.traceIndex + 1)} disabled={loaded.traceIndex >= loaded.trace.steps.length}>
+                Next
+              </button>
+              <span>{loaded.traceIndex}/{loaded.trace.steps.length}</span>
+            </div>
+          )}
 
           {loaded && (
             <div className="player-panels">
@@ -494,6 +560,68 @@ export default function App() {
               </div>
             </dl>
           </div>
+
+          {loaded?.trace && (
+            <div className="inspector-block">
+              <h2>Trace</h2>
+              <dl>
+                <div>
+                  <dt>Source</dt>
+                  <dd>{traceSourceLabel(loaded.trace)}</dd>
+                </div>
+                <div>
+                  <dt>Step</dt>
+                  <dd>{loaded.traceIndex}/{loaded.trace.steps.length}</dd>
+                </div>
+                <div>
+                  <dt>Action</dt>
+                  <dd>{currentTraceStep ? labelForAction(currentTraceStep.action) : "Initial state"}</dd>
+                </div>
+                <div>
+                  <dt>Legal</dt>
+                  <dd>{currentTraceStep?.legalActionCount ?? "-"}</dd>
+                </div>
+                <div>
+                  <dt>Terminal</dt>
+                  <dd>{loaded.trace.terminalReason ?? "-"}</dd>
+                </div>
+                <div>
+                  <dt>Winner</dt>
+                  <dd>{loaded.trace.winner ?? "-"}</dd>
+                </div>
+              </dl>
+              {currentTraceStep && (
+                <pre>{JSON.stringify({
+                  ply: currentTraceStep.ply,
+                  player: currentTraceStep.player,
+                  actionIndex: currentTraceStep.actionIndex,
+                  action: currentTraceStep.action,
+                  selectedActionIndex: currentTraceStep.selectedActionIndex,
+                  mcts: currentTraceStep.mcts,
+                  visitCounts: currentTraceStep.visitCounts?.slice(0, 20)
+                }, null, 2)}</pre>
+              )}
+              <div className="trace-log">
+                <button type="button" className={loaded.traceIndex === 0 ? "trace-log-row active-trace-row" : "trace-log-row"} onClick={() => selectTraceIndex(0)}>
+                  <span>0</span>
+                  <span>-</span>
+                  <span>Initial state</span>
+                </button>
+                {loaded.trace.steps.map((step, index) => (
+                  <button
+                    type="button"
+                    className={loaded.traceIndex === index + 1 ? "trace-log-row active-trace-row" : "trace-log-row"}
+                    key={`${step.ply}-${step.actionIndex}`}
+                    onClick={() => selectTraceIndex(index + 1)}
+                  >
+                    <span>{index + 1}</span>
+                    <span>P{step.player}</span>
+                    <span>{labelForAction(step.action)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="inspector-block">
             <h2>{displayCoordinate ? `(${displayCoordinate[0]}, ${displayCoordinate[1]})` : "Tile"}</h2>

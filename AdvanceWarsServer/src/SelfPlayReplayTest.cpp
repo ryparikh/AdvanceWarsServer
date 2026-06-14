@@ -169,6 +169,52 @@ bool GeneratedReplayValidatesAndUsesSparseSamples() {
 	return true;
 }
 
+bool ReplayTraceExportMaterializesEveryActionState() {
+	const std::filesystem::path replayPath = MakeTempReplayPath("self-play-replay-trace-source");
+	std::filesystem::remove(replayPath);
+
+	SelfPlayRunnerOptions options;
+	options.outputPath = replayPath;
+	options.mapId = "mcts";
+	options.player0CoId = "andy";
+	options.player1CoId = "adder";
+	options.games = 1;
+	options.maxActions = 2;
+	options.baseSeed = 19;
+	options.mctsOptions.maxSimulations = 1;
+	options.mctsOptions.maxNodes = 16;
+	options.mctsOptions.maxRolloutActions = 4;
+	options.mctsOptions.temperature = 0.0;
+	options.quiet = true;
+
+	SelfPlayRunSummary runSummary;
+	SelfPlayError error;
+	if (!Expect(RunSelfPlay(options, runSummary, error) == Result::Succeeded, "self-play run should create trace source replay: " + error.message)) {
+		std::filesystem::remove(replayPath);
+		return false;
+	}
+
+	const json game = ReadJsonLine(replayPath, 2);
+	json trace;
+	if (!Expect(ExportSelfPlayReplayTrace(replayPath, 0, trace, error) == Result::Succeeded, "trace export should materialize replay states: " + error.message)) {
+		std::filesystem::remove(replayPath);
+		return false;
+	}
+
+	const bool passed =
+		Expect(trace.at("traceFormatVersion") == "standard-gl-visualizer-trace-v1", "trace should identify the visualizer format") &&
+		Expect(trace.at("initialState") == game.at("initialState"), "trace should preserve the replay initial state") &&
+		Expect(trace.at("steps").size() == game.at("actions").size(), "trace should have one step per replay action") &&
+		Expect(trace.at("steps")[0].at("action") == game.at("actions")[0].at("action"), "trace step should preserve submitted action JSON") &&
+		Expect(trace.at("steps")[0].at("legalActionCount") == game.at("samples")[0].at("legalActionCount"), "trace step should expose the pre-action legal count") &&
+		Expect(trace.at("steps").back().at("resultingState") == game.at("finalState"), "last trace step should reach replay final state") &&
+		Expect(trace.at("terminalReason") == game.at("terminalReason"), "trace should expose terminal reason") &&
+		Expect(trace.at("winner") == game.at("winner"), "trace should expose winner");
+
+	std::filesystem::remove(replayPath);
+	return passed;
+}
+
 bool WriteLegacyReplayWithoutSearchMetadata(const std::filesystem::path& source, const std::filesystem::path& target) {
 	std::ifstream input(source);
 	std::ofstream output(target, std::ios::trunc);
@@ -464,6 +510,10 @@ bool InvalidSelfPlaySetupReportsError() {
 
 int RunSelfPlayReplayTests() {
 	if (!GeneratedReplayValidatesAndUsesSparseSamples()) {
+		return 1;
+	}
+
+	if (!ReplayTraceExportMaterializesEveryActionState()) {
 		return 1;
 	}
 

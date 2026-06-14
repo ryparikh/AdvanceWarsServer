@@ -27,6 +27,15 @@ Validate an existing shard:
 ..\x64\Debug\AdvanceWarsServer.exe -validate-replay ..\artifacts\replays\smoke.jsonl
 ```
 
+Export a materialized visualizer trace from a replay shard:
+
+```powershell
+..\x64\Debug\AdvanceWarsServer.exe -export-replay-trace `
+  ..\artifacts\replays\smoke.jsonl `
+  ..\artifacts\replays\smoke-trace.json `
+  --game-index 0
+```
+
 Generate one neural-guided PUCT replay from an initialized checkpoint:
 
 ```powershell
@@ -46,6 +55,8 @@ Generate one neural-guided PUCT replay from an initialized checkpoint:
 `-self-play` writes the replay and then validates the whole file. If validation fails, the file is left in place for debugging and the process returns nonzero.
 
 By default, `-self-play` fails when `--out` already exists. Pass `--append` to append to an existing compatible shard. Appends validate the whole existing file first. An empty existing file is treated as a new shard and receives a fresh header.
+
+`-export-replay-trace` validates the selected game record and replays it through the engine to write `standard-gl-visualizer-trace-v1` JSON. The trace contains `initialState`, one `steps[]` entry per action with the submitted action, pre-action search metadata, and the authoritative `resultingState`, plus `finalState`, `terminalReason`, `winner`, and game metrics. This keeps the browser visualizer from reimplementing game rules while still allowing forward/backward scrubbing.
 
 ## Options
 

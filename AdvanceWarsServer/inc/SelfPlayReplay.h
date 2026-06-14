@@ -22,6 +22,10 @@ struct SelfPlayReplayValidationSummary {
 };
 
 const char* SelfPlayReplayFormatVersion() noexcept;
+const char* SelfPlayReplayTraceFormatVersion() noexcept;
 json SelfPlayVersionsJson();
 Result ValidateSelfPlayReplay(const std::filesystem::path& path, SelfPlayReplayValidationSummary& summary, SelfPlayError& error);
 Result ValidateSelfPlayReplayForAppend(const std::filesystem::path& path, const json& expectedHeader, SelfPlayReplayValidationSummary& summary, SelfPlayError& error);
+Result ExportSelfPlayReplayTrace(const std::filesystem::path& replayPath, int gameIndex, json& trace, SelfPlayError& error);
+Result ExportSelfPlayReplayTraceFile(const std::filesystem::path& replayPath, const std::filesystem::path& outputPath, int gameIndex, SelfPlayError& error);
+int RunExportReplayTraceCommand(int argc, char* argv[]) noexcept;

@@ -19,6 +19,7 @@ export type RenderBoardOptions = {
   hover?: Coordinate;
   movementTrail?: Coordinate[];
   highlights?: ActionHighlights;
+  changedTiles?: Coordinate[];
   showCoordinates: boolean;
   showGrid: boolean;
   showTerrainIds: boolean;
@@ -439,6 +440,32 @@ function drawHighlights(ctx: CanvasRenderingContext2D, options: RenderBoardOptio
   ctx.restore();
 }
 
+function drawChangedTiles(ctx: CanvasRenderingContext2D, changedTiles: Coordinate[] | undefined) {
+  if (!changedTiles || changedTiles.length === 0) {
+    return;
+  }
+
+  ctx.save();
+  for (const [x, y] of changedTiles) {
+    const left = x * tileSize;
+    const top = y * tileSize;
+    ctx.fillStyle = "rgba(255, 221, 74, 0.32)";
+    ctx.fillRect(left, top, tileSize, tileSize);
+    ctx.strokeStyle = "#1d2330";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(left + 1.5, top + 1.5, tileSize - 3, tileSize - 3);
+    ctx.strokeStyle = "#ffe15a";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(left + 1.5, top + 1.5, tileSize - 3, tileSize - 3);
+    ctx.fillStyle = "#ffe15a";
+    ctx.fillRect(left + 2, top + 2, 4, 4);
+    ctx.fillRect(left + tileSize - 6, top + 2, 4, 4);
+    ctx.fillRect(left + 2, top + tileSize - 6, 4, 4);
+    ctx.fillRect(left + tileSize - 6, top + tileSize - 6, 4, 4);
+  }
+  ctx.restore();
+}
+
 function drawAttackArrow(ctx: CanvasRenderingContext2D, attacker: Coordinate, defender: Coordinate) {
   const start = tileCenter(attacker);
   const end = tileCenter(defender);
@@ -601,6 +628,7 @@ export function renderBoard(ctx: CanvasRenderingContext2D, state: GameState, opt
   drawHighlights(ctx, options);
   drawCaptureProgress(ctx, state);
   drawUnits(ctx, state, options.images);
+  drawChangedTiles(ctx, options.changedTiles);
   drawDebugOverlays(ctx, state, options);
   drawActionPreview(ctx, state, options);
   drawCursor(ctx, options);

@@ -1,0 +1,885 @@
+{
+  "finalState": {
+    "activePlayer": 1,
+    "cap-limit": 21,
+    "combat-rng-seed": 19,
+    "game-over": false,
+    "gameId": "b7d7af08-18f3-44ec-9c7a-753916c643ff",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 42
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 1
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 39,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": true,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 44,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 2
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 34
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 47
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 2000,
+        "luck-policy": 0,
+        "power-meter": {
+          "can-use-cop": false,
+          "can-use-scop": false,
+          "charge": 0,
+          "cop-stars": 3,
+          "cop-threshold": 27000,
+          "scop-stars": 3,
+          "scop-threshold": 54000,
+          "star-value": 9000
+        },
+        "power-status": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 2000,
+        "luck-policy": 0,
+        "power-meter": {
+          "can-use-cop": false,
+          "can-use-scop": false,
+          "charge": 0,
+          "cop-stars": 2,
+          "cop-threshold": 18000,
+          "scop-stars": 3,
+          "scop-threshold": 45000,
+          "star-value": 9000
+        },
+        "power-status": 0
+      }
+    ],
+    "settings": {
+      "bannedUnits": [
+        "blackbomb"
+      ],
+      "captureLimit": 21,
+      "coPowers": true,
+      "dayLimit": null,
+      "fog": false,
+      "heuristicAutoResign": false,
+      "incomePerProperty": 1000,
+      "mode": "standard",
+      "startingFunds": 0,
+      "tags": false,
+      "unitCap": 50,
+      "weather": "clear"
+    },
+    "terminalReason": null,
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "initialState": {
+    "activePlayer": 0,
+    "cap-limit": 21,
+    "combat-rng-seed": 19,
+    "game-over": false,
+    "gameId": "b7d7af08-18f3-44ec-9c7a-753916c643ff",
+    "map": [
+      [
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 42
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 1
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "orange-star"
+          },
+          "terrain": 39,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "orange-star",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "terrain": 3
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 44,
+          "unit": {
+            "ammo": 0,
+            "fuel": 99,
+            "health": 100,
+            "hidden": false,
+            "moved": false,
+            "owner": "blue-moon",
+            "type": "infantry"
+          }
+        },
+        {
+          "terrain": 1
+        }
+      ],
+      [
+        {
+          "terrain": 2
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "neutral"
+          },
+          "terrain": 34
+        },
+        {
+          "terrain": 2
+        },
+        {
+          "terrain": 1
+        },
+        {
+          "property": {
+            "capture-points": 20,
+            "owner": "blue-moon"
+          },
+          "terrain": 47
+        }
+      ]
+    ],
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "Andy",
+        "funds": 2000,
+        "luck-policy": 0,
+        "power-meter": {
+          "can-use-cop": false,
+          "can-use-scop": false,
+          "charge": 0,
+          "cop-stars": 3,
+          "cop-threshold": 27000,
+          "scop-stars": 3,
+          "scop-threshold": 54000,
+          "star-value": 9000
+        },
+        "power-status": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "Adder",
+        "funds": 0,
+        "luck-policy": 0,
+        "power-meter": {
+          "can-use-cop": false,
+          "can-use-scop": false,
+          "charge": 0,
+          "cop-stars": 2,
+          "cop-threshold": 18000,
+          "scop-stars": 3,
+          "scop-threshold": 45000,
+          "star-value": 9000
+        },
+        "power-status": 0
+      }
+    ],
+    "settings": {
+      "bannedUnits": [
+        "blackbomb"
+      ],
+      "captureLimit": 21,
+      "coPowers": true,
+      "dayLimit": null,
+      "fog": false,
+      "heuristicAutoResign": false,
+      "incomePerProperty": 1000,
+      "mode": "standard",
+      "startingFunds": 0,
+      "tags": false,
+      "unitCap": 50,
+      "weather": "clear"
+    },
+    "terminalReason": null,
+    "turn-count": 1,
+    "unit-cap": 50,
+    "winner": -1
+  },
+  "metrics": {
+    "actionCount": 2,
+    "averageBranchingFactor": 9.5,
+    "averageLegalActionGenerationTimeMs": 0.09170833333333334,
+    "averageSearchTimeMs": 0.9279,
+    "invalidActionCount": 0,
+    "resignations": 0,
+    "sampleCount": 2,
+    "totalElapsedMs": 8.308,
+    "totalLegalActionGenerationCalls": 12,
+    "totalLegalActionGenerationTimeMs": 1.1005,
+    "totalSearchTimeMs": 1.8558,
+    "turnCount": 1
+  },
+  "source": {
+    "config": {
+      "baseSeed": 19,
+      "combatSeed": 19,
+      "device": "auto",
+      "mapId": "mcts",
+      "maxActions": 2,
+      "mctsMode": "rollout",
+      "mctsOptions": {
+        "explorationConstant": 1.4142135623730951,
+        "maxNodes": 16,
+        "maxRolloutActions": 4,
+        "maxSimulations": 1,
+        "temperature": 0.0
+      },
+      "mctsSeed": 1000022,
+      "policyValueCheckpoint": null
+    },
+    "createdAt": "2026-06-14T07:10:02Z",
+    "gameIndex": 0,
+    "kind": "self-play-replay",
+    "players": [
+      {
+        "armyType": "orange-star",
+        "co": "andy",
+        "slot": 0
+      },
+      {
+        "armyType": "blue-moon",
+        "co": "adder",
+        "slot": 1
+      }
+    ],
+    "replayFormatVersion": "standard-gl-self-play-replay-v1",
+    "selectedGameIndex": 0,
+    "settings": {
+      "bannedUnits": [
+        "blackbomb"
+      ],
+      "captureLimit": 21,
+      "coPowers": true,
+      "dayLimit": null,
+      "fog": false,
+      "heuristicAutoResign": false,
+      "incomePerProperty": 1000,
+      "mode": "standard",
+      "startingFunds": 0,
+      "tags": false,
+      "unitCap": 50,
+      "weather": "clear"
+    }
+  },
+  "steps": [
+    {
+      "action": {
+        "source": [
+          1,
+          1
+        ],
+        "target": [
+          1,
+          1
+        ],
+        "type": "move-wait"
+      },
+      "actionIndex": 82000,
+      "legalActionCount": 18,
+      "mcts": {
+        "legalActionGenerationCalls": 6,
+        "legalActionGenerationTimeMs": 0.542,
+        "mctsSeed": 1182185434,
+        "nodesCreated": 2,
+        "searchTimeMs": 0.9077,
+        "simulationsRun": 1
+      },
+      "outcome": 0,
+      "player": 0,
+      "ply": 0,
+      "resultingState": {
+        "activePlayer": 0,
+        "cap-limit": 21,
+        "combat-rng-seed": 19,
+        "game-over": false,
+        "gameId": "b7d7af08-18f3-44ec-9c7a-753916c643ff",
+        "map": [
+          [
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "orange-star"
+              },
+              "terrain": 42
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 2
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 1
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "orange-star"
+              },
+              "terrain": 39,
+              "unit": {
+                "ammo": 0,
+                "fuel": 99,
+                "health": 100,
+                "hidden": false,
+                "moved": true,
+                "owner": "orange-star",
+                "type": "infantry"
+              }
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 2
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "blue-moon"
+              },
+              "terrain": 44,
+              "unit": {
+                "ammo": 0,
+                "fuel": 99,
+                "health": 100,
+                "hidden": false,
+                "moved": false,
+                "owner": "blue-moon",
+                "type": "infantry"
+              }
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 2
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "neutral"
+              },
+              "terrain": 34
+            },
+            {
+              "terrain": 2
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "blue-moon"
+              },
+              "terrain": 47
+            }
+          ]
+        ],
+        "players": [
+          {
+            "armyType": "orange-star",
+            "co": "Andy",
+            "funds": 2000,
+            "luck-policy": 0,
+            "power-meter": {
+              "can-use-cop": false,
+              "can-use-scop": false,
+              "charge": 0,
+              "cop-stars": 3,
+              "cop-threshold": 27000,
+              "scop-stars": 3,
+              "scop-threshold": 54000,
+              "star-value": 9000
+            },
+            "power-status": 0
+          },
+          {
+            "armyType": "blue-moon",
+            "co": "Adder",
+            "funds": 0,
+            "luck-policy": 0,
+            "power-meter": {
+              "can-use-cop": false,
+              "can-use-scop": false,
+              "charge": 0,
+              "cop-stars": 2,
+              "cop-threshold": 18000,
+              "scop-stars": 3,
+              "scop-threshold": 45000,
+              "star-value": 9000
+            },
+            "power-status": 0
+          }
+        ],
+        "settings": {
+          "bannedUnits": [
+            "blackbomb"
+          ],
+          "captureLimit": 21,
+          "coPowers": true,
+          "dayLimit": null,
+          "fog": false,
+          "heuristicAutoResign": false,
+          "incomePerProperty": 1000,
+          "mode": "standard",
+          "startingFunds": 0,
+          "tags": false,
+          "unitCap": 50,
+          "weather": "clear"
+        },
+        "terminalReason": null,
+        "turn-count": 1,
+        "unit-cap": 50,
+        "winner": -1
+      },
+      "selectedActionIndex": 82000,
+      "stateTensorChecksum": "54aa8a4e68a894b4",
+      "visitCounts": [
+        {
+          "actionIndex": 82000,
+          "visits": 1
+        }
+      ]
+    },
+    {
+      "action": {
+        "type": "end-turn"
+      },
+      "actionIndex": 1554363,
+      "legalActionCount": 1,
+      "mcts": {
+        "legalActionGenerationCalls": 6,
+        "legalActionGenerationTimeMs": 0.5585,
+        "mctsSeed": 2834319191,
+        "nodesCreated": 2,
+        "searchTimeMs": 0.9481,
+        "simulationsRun": 1
+      },
+      "outcome": 0,
+      "player": 0,
+      "ply": 1,
+      "resultingState": {
+        "activePlayer": 1,
+        "cap-limit": 21,
+        "combat-rng-seed": 19,
+        "game-over": false,
+        "gameId": "b7d7af08-18f3-44ec-9c7a-753916c643ff",
+        "map": [
+          [
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "orange-star"
+              },
+              "terrain": 42
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 2
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 1
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "orange-star"
+              },
+              "terrain": 39,
+              "unit": {
+                "ammo": 0,
+                "fuel": 99,
+                "health": 100,
+                "hidden": false,
+                "moved": true,
+                "owner": "orange-star",
+                "type": "infantry"
+              }
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 2
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "terrain": 3
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "blue-moon"
+              },
+              "terrain": 44,
+              "unit": {
+                "ammo": 0,
+                "fuel": 99,
+                "health": 100,
+                "hidden": false,
+                "moved": false,
+                "owner": "blue-moon",
+                "type": "infantry"
+              }
+            },
+            {
+              "terrain": 1
+            }
+          ],
+          [
+            {
+              "terrain": 2
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "neutral"
+              },
+              "terrain": 34
+            },
+            {
+              "terrain": 2
+            },
+            {
+              "terrain": 1
+            },
+            {
+              "property": {
+                "capture-points": 20,
+                "owner": "blue-moon"
+              },
+              "terrain": 47
+            }
+          ]
+        ],
+        "players": [
+          {
+            "armyType": "orange-star",
+            "co": "Andy",
+            "funds": 2000,
+            "luck-policy": 0,
+            "power-meter": {
+              "can-use-cop": false,
+              "can-use-scop": false,
+              "charge": 0,
+              "cop-stars": 3,
+              "cop-threshold": 27000,
+              "scop-stars": 3,
+              "scop-threshold": 54000,
+              "star-value": 9000
+            },
+            "power-status": 0
+          },
+          {
+            "armyType": "blue-moon",
+            "co": "Adder",
+            "funds": 2000,
+            "luck-policy": 0,
+            "power-meter": {
+              "can-use-cop": false,
+              "can-use-scop": false,
+              "charge": 0,
+              "cop-stars": 2,
+              "cop-threshold": 18000,
+              "scop-stars": 3,
+              "scop-threshold": 45000,
+              "star-value": 9000
+            },
+            "power-status": 0
+          }
+        ],
+        "settings": {
+          "bannedUnits": [
+            "blackbomb"
+          ],
+          "captureLimit": 21,
+          "coPowers": true,
+          "dayLimit": null,
+          "fog": false,
+          "heuristicAutoResign": false,
+          "incomePerProperty": 1000,
+          "mode": "standard",
+          "startingFunds": 0,
+          "tags": false,
+          "unitCap": 50,
+          "weather": "clear"
+        },
+        "terminalReason": null,
+        "turn-count": 1,
+        "unit-cap": 50,
+        "winner": -1
+      },
+      "selectedActionIndex": 1554363,
+      "stateTensorChecksum": "4398e4e6fd9029d9",
+      "visitCounts": [
+        {
+          "actionIndex": 1554363,
+          "visits": 1
+        }
+      ]
+    }
+  ],
+  "terminalReason": "action-limit",
+  "traceFormatVersion": "standard-gl-visualizer-trace-v1",
+  "winner": null
+}

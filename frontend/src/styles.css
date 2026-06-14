@@ -173,6 +173,23 @@ input {
   gap: 6px;
 }
 
+.trace-controls {
+  width: min(620px, 100%);
+  margin: 10px auto 0;
+  display: grid;
+  grid-template-columns: minmax(62px, max-content) minmax(160px, 1fr) minmax(62px, max-content) minmax(54px, max-content);
+  gap: 6px;
+  align-items: center;
+  padding: 6px;
+  border: 1px solid #9da9b5;
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.trace-controls input[type="range"] {
+  width: 100%;
+}
+
 .player-panel {
   border: 1px solid #434d58;
   background: #fafbfd;
@@ -248,6 +265,35 @@ dd {
   gap: 4px;
   max-height: 180px;
   overflow: auto;
+}
+
+.trace-log {
+  display: grid;
+  gap: 3px;
+  max-height: 170px;
+  overflow: auto;
+  margin-top: 6px;
+}
+
+.trace-log-row {
+  display: grid;
+  grid-template-columns: 34px 34px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+}
+
+.trace-log-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.active-trace-row {
+  border-color: #0673d8;
+  background: #ddecff;
 }
 
 .buy-menu {

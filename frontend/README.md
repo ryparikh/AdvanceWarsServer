@@ -24,9 +24,21 @@ yarn dev
 
 Open <http://127.0.0.1:5173/>. The Vite dev server is bound to `127.0.0.1` by default for local-only access.
 
-The app opens on a board viewer, not a landing page. It can load the bundled Lefty board sample, a small legal-action sample, pasted JSON, a local `.json`/`.jsonl` file, or a state created by the current C++ server.
+The app opens on a board viewer, not a landing page. It can load the bundled Lefty board sample, a small legal-action sample, a tiny self-play trace sample, pasted JSON, a local `.json`/`.jsonl` file, or a state created by the current C++ server.
 
-Use **Open file** to inspect a local serialized `GameState`, a JSON fixture with `initial-game-state`, map templates such as `AdvanceWarsServer/res/AWBW/MapSources/TinyCapture5x5.json`, or the initial state from a self-play replay `.jsonl` shard.
+Use **Open file** to inspect a local serialized `GameState`, a JSON fixture with `initial-game-state`, map templates such as `AdvanceWarsServer/res/AWBW/MapSources/TinyCapture5x5.json`, the initial state from a self-play replay `.jsonl` shard, or a materialized `standard-gl-visualizer-trace-v1` trace.
+
+To scrub through a self-play game without rerunning training, export an engine-materialized trace from a replay shard:
+
+```powershell
+Set-Location .\AdvanceWarsServer
+..\x64\Debug\AdvanceWarsServer.exe -export-replay-trace `
+  ..\artifacts\replays\smoke.jsonl `
+  ..\artifacts\replays\smoke-trace.json `
+  --game-index 0
+```
+
+Then open the generated `.json` file in the viewer. The browser displays state snapshots written by the engine; it does not replay game rules.
 
 ## Server Source
 

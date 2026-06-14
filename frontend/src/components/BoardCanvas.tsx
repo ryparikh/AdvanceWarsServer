@@ -12,6 +12,7 @@ type BoardCanvasProps = {
   showCoordinates: boolean;
   showGrid: boolean;
   showTerrainIds: boolean;
+  changedTiles?: Coordinate[];
   onSelectTile: (coordinate: Coordinate) => void;
 };
 
@@ -47,6 +48,7 @@ export function BoardCanvas({
   showCoordinates,
   showGrid,
   showTerrainIds,
+  changedTiles,
   onSelectTile
 }: BoardCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -117,11 +119,12 @@ export function BoardCanvas({
       hover,
       movementTrail,
       highlights,
+      changedTiles,
       showCoordinates,
       showGrid,
       showTerrainIds
     });
-  }, [cssHeight, cssWidth, gameState, highlights, hover, images, movementTrail, selected, showCoordinates, showGrid, showTerrainIds, zoom]);
+  }, [changedTiles, cssHeight, cssWidth, gameState, highlights, hover, images, movementTrail, selected, showCoordinates, showGrid, showTerrainIds, zoom]);
 
   function eventToCoordinate(event: React.MouseEvent<HTMLCanvasElement>): Coordinate | undefined {
     const rect = event.currentTarget.getBoundingClientRect();

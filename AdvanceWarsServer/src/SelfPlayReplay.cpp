@@ -4,6 +4,7 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <set>
 #include <sstream>
 #include <vector>
@@ -623,6 +624,96 @@ Result ValidateGameRecord(const json& game, SelfPlayReplayValidationSummary& sum
 	return Result::Succeeded;
 }
 
+json TraceSourceFromReplay(const json& header, const json& game, int selectedGameIndex) {
+	json source = {
+		{ "kind", "self-play-replay" },
+		{ "replayFormatVersion", game.at("replayFormatVersion") },
+		{ "gameIndex", game.at("gameIndex") },
+		{ "selectedGameIndex", selectedGameIndex },
+		{ "config", game.at("config") },
+		{ "players", game.at("players") },
+		{ "settings", game.at("settings") },
+	};
+
+	if (header.contains("createdAt")) {
+		source["createdAt"] = header.at("createdAt");
+	}
+	return source;
+}
+
+Result MaterializeReplayTrace(const json& header, const json& game, int selectedGameIndex, int line, json& trace, SelfPlayError& error) {
+	SelfPlayReplayValidationSummary validationSummary;
+	IfFailedReturn(ValidateGameRecord(game, validationSummary, error, line));
+
+	GameState replayState;
+	json initialState = game.at("initialState");
+	try {
+		GameState::from_json(initialState, replayState);
+	}
+	catch (const std::exception& err) {
+		SetError(error, "initial-state-invalid", err.what(), line, game.at("gameIndex").get<int>());
+		return Result::Failed;
+	}
+
+	json steps = json::array();
+	for (std::size_t i = 0; i < game.at("actions").size(); ++i) {
+		const int ply = static_cast<int>(i);
+		const json& actionEntry = game.at("actions").at(i);
+		const json& sample = game.at("samples").at(i);
+
+		Action action;
+		json actionJson = actionEntry.at("action");
+		try {
+			from_json(actionJson, action);
+		}
+		catch (const std::exception& err) {
+			SetError(error, "action-invalid", err.what(), line, game.at("gameIndex").get<int>(), ply);
+			return Result::Failed;
+		}
+
+		if (replayState.DoAction(action) == Result::Failed) {
+			SetError(error, "action-apply-failed", "recorded action failed during trace materialization", line, game.at("gameIndex").get<int>(), ply);
+			return Result::Failed;
+		}
+		if (replayState.FHeuristicAutoResign()) {
+			replayState.CheckPlayerResigns();
+		}
+
+		json step = {
+			{ "ply", actionEntry.at("ply") },
+			{ "player", actionEntry.at("player") },
+			{ "actionIndex", actionEntry.at("actionIndex") },
+			{ "action", actionEntry.at("action") },
+			{ "legalActionCount", sample.at("legalActionCount") },
+			{ "selectedActionIndex", sample.at("selectedActionIndex") },
+			{ "stateTensorChecksum", sample.at("stateTensorChecksum") },
+			{ "resultingState", SerializeGameStateForReplay(replayState) },
+		};
+		if (sample.contains("visitCounts")) {
+			step["visitCounts"] = sample.at("visitCounts");
+		}
+		if (sample.contains("mcts")) {
+			step["mcts"] = sample.at("mcts");
+		}
+		if (sample.contains("outcome")) {
+			step["outcome"] = sample.at("outcome");
+		}
+		steps.push_back(std::move(step));
+	}
+
+	trace = {
+		{ "traceFormatVersion", SelfPlayReplayTraceFormatVersion() },
+		{ "source", TraceSourceFromReplay(header, game, selectedGameIndex) },
+		{ "initialState", game.at("initialState") },
+		{ "steps", std::move(steps) },
+		{ "finalState", game.at("finalState") },
+		{ "terminalReason", game.at("terminalReason") },
+		{ "winner", game.at("winner") },
+		{ "metrics", game.at("metrics") },
+	};
+	return Result::Succeeded;
+}
+
 Result ValidateReplayStream(std::istream& input, const json* expectedHeader, SelfPlayReplayValidationSummary& summary, SelfPlayError& error) {
 	summary = SelfPlayReplayValidationSummary{};
 	std::string line;
@@ -665,10 +756,93 @@ Result ValidateReplayStream(std::istream& input, const json* expectedHeader, Sel
 
 	return Result::Succeeded;
 }
+
+Result ExportTraceFromReplayStream(std::istream& input, int selectedGameIndex, json& trace, SelfPlayError& error) {
+	if (selectedGameIndex < 0) {
+		SetError(error, "invalid-game-index", "game index must be at least 0");
+		return Result::Failed;
+	}
+
+	std::string line;
+	int lineNumber = 0;
+	int gameOrdinal = 0;
+	bool sawHeader = false;
+	json header;
+	while (std::getline(input, line)) {
+		++lineNumber;
+		if (line.empty()) {
+			SetError(error, "schema-error", "JSONL records must not be blank", lineNumber);
+			return Result::Failed;
+		}
+
+		json record;
+		try {
+			record = json::parse(line);
+		}
+		catch (const std::exception& err) {
+			SetError(error, "malformed-json", err.what(), lineNumber);
+			return Result::Failed;
+		}
+
+		if (!sawHeader) {
+			IfFailedReturn(ValidateHeader(record, nullptr, error, lineNumber));
+			header = record;
+			sawHeader = true;
+			continue;
+		}
+
+		if (gameOrdinal == selectedGameIndex) {
+			return MaterializeReplayTrace(header, record, selectedGameIndex, lineNumber, trace, error);
+		}
+		++gameOrdinal;
+	}
+
+	if (!sawHeader) {
+		SetError(error, "empty-replay", "replay file does not contain a header");
+		return Result::Failed;
+	}
+	if (gameOrdinal == 0) {
+		SetError(error, "empty-replay", "replay file does not contain any games");
+		return Result::Failed;
+	}
+
+	SetError(error, "game-index-not-found", "replay file does not contain requested game index");
+	return Result::Failed;
+}
+
+bool ParseNonnegativeInt(const std::string& text, int& value) {
+	try {
+		size_t processed = 0;
+		value = std::stoi(text, &processed);
+		return processed == text.size() && value >= 0;
+	}
+	catch (const std::exception&) {
+		return false;
+	}
+}
+
+int PrintReplayError(const SelfPlayError& error) {
+	std::cerr << error.code << ": " << error.message;
+	if (error.line > 0) {
+		std::cerr << " (line " << error.line << ")";
+	}
+	if (error.gameIndex >= 0) {
+		std::cerr << " (game " << error.gameIndex << ")";
+	}
+	if (error.ply >= 0) {
+		std::cerr << " (ply " << error.ply << ")";
+	}
+	std::cerr << std::endl;
+	return 1;
+}
 }
 
 const char* SelfPlayReplayFormatVersion() noexcept {
 	return "standard-gl-self-play-replay-v1";
+}
+
+const char* SelfPlayReplayTraceFormatVersion() noexcept {
+	return "standard-gl-visualizer-trace-v1";
 }
 
 json SelfPlayVersionsJson() {
@@ -701,4 +875,79 @@ Result ValidateSelfPlayReplayForAppend(const std::filesystem::path& path, const 
 	}
 
 	return ValidateReplayStream(input, &expectedHeader, summary, error);
+}
+
+Result ExportSelfPlayReplayTrace(const std::filesystem::path& replayPath, int gameIndex, json& trace, SelfPlayError& error) {
+	std::ifstream input(replayPath);
+	if (!input.is_open()) {
+		SetError(error, "open-failed", "could not open replay file: " + replayPath.string());
+		return Result::Failed;
+	}
+
+	return ExportTraceFromReplayStream(input, gameIndex, trace, error);
+}
+
+Result ExportSelfPlayReplayTraceFile(const std::filesystem::path& replayPath, const std::filesystem::path& outputPath, int gameIndex, SelfPlayError& error) {
+	json trace;
+	IfFailedReturn(ExportSelfPlayReplayTrace(replayPath, gameIndex, trace, error));
+
+	const std::filesystem::path parent = outputPath.parent_path();
+	if (!parent.empty()) {
+		std::error_code ec;
+		std::filesystem::create_directories(parent, ec);
+		if (ec) {
+			SetError(error, "mkdir-failed", "could not create output directory: " + parent.string());
+			return Result::Failed;
+		}
+	}
+
+	std::ofstream output(outputPath, std::ios::trunc);
+	if (!output.is_open()) {
+		SetError(error, "open-failed", "could not open trace output file: " + outputPath.string());
+		return Result::Failed;
+	}
+
+	output << trace.dump(2) << "\n";
+	return Result::Succeeded;
+}
+
+int RunExportReplayTraceCommand(int argc, char* argv[]) noexcept {
+	if (argc < 2) {
+		std::cerr << "usage: -export-replay-trace <replay.jsonl> <trace.json> [--game-index <n>]" << std::endl;
+		return 1;
+	}
+
+	std::filesystem::path replayPath = argv[0];
+	std::filesystem::path outputPath = argv[1];
+	int gameIndex = 0;
+	for (int i = 2; i < argc; ++i) {
+		const std::string arg = argv[i];
+		if (arg == "--game-index" && i + 1 < argc) {
+			if (!ParseNonnegativeInt(argv[++i], gameIndex)) {
+				std::cerr << "invalid --game-index value" << std::endl;
+				return 1;
+			}
+		}
+		else {
+			std::cerr << "invalid export-replay-trace argument: " << arg << std::endl;
+			return 1;
+		}
+	}
+
+	SelfPlayError error;
+	if (ExportSelfPlayReplayTraceFile(replayPath, outputPath, gameIndex, error) == Result::Failed) {
+		return PrintReplayError(error);
+	}
+
+	json trace;
+	if (ExportSelfPlayReplayTrace(replayPath, gameIndex, trace, error) == Result::Succeeded) {
+		std::cout << "Replay trace exported: gameIndex=" << gameIndex <<
+			" steps=" << trace.at("steps").size() <<
+			" out=" << outputPath.string() << std::endl;
+	}
+	else {
+		std::cout << "Replay trace exported: gameIndex=" << gameIndex <<
+			" out=" << outputPath.string() << std::endl;
+	}
+	return 0;
 }

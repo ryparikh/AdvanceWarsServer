@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) noexcept {
 			std::cerr << "  -sim-mcts-game        : Simulate an MCTS game.\n";
 			std::cerr << "  -self-play [options]  : Generate validated self-play replay JSONL.\n";
 			std::cerr << "  -validate-replay <path> : Validate a self-play replay JSONL file.\n";
+			std::cerr << "  -export-replay-trace <replay.jsonl> <trace.json> [--game-index <n>] : Export a materialized visualizer trace.\n";
 			std::cerr << "  -test-mcts            : Run focused MCTS tests.\n";
 			std::cerr << "  -test-model           : Run focused policy/value model tests.\n";
 			std::cerr << "  -test-evaluate        : Run focused checkpoint evaluation tests.\n";
@@ -239,6 +240,9 @@ int main(int argc, char* argv[]) noexcept {
 		}
 		else if (argument == "-validate-replay") {
 			return RunValidateReplayCommand(argc - 2, argv + 2);
+		}
+		else if (argument == "-export-replay-trace") {
+			return RunExportReplayTraceCommand(argc - 2, argv + 2);
 		}
 		else if (argument == "-train") {
 			return RunTrainingCommand(argc - 2, argv + 2);

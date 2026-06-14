@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { BoardCanvas } from "./components/BoardCanvas";
 import { actionHighlightsForSource } from "./rendering/actions";
 import { actionToSubmitFromBoardTarget, actionsVisibleInInspector, buyMenuItems, globalActionsFromLegalActions, labelForAction } from "./gameState/actionDisplay";
 import { coordinateKey, parseGameStatePayload, type Action, legalActionEnvelopeSchema, type Coordinate, type GameState, type ValidActionGroup } from "./gameState/schema";
+import { parseGameStateFileText } from "./gameState/filePayload";
 import { normalizeServerBaseUrl, serverApiUrl } from "./api/url";
 import { terrainDisplayName } from "./rendering/terrain";
 import { unitAssetPath, unitFallbackLabel } from "./rendering/unitAssets";
@@ -12,7 +13,7 @@ const defaultServerBaseUrl = "http://localhost:80";
 const storageKey = "advance-wars-server-base-url";
 const maxPastedJsonCharacters = 2_000_000;
 
-type LoadSource = "sample" | "server" | "pasted";
+type LoadSource = "sample" | "server" | "pasted" | "file";
 
 type LoadedState = {
   gameState: GameState;
@@ -101,6 +102,7 @@ export default function App() {
   const [zoom, setZoom] = useState(2.4);
   const [inspectedCoordinate, setInspectedCoordinate] = useState<Coordinate | undefined>();
   const [inspectedActions, setInspectedActions] = useState<Action[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const loadRequestId = useRef(0);
   const actionRequestId = useRef(0);
   const [toggles, setToggles] = useState<Toggles>({
@@ -213,6 +215,41 @@ export default function App() {
       setInspectedActions([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to parse pasted JSON");
+    }
+  }
+
+  async function loadLocalFile(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const requestId = loadRequestId.current + 1;
+    loadRequestId.current = requestId;
+    setIsLoading(true);
+    setError(undefined);
+    try {
+      const parsed = parseGameStateFileText(await file.text(), file.name);
+      if (loadRequestId.current !== requestId) {
+        return;
+      }
+
+      actionRequestId.current += 1;
+      setLoaded({ ...parsed, globalActions: [], source: "file", label: file.name });
+      setSelected(undefined);
+      setInspectedCoordinate(undefined);
+      setSelectedActions([]);
+      setInspectedActions([]);
+    } catch (err) {
+      if (loadRequestId.current === requestId) {
+        setError(err instanceof Error ? err.message : "Unable to load selected file");
+      }
+    } finally {
+      input.value = "";
+      if (loadRequestId.current === requestId) {
+        setIsLoading(false);
+      }
     }
   }
 
@@ -358,6 +395,18 @@ export default function App() {
         <button type="button" onClick={() => loadPayload("/samples/grit-indirect-range-valid-actions.json", "Grit action sample")}>
           Action sample
         </button>
+        <button type="button" onClick={() => fileInputRef.current?.click()}>
+          Open file
+        </button>
+        <input
+          ref={fileInputRef}
+          className="file-input"
+          type="file"
+          accept=".json,.jsonl,application/json,application/x-ndjson"
+          tabIndex={-1}
+          aria-hidden="true"
+          onChange={loadLocalFile}
+        />
         <button type="button" onClick={createServerGame}>
           Server game
         </button>

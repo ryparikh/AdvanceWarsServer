@@ -54,7 +54,7 @@ Resolved default settings:
 }
 ```
 
-Supported v1 map ids are `lefty` and `mcts`.
+Supported v1 map ids are `tiny-capture-5x5`, `tiny-skirmish-5x5`, `small-capture-7x7`, `small-production-7x7`, `mcts`, and `lefty`.
 
 ## Responses
 

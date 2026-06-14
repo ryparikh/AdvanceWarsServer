@@ -92,6 +92,15 @@ input {
   font-weight: 700;
 }
 
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .server-url input {
   width: min(280px, 50vw);
 }

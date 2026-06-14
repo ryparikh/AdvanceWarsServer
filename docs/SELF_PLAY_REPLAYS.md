@@ -54,9 +54,20 @@ Required:
 | Option | Meaning |
 | --- | --- |
 | `--out <path>` | Output JSONL shard. Missing parent directories are created. |
-| `--map <id>` | Supported Standard map id, currently `lefty` or `mcts`. |
+| `--map <id>` | Supported Standard map id. |
 | `--player0-co <id>` | Player 0 CO id in API style, such as `andy` or `von-bolt`. |
 | `--player1-co <id>` | Player 1 CO id in API style. |
+
+Supported map ids:
+
+| Map id | Size | Training intent |
+| --- | ---: | --- |
+| `tiny-capture-5x5` | 5x5 | Stage 1 infantry capture and HQ race. |
+| `tiny-skirmish-5x5` | 5x5 | Stage 1 direct combat, rout pressure, and HQ threats. |
+| `small-capture-7x7` | 7x7 | Stage 1/2 capture expansion with more neutral properties. |
+| `small-production-7x7` | 7x7 | Stage 2 base production plus nearby capture choices. |
+| `mcts` | 5x5 | Legacy deterministic MCTS smoke map. |
+| `lefty` | full | Full Standard GL target map. |
 
 Common optional settings:
 
